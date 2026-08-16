@@ -229,6 +229,18 @@ describe("editor", () => {
         expect(output.stdout).toBe("alpha\n1\n");
     });
 
+    test("stops interactive global execution after quit", async () => {
+        const output = new memory_output();
+        const instance = new editor(
+            new memory_input(["a", "one", "two", ".", "V/match/", "Q"]),
+            output,
+            { input_kind: "regular", prompt: undefined, silent: true },
+        );
+
+        expect(await instance.run(undefined)).toBe(0);
+        expect(output.stdout).toBe("one\n");
+    });
+
     test("writes an empty buffer as a complete save", async () => {
         const directory = await mkdtemp(join(tmpdir(), "tsed-editor-"));
         const pathname = join(directory, "empty-after-write");

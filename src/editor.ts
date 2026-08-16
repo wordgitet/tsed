@@ -745,12 +745,18 @@ export class editor {
                         } catch {
                             break;
                         }
+                        if (this.quit_requested) {
+                            return;
+                        }
                     } else if (command_line.length !== 0) {
                         previous_command = command_line;
                         try {
                             await this.execute_line(command_line, false);
                         } catch {
                             break;
+                        }
+                        if (this.quit_requested) {
+                            return;
                         }
                     }
                 } else {
