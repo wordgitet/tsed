@@ -1,4 +1,7 @@
-Inside ed in TypeScript
+========================================================================
+                       ed in TypeScript
+                         A guided tour
+========================================================================
 
 Copyright (c) 2026 wordgitet
 SPDX-License-Identifier: 0BSD
@@ -12,7 +15,9 @@ written in TypeScript for Bun.
 The project targets POSIX platforms and is a research toy.  This tour presents
 the implementation that exists.  It does not claim complete POSIX conformance.
 
-Before you start
+------------------------------------------------------------------------
+BEFORE YOU START
+------------------------------------------------------------------------
 
 Install Bun and build the editor from the repository root:
 
@@ -26,8 +31,9 @@ The examples in this tour are real.  Each TRANSCRIPT contains a SCRIPT followed
 by its exact OUTPUT.  After building, bun test and bun run test:tour execute
 those scripts against dist/ed.
 
-
-How the editor is put together
+------------------------------------------------------------------------
+HOW THE EDITOR IS PUT TOGETHER
+------------------------------------------------------------------------
 
 Input passes through a small set of explicit boundaries:
 
@@ -114,7 +120,9 @@ source line length.  Unit tests exercise the parser, buffer, BRE engine, and
 editor.  This TOUR supplies the process-level documentation tests.
 
 
-How addresses work
+------------------------------------------------------------------------
+HOW ADDRESSES WORK
+------------------------------------------------------------------------
 
 An address identifies a line:
 
@@ -165,7 +173,9 @@ ka attaches mark a to line 2.  Searches wrap around the buffer.  Numbered
 printing uses a tab between the address and text.
 
 
-Changing text
+------------------------------------------------------------------------
+CHANGING TEXT
+------------------------------------------------------------------------
 
 These commands perform the basic mutations:
 
@@ -225,7 +235,9 @@ line to the end.  1m$ moves the first line there.  u restores the state
 immediately before the move.
 
 
-Matching and substitution
+------------------------------------------------------------------------
+MATCHING AND SUBSTITUTION
+------------------------------------------------------------------------
 
 The command s/BRE/replacement/flags substitutes in the addressed range.  An
 empty BRE reuses the previous one.
@@ -266,7 +278,9 @@ uses two captures across lines 1 and 2.  Its p flag prints the final changed
 line, and the last command shows the complete result.
 
 
-Running commands globally
+------------------------------------------------------------------------
+RUNNING COMMANDS GLOBALLY
+------------------------------------------------------------------------
 
 g/BRE/commands executes commands for matching lines.  v selects non-matching
 lines.  If the command list is omitted, both default to p.
@@ -302,7 +316,9 @@ END OUTPUT
 END TRANSCRIPT
 
 
-Printing lines
+------------------------------------------------------------------------
+PRINTING LINES
+------------------------------------------------------------------------
 
 Four commands expose the buffer:
 
@@ -338,7 +354,9 @@ dollar, emits other non-printing bytes as three-digit octal, and folds after
 70 rendered characters.
 
 
-Reading and writing files
+------------------------------------------------------------------------
+READING AND WRITING FILES
+------------------------------------------------------------------------
 
 The file commands are:
 
@@ -390,7 +408,9 @@ The example starts with base, reads extra, changes the remembered pathname to
 result, and writes the complete buffer.
 
 
-Talking to the shell
+------------------------------------------------------------------------
+TALKING TO THE SHELL
+------------------------------------------------------------------------
 
 There are three shell boundaries:
 
@@ -421,7 +441,9 @@ END OUTPUT
 END TRANSCRIPT
 
 
-Prompts, errors, and quitting
+------------------------------------------------------------------------
+PROMPTS, ERRORS, AND QUITTING
+------------------------------------------------------------------------
 
 -p prompt enables a prompt.  P toggles it.  -s suppresses byte counts and
 shell-completion markers, not ordinary command output.
@@ -482,7 +504,9 @@ non-recoverable error ends input classified as a regular file.  Terminal and
 other streaming input can continue accepting commands.
 
 
-All commands at a glance
+------------------------------------------------------------------------
+ALL COMMANDS AT A GLANCE
+------------------------------------------------------------------------
 
     a           append input
     c           change a range
@@ -510,7 +534,9 @@ All commands at a glance
     !           run a shell command
 
 
-Current limitations
+------------------------------------------------------------------------
+CURRENT LIMITATIONS
+------------------------------------------------------------------------
 
 The target is POSIX platforms with Bun.  There is no Windows support layer.
 
