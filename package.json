@@ -1,0 +1,22 @@
+{
+  "name": "tsed",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "tsed": "src/main.ts",
+    "ed": "src/main.ts"
+  },
+  "scripts": {
+    "test": "bun test",
+    "test:tour": "bun test test/tour.test.ts",
+    "typecheck": "tsc --noEmit",
+    "check:style": "bun src/style_check.ts",
+    "check": "bun run typecheck && bun run build && bun test && bun run check:style",
+    "build": "bun src/build.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "latest"
+  }
+}

@@ -1,0 +1,60 @@
+ed in TypeScript
+
+Copyright (c) 2026 wordgitet
+SPDX-License-Identifier: 0BSD
+
+tsed is a real implementation of the classic ed line editor in TypeScript,
+running on Bun.  That sentence is also the joke.
+
+This is a research toy, not a claim of complete POSIX conformance.  It targets
+POSIX platforms only.  Windows is not supported.
+
+Building and running
+
+Install Bun and build the editor from the repository root:
+
+    bun install
+    bun run build
+
+The build creates two command names:
+
+    ./dist/ed
+    ./dist/tsed
+
+Both accept the following arguments:
+
+    ./dist/ed [-s] [-p prompt] [--] [pathname]
+
+The minimum usable Bun version is not known.  Development currently uses Bun
+1.3.14, so trying an older version is at your own risk.
+
+A tiny session
+
+Run the editor:
+
+    $ ./dist/ed -s
+
+Then enter:
+
+    a
+    hello, world
+    .
+    s/world/POSIX/
+    p
+    Q
+
+The editor prints:
+
+    hello, POSIX
+
+The a command appends input until a line containing only a dot.  The s command
+substitutes text, p prints the current line, and Q quits without a
+modified-buffer warning.
+
+Where to go next
+
+TOUR is the complete guided presentation of the editor.  It explains the
+architecture, command language, limitations, and runnable examples.
+
+CONTRIBUTING.md explains development, validation, style, and the AI disclosure
+policy.

@@ -1,0 +1,535 @@
+Inside ed in TypeScript
+
+Copyright (c) 2026 wordgitet
+SPDX-License-Identifier: 0BSD
+
+This is the long version of the joke.
+
+tsed accepts the command language of the classic ed line editor, but its
+buffer, parser, regular-expression engine, I/O adapters, and executable are
+written in TypeScript for Bun.
+
+The project targets POSIX platforms and is a research toy.  This tour presents
+the implementation that exists.  It does not claim complete POSIX conformance.
+
+Before you start
+
+Install Bun and build the editor from the repository root:
+
+    bun install
+    bun run build
+
+The build creates dist/tsed and the dist/ed symlink.  The minimum usable Bun
+version is not known.  Development currently uses Bun 1.3.14.
+
+The examples in this tour are real.  Each TRANSCRIPT contains a SCRIPT followed
+by its exact OUTPUT.  After building, bun test and bun run test:tour execute
+those scripts against dist/ed.
+
+
+How the editor is put together
+
+Input passes through a small set of explicit boundaries:
+
+    argv and signals
+           |
+           v
+    stdin bytes -> line reader -> parser -> editor
+                                           |   |
+                                           |   +-> BRE matcher
+                                           v
+                                      line buffer
+                                           |
+                                           v
+                              stdout, files, and POSIX sh
+
+The process boundary lives in src/main.ts.
+
+It parses -s, -p prompt, --, and one optional pathname.  It classifies standard
+input as a terminal, regular file, or another stream, constructs the editor,
+installs signal handlers, and turns the editor result into process exit status.
+
+SIGINT interrupts a pending editor operation.  SIGQUIT is ignored.  SIGHUP asks
+the editor to preserve a modified buffer in ed.hup, first in the current
+directory and then under HOME.
+
+Byte I/O lives in src/io.ts.
+
+stdin_line_reader turns Bun's asynchronous standard-input stream into
+newline-delimited byte arrays.  It keeps partial reads and can wake a pending
+read when an interrupt arrives.
+
+The same module reads and writes files, converts between complete files and
+editor lines, and runs commands through POSIX sh -c.  File data remains byte
+oriented at this boundary.
+
+Command parsing lives in src/parser.ts.
+
+The parser separates an input line into zero, one, or two address
+specifications, a one-character command, and the remaining argument.
+
+Address expressions stay structured until the editor resolves them against the
+current buffer.  This matters for semicolon ranges: resolving the first address
+changes the current line before the second address is resolved.
+
+The command machine lives in src/editor.ts.
+
+The editor owns the command loop and the state outside the text buffer:
+pathname, previous regular expression, previous replacement, previous shell
+command, prompt mode, help mode, undo state, and modified-buffer warnings.
+
+It resolves default ranges, validates addresses, dispatches commands, reports
+errors, and decides whether an error ends a regular-file command script.
+Buffer mutations use snapshots.  A failed mutation is rolled back, while a
+successful one becomes undoable.
+
+Stable lines live in src/buffer.ts.
+
+line_buffer stores the complete file in memory.  Each line has a stable numeric
+identity, while its visible address is its current array position.  Marks refer
+to identities, so moving or inserting neighboring lines does not silently
+retarget a mark.
+
+The buffer owns insertion, deletion, replacement, joining, moving, copying,
+marks, current-line updates, modified state, and snapshots.  Undo swaps the
+current snapshot with the previous one, so repeated u commands toggle between
+two states.
+
+Basic regular expressions live in src/bre.ts.
+
+The local BRE engine parses patterns into a small tree and matches them against
+the editor's byte-preserving string representation.  It supports literals,
+dot, anchors, bracket expressions, ASCII POSIX character classes, star,
+intervals, captured groups, back-references, and replacement expansion.
+
+Substitution can replace one match, every match, or a numbered match.
+Ampersand inserts the complete match.  Backslash followed by 1 through 9
+inserts a captured group.
+
+Shared contracts live in src/types.ts.  That file contains addresses,
+snapshots, input and output adapters, and ed_error.
+
+src/build.ts compiles the executable.  src/style_check.ts checks whitespace and
+source line length.  Unit tests exercise the parser, buffer, BRE engine, and
+editor.  This TOUR supplies the process-level documentation tests.
+
+
+How addresses work
+
+An address identifies a line:
+
+    .           current line
+    $           last line
+    number      absolute line number
+    'x          line carrying mark x
+    /BRE/       next matching line, wrapping forward
+    ?BRE?       previous matching line, wrapping backward
+    + or -n     offset from an address or the current line
+
+Two addresses form a range.  A comma leaves the current line alone while
+resolving the second address.  A semicolon makes the first address current
+first.  A leading comma means 1,$.  A leading semicolon means .;$.
+
+An address with no command prints that line.  A completely empty input line is
+currently a no-op.
+
+TRANSCRIPT addresses, searches, marks, and ranges
+BEGIN SCRIPT
+./dist/ed -s <<'ED'
+a
+alpha
+beta
+gamma
+delta
+.
+2ka
+'a=
+/gamma/p
+?alpha?p
+.,$n
+Q
+ED
+END SCRIPT
+BEGIN OUTPUT
+2
+gamma
+alpha
+1	alpha
+2	beta
+3	gamma
+4	delta
+END OUTPUT
+END TRANSCRIPT
+
+ka attaches mark a to line 2.  Searches wrap around the buffer.  Numbered
+printing uses a tab between the address and text.
+
+
+Changing text
+
+These commands perform the basic mutations:
+
+    a           append input after the addressed line
+    i           insert input before the addressed line
+    c           replace the addressed range with input
+    d           delete the addressed range
+    j           join addressed lines without a separator
+    m address   move the range after the destination
+    t address   copy the range after the destination
+    u           swap with the previous undo snapshot
+
+The a, i, and c commands read lines until a line containing only a dot.  The
+terminating dot is not inserted.
+
+TRANSCRIPT editing, copying, moving, and undo
+BEGIN SCRIPT
+./dist/ed -s <<'ED'
+a
+one
+two
+three
+.
+2i
+one-and-half
+.
+1c
+ONE
+.
+3d
+1,$p
+2t$
+1m$
+1,$p
+u
+1,$p
+Q
+ED
+END SCRIPT
+BEGIN OUTPUT
+ONE
+one-and-half
+three
+one-and-half
+three
+one-and-half
+ONE
+ONE
+one-and-half
+three
+one-and-half
+END OUTPUT
+END TRANSCRIPT
+
+The first print shows the insert, change, and deletion.  2t$ copies the second
+line to the end.  1m$ moves the first line there.  u restores the state
+immediately before the move.
+
+
+Matching and substitution
+
+The command s/BRE/replacement/flags substitutes in the addressed range.  An
+empty BRE reuses the previous one.
+
+The implemented flags and expansions include:
+
+    g           replace every match
+    number      replace one numbered occurrence
+    p, n, l     print the last changed line in that format
+    &           insert the complete match
+    \1 ... \9   insert a captured group
+
+TRANSCRIPT BRE matching and substitution
+BEGIN SCRIPT
+./dist/ed -s <<'ED'
+a
+item 12
+item 345
+note
+.
+g/^item [[:digit:]]\{2\}$/p
+1,2s/\(item\) \([0-9]*\)/\1 #\2/p
+1,$p
+Q
+ED
+END SCRIPT
+BEGIN OUTPUT
+item 12
+item #345
+item #12
+item #345
+note
+END OUTPUT
+END TRANSCRIPT
+
+The global command first selects the two-digit item.  The substitution then
+uses two captures across lines 1 and 2.  Its p flag prints the final changed
+line, and the last command shows the complete result.
+
+
+Running commands globally
+
+g/BRE/commands executes commands for matching lines.  v selects non-matching
+lines.  If the command list is omitted, both default to p.
+
+G and V are interactive forms.  They print each selected line and read a
+command for it.  An empty command skips that line.  An ampersand repeats the
+previous interactive command.
+
+Global selection records stable line identities before execution.  A command
+may delete or move selected lines without turning later selections into
+unrelated lines.
+
+TRANSCRIPT global and inverse-global commands
+BEGIN SCRIPT
+./dist/ed -s <<'ED'
+a
+apple
+apricot
+berry
+.
+g/^a/s/^/fruit: /
+v/^fruit:/p
+1,$p
+Q
+ED
+END SCRIPT
+BEGIN OUTPUT
+berry
+fruit: apple
+fruit: apricot
+berry
+END OUTPUT
+END TRANSCRIPT
+
+
+Printing lines
+
+Four commands expose the buffer:
+
+    p           print lines as stored
+    n           print address, tab, and line
+    l           print escaped and folded lines ending in $
+    =           print the addressed line number
+
+The p, n, and l suffixes can be attached to many commands that change the
+current line.  They print after the command succeeds.
+
+TRANSCRIPT plain, numbered, and list output
+BEGIN SCRIPT
+./dist/ed -s <<'ED'
+a
+plain
+.
+l
+n
+p
+Q
+ED
+END SCRIPT
+BEGIN OUTPUT
+plain$
+1	plain
+plain
+END OUTPUT
+END TRANSCRIPT
+
+List mode gives common control bytes names such as \t, escapes backslash and
+dollar, emits other non-printing bytes as three-digit octal, and folds after
+70 rendered characters.
+
+
+Reading and writing files
+
+The file commands are:
+
+    e file      replace the buffer, protecting modifications
+    E file      replace the buffer without that protection
+    f file      set or print the remembered pathname
+    r file      read a file after the addressed line
+    w file      write the addressed range
+
+An initial pathname behaves like a forced edit.  Without an explicit argument,
+e, E, r, and w use the remembered pathname when possible.  Reading the first
+named file can establish it.  Writing the complete buffer clears the modified
+flag.  Writing a partial range does not.
+
+Unless -s is active, successful reads, edits, and writes print their byte
+count.
+
+TRANSCRIPT reading, naming, and writing files
+BEGIN SCRIPT
+tour_root=$PWD
+tour_tmp=$(mktemp -d)
+tour_cleanup()
+{
+    unlink "$tour_tmp/base" "$tour_tmp/extra" "$tour_tmp/result" \
+        2>/dev/null || :
+    rmdir "$tour_tmp" 2>/dev/null || :
+}
+trap tour_cleanup EXIT HUP INT TERM
+cd "$tour_tmp"
+printf 'red\nblue\n' > base
+printf 'green\n' > extra
+"$tour_root/dist/ed" -s base <<'ED'
+r extra
+f result
+w
+Q
+ED
+cat result
+END SCRIPT
+BEGIN OUTPUT
+result
+red
+blue
+green
+END OUTPUT
+END TRANSCRIPT
+
+The example starts with base, reads extra, changes the remembered pathname to
+result, and writes the complete buffer.
+
+
+Talking to the shell
+
+There are three shell boundaries:
+
+    !command        run with inherited standard streams
+    r !command      capture output and insert it as lines
+    w !command      send addressed lines to standard input
+
+In a standalone shell escape, an unescaped percent sign expands to the
+remembered pathname.  A leading second exclamation mark repeats the previous
+shell command with any following text appended.  Without -s, a completed
+standalone escape prints an exclamation mark.
+
+TRANSCRIPT shell escapes and shell-backed file commands
+BEGIN SCRIPT
+./dist/ed -s <<'ED'
+r !printf 'shell line\n'
+1p
+1w !tr a-z A-Z
+!printf 'outside\n'
+Q
+ED
+END SCRIPT
+BEGIN OUTPUT
+shell line
+SHELL LINE
+outside
+END OUTPUT
+END TRANSCRIPT
+
+
+Prompts, errors, and quitting
+
+-p prompt enables a prompt.  P toggles it.  -s suppresses byte counts and
+shell-completion markers, not ordinary command output.
+
+TRANSCRIPT prompt toggling
+BEGIN SCRIPT
+./dist/ed -s -p '> ' <<'ED'
+a
+hello
+.
+p
+P
+p
+Q
+ED
+END SCRIPT
+BEGIN OUTPUT
+> > hello
+> hello
+END OUTPUT
+END TRANSCRIPT
+
+Errors print a question mark.  The h command prints the most recent reason.
+H toggles automatic reasons after future errors.
+
+TRANSCRIPT help mode and failure status
+BEGIN SCRIPT
+set +e
+tour_output=$(./dist/ed -s <<'ED'
+H
+a
+only
+.
+2p
+h
+Q
+ED
+)
+tour_status=$?
+set -e
+printf '%s\n' "$tour_output"
+test "$tour_status" -eq 1
+END SCRIPT
+BEGIN OUTPUT
+?
+invalid address
+invalid address
+END OUTPUT
+END TRANSCRIPT
+
+q warns once instead of discarding a modified buffer.  Repeating q allows the
+quit if no intervening different command clears the warning.  Q always quits.
+End of input acts like q.
+
+A recoverable modified-buffer warning does not by itself force failure status.
+Other command errors make the eventual process status nonzero.  A
+non-recoverable error ends input classified as a regular file.  Terminal and
+other streaming input can continue accepting commands.
+
+
+All commands at a glance
+
+    a           append input
+    c           change a range
+    d           delete a range
+    e, E        protected and forced edit
+    f           print or set the pathname
+    g, G        global and interactive global
+    h, H        print or automatically display error reasons
+    i           insert input
+    j           join lines
+    k           set a mark
+    l           list escaped lines
+    m           move a range
+    n           print numbered lines
+    p           print lines
+    P           toggle the prompt
+    q, Q        protected and unconditional quit
+    r           read a file or command output
+    s           substitute BRE matches
+    t           copy a range
+    u           undo or redo the latest mutation
+    v, V        inverse global and interactive inverse global
+    w           write a range to a file or command
+    =           print an address
+    !           run a shell command
+
+
+Current limitations
+
+The target is POSIX platforms with Bun.  There is no Windows support layer.
+
+The complete buffer and undo snapshot live in memory rather than an ed-style
+temporary backing file.
+
+File writes truncate and replace their destination directly.  They are not an
+atomic rename transaction.
+
+Text and regular-expression behavior is byte-oriented.  Character classes are
+ASCII definitions, not locale-sensitive multibyte collation.  Bracket
+collating and equivalence forms accept one byte-like character; they do not
+implement a locale database.
+
+A final input line without a newline is accepted.  Writing reconstructs every
+buffer line with a trailing newline.
+
+Bun and the host operating system still determine behavior for signals not
+explicitly handled by the entry point.
+
+This tour intentionally contains no material, logs, commands, names, or result
+summaries from private or restrictively licensed test suites.
