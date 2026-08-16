@@ -32,12 +32,43 @@ Useful aggregate and focused commands are:
 
 ```console
 $ bun run check
+$ bun run test:all
 $ bun run test:tour
+$ bun run test:portable
+$ bun run test:integration
+$ bun run test:fuzz
+$ bun run test:fuzz:ed
 ```
 
-`bun run check` type-checks, builds, runs all tests, and checks source style.
-`bun run test:tour` runs the executable documentation examples and also
-requires a prior build.
+`bun run check` type-checks, builds, runs the fast deterministic tests, and
+checks source style.  `bun run test:all` additionally runs the portable
+process corpus, PTY integration tests, model fuzzer, and GNU ed differential
+fuzzer.  Executable and integration tests require a prior build.
+
+The portable black-box corpus is documented in `test/portable/README`.  Point
+its runner at another editor with:
+
+```console
+$ TSED_TEST_ED=/path/to/ed bun run test:portable
+```
+
+The model fuzzer runs 10,000 deterministic cases by default.  The differential
+fuzzer runs 1,000 cases against `/usr/bin/ed` under `LC_ALL=C`.  Configure and
+replay them with:
+
+```console
+$ TSED_FUZZ_SEED=123 TSED_FUZZ_CASES=50 bun run test:fuzz
+$ TSED_REFERENCE_ED=/path/to/ed bun run test:fuzz:ed
+```
+
+Both fuzzers print regular progress.  A mismatch is reduced when possible and
+saved under ignored `.tmp/fuzz/` state with its seed, complete input, and
+observed results.  Promote every confirmed implementation defect into a named
+deterministic regression before fixing it.
+
+`bun run probe:bun-sigbus` checks Bun standalone signal reporting without
+affecting any test result.  It exists to reproduce an upstream Bun issue and
+is intentionally non-gating.
 
 The editor's regular-expression backend is a POSIX Node-API addon.  `bun run
 build` compiles it for the current host before compiling the standalone

@@ -11,7 +11,10 @@ const maximum_line_length = 80;
 async function
 main(): Promise<void>
 {
-    const files = await source_files("src");
+    const files = [
+        ...await source_files("src"),
+        ...await source_files("tools"),
+    ];
     let failed = false;
     for (const pathname of files) {
         const source = await Bun.file(pathname).text();
