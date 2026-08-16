@@ -1,0 +1,42 @@
+========================================================================
+                    PORTABLE ED TEST CORPUS
+========================================================================
+
+cases.json is a language-neutral collection of black-box ed tests.  It can be
+used by implementations written in C, Rust, TypeScript, Go, or any other
+language.  The corpus does not import tsed code and contains no material from
+private conformance suites.
+
+Each case has these fields:
+
+    name        stable descriptive identifier
+    arguments   command-line arguments passed to ed
+    stdin       exact bytes supplied to standard input
+    stdout      exact expected standard output
+    stderr      exact expected standard error
+    status      expected process exit status
+
+All strings currently contain ASCII text encoded as UTF-8.  Cases use -s to
+suppress byte counts and write the final buffer to /dev/null before quitting.
+This keeps them deterministic while using only POSIX interfaces.
+
+Run the corpus against tsed after building it:
+
+    bun run test:portable
+
+Run it against another implementation:
+
+    bun test/portable_runner.ts /path/to/ed
+
+or:
+
+    TSED_TEST_ED=/path/to/ed bun run test:portable
+
+The JSON file is the public interface.  The supplied runner uses Bun only for
+convenience; another project may consume the same file with any JSON parser and
+process-launching API.
+
+Do not edit cases.json by hand.  Change the compact families in
+tools/generate_portable_corpus.ts and regenerate it with:
+
+    bun run generate:portable

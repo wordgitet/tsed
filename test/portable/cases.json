@@ -1,0 +1,1257 @@
+{
+  "format": "portable-ed-corpus",
+  "version": 1,
+  "license": "0BSD",
+  "cases": [
+    {
+      "name": "address/numeric/1",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n1p\nw /dev/null\nq\n",
+      "stdout": "amber\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "address/numeric/2",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n2p\nw /dev/null\nq\n",
+      "stdout": "blue\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "address/numeric/3",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n3p\nw /dev/null\nq\n",
+      "stdout": "coral\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "address/numeric/4",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n4p\nw /dev/null\nq\n",
+      "stdout": "denim\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "address/numeric/5",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n5p\nw /dev/null\nq\n",
+      "stdout": "ember\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "address/numeric/6",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n6p\nw /dev/null\nq\n",
+      "stdout": "fawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "address/range/1-1",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n1,1p\nw /dev/null\nq\n",
+      "stdout": "amber\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "address/range/1-3",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n1,3p\nw /dev/null\nq\n",
+      "stdout": "amber\nblue\ncoral\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "address/range/1-5",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n1,5p\nw /dev/null\nq\n",
+      "stdout": "amber\nblue\ncoral\ndenim\nember\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "address/range/2-2",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n2,2p\nw /dev/null\nq\n",
+      "stdout": "blue\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "address/range/2-4",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n2,4p\nw /dev/null\nq\n",
+      "stdout": "blue\ncoral\ndenim\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "address/range/2-6",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n2,6p\nw /dev/null\nq\n",
+      "stdout": "blue\ncoral\ndenim\nember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "address/range/3-3",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n3,3p\nw /dev/null\nq\n",
+      "stdout": "coral\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "address/range/3-5",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n3,5p\nw /dev/null\nq\n",
+      "stdout": "coral\ndenim\nember\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "address/range/4-4",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n4,4p\nw /dev/null\nq\n",
+      "stdout": "denim\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "address/range/4-6",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n4,6p\nw /dev/null\nq\n",
+      "stdout": "denim\nember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "address/range/5-5",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n5,5p\nw /dev/null\nq\n",
+      "stdout": "ember\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "address/range/6-6",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n6,6p\nw /dev/null\nq\n",
+      "stdout": "fawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "address/relative/1-to-last",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n1p\n.+5p\nw /dev/null\nq\n",
+      "stdout": "amber\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "address/relative/2-to-last",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n2p\n.+4p\nw /dev/null\nq\n",
+      "stdout": "blue\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "address/relative/3-to-last",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n3p\n.+3p\nw /dev/null\nq\n",
+      "stdout": "coral\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "address/relative/4-to-last",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n4p\n.+2p\nw /dev/null\nq\n",
+      "stdout": "denim\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "address/relative/5-to-last",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n5p\n.+1p\nw /dev/null\nq\n",
+      "stdout": "ember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "address/relative/6-to-last",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n6p\n.p\nw /dev/null\nq\n",
+      "stdout": "fawn\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "address/current",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n2p\n.p\nw /dev/null\nq\n",
+      "stdout": "blue\nblue\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "address/last",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n$p\nw /dev/null\nq\n",
+      "stdout": "fawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "address/all",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\nblue\ncoral\ndenim\nember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "address/search-forward",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n1p\n/ember/p\nw /dev/null\nq\n",
+      "stdout": "amber\nember\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "address/search-backward",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n1p\n?fawn?p\nw /dev/null\nq\n",
+      "stdout": "amber\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/delete/1",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n1d\n,p\nw /dev/null\nq\n",
+      "stdout": "blue\ncoral\ndenim\nember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/change/1",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n1c\nchanged-1\n.\n,p\nw /dev/null\nq\n",
+      "stdout": "changed-1\nblue\ncoral\ndenim\nember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/delete/2",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n2d\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\ncoral\ndenim\nember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/change/2",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n2c\nchanged-2\n.\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\nchanged-2\ncoral\ndenim\nember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/delete/3",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n3d\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\nblue\ndenim\nember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/change/3",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n3c\nchanged-3\n.\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\nblue\nchanged-3\ndenim\nember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/delete/4",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n4d\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\nblue\ncoral\nember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/change/4",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n4c\nchanged-4\n.\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\nblue\ncoral\nchanged-4\nember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/delete/5",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n5d\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\nblue\ncoral\ndenim\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/change/5",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n5c\nchanged-5\n.\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\nblue\ncoral\ndenim\nchanged-5\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/delete/6",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n6d\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\nblue\ncoral\ndenim\nember\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/change/6",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n6c\nchanged-6\n.\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\nblue\ncoral\ndenim\nember\nchanged-6\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/append/0",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n0a\nafter-0\n.\n,p\nw /dev/null\nq\n",
+      "stdout": "after-0\namber\nblue\ncoral\ndenim\nember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/append/1",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n1a\nafter-1\n.\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\nafter-1\nblue\ncoral\ndenim\nember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/append/2",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n2a\nafter-2\n.\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\nblue\nafter-2\ncoral\ndenim\nember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/append/3",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n3a\nafter-3\n.\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\nblue\ncoral\nafter-3\ndenim\nember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/append/4",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n4a\nafter-4\n.\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\nblue\ncoral\ndenim\nafter-4\nember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/append/5",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n5a\nafter-5\n.\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\nblue\ncoral\ndenim\nember\nafter-5\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/append/6",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n6a\nafter-6\n.\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\nblue\ncoral\ndenim\nember\nfawn\nafter-6\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/insert/1",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n1i\nbefore-1\n.\n,p\nw /dev/null\nq\n",
+      "stdout": "before-1\namber\nblue\ncoral\ndenim\nember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/insert/2",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n2i\nbefore-2\n.\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\nbefore-2\nblue\ncoral\ndenim\nember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/insert/3",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n3i\nbefore-3\n.\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\nblue\nbefore-3\ncoral\ndenim\nember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/insert/4",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n4i\nbefore-4\n.\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\nblue\ncoral\nbefore-4\ndenim\nember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/insert/5",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n5i\nbefore-5\n.\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\nblue\ncoral\ndenim\nbefore-5\nember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/insert/6",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n6i\nbefore-6\n.\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\nblue\ncoral\ndenim\nember\nbefore-6\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/join/1-2",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n1,2j\n,p\nw /dev/null\nq\n",
+      "stdout": "amberblue\ncoral\ndenim\nember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/join/1-3",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n1,3j\n,p\nw /dev/null\nq\n",
+      "stdout": "amberbluecoral\ndenim\nember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/join/2-3",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n2,3j\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\nbluecoral\ndenim\nember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/join/2-4",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n2,4j\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\nbluecoraldenim\nember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/join/3-4",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n3,4j\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\nblue\ncoraldenim\nember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/join/3-5",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n3,5j\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\nblue\ncoraldenimember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/join/4-5",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n4,5j\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\nblue\ncoral\ndenimember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/join/4-6",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n4,6j\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\nblue\ncoral\ndenimemberfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/join/5-6",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n5,6j\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\nblue\ncoral\ndenim\nemberfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/move/1-after-$",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n1m$\n,p\nw /dev/null\nq\n",
+      "stdout": "blue\ncoral\ndenim\nember\nfawn\namber\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/move/2,3-after-$",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n2,3m$\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\ndenim\nember\nfawn\nblue\ncoral\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/move/5,6-after-0",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n5,6m0\n,p\nw /dev/null\nq\n",
+      "stdout": "ember\nfawn\namber\nblue\ncoral\ndenim\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/move/3,4-after-1",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n3,4m1\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\ncoral\ndenim\nblue\nember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/copy/1-after-$",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n1t$\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\nblue\ncoral\ndenim\nember\nfawn\namber\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/copy/2,3-after-$",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n2,3t$\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\nblue\ncoral\ndenim\nember\nfawn\nblue\ncoral\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "edit/copy/5,6-after-$",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n5,6t$\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\nblue\ncoral\ndenim\nember\nfawn\nember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "substitute/literal/amber",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n1s/amber/AMBER/\n1p\nw /dev/null\nq\n",
+      "stdout": "AMBER\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "substitute/literal/blue",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n2s/blue/BLUE/\n2p\nw /dev/null\nq\n",
+      "stdout": "BLUE\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "substitute/literal/coral",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n3s/coral/CORAL/\n3p\nw /dev/null\nq\n",
+      "stdout": "CORAL\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "substitute/literal/denim",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n4s/denim/DENIM/\n4p\nw /dev/null\nq\n",
+      "stdout": "DENIM\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "substitute/literal/ember",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n5s/ember/EMBER/\n5p\nw /dev/null\nq\n",
+      "stdout": "EMBER\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "substitute/literal/fawn",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n6s/fawn/FAWN/\n6p\nw /dev/null\nq\n",
+      "stdout": "FAWN\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "substitute/global/aaaa",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n$c\naaaa\n.\ns/a/X/g\np\nw /dev/null\nq\n",
+      "stdout": "XXXX\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "substitute/global/ababab",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n$c\nababab\n.\ns/a/X/g\np\nw /dev/null\nq\n",
+      "stdout": "XbXbXb\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "substitute/global/mississippi",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n$c\nmississippi\n.\ns/m/X/g\np\nw /dev/null\nq\n",
+      "stdout": "Xississippi\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "substitute/global/one-one-one",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n$c\none one one\n.\ns/one/X/g\np\nw /dev/null\nq\n",
+      "stdout": "X X X\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "substitute/anchor/start",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n1s/^/start-/\n1p\nw /dev/null\nq\n",
+      "stdout": "start-amber\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "substitute/anchor/end",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n1s/$/-end/\n1p\nw /dev/null\nq\n",
+      "stdout": "amber-end\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "substitute/group/back-reference",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n1s/\\(am\\)ber/\\1-\\1/\n1p\nw /dev/null\nq\n",
+      "stdout": "am-am\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "substitute/whole-match",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n1s/am[[:alpha:]]*/<&>/\n1p\nw /dev/null\nq\n",
+      "stdout": "<amber>\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "global/matching/a",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\ng/^a/p\nw /dev/null\nq\n",
+      "stdout": "amber\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "global/nonmatching/a",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\nv/^a/p\nw /dev/null\nq\n",
+      "stdout": "blue\ncoral\ndenim\nember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "global/matching/e",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\ng/e/p\nw /dev/null\nq\n",
+      "stdout": "amber\nblue\ndenim\nember\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "global/nonmatching/e",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\nv/e/p\nw /dev/null\nq\n",
+      "stdout": "coral\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "global/matching/a-c",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\ng/^[a-c]/p\nw /dev/null\nq\n",
+      "stdout": "amber\nblue\ncoral\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "global/nonmatching/a-c",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\nv/^[a-c]/p\nw /dev/null\nq\n",
+      "stdout": "denim\nember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "global/matching/n",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\ng/n$/p\nw /dev/null\nq\n",
+      "stdout": "fawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "global/nonmatching/n",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\nv/n$/p\nw /dev/null\nq\n",
+      "stdout": "amber\nblue\ncoral\ndenim\nember\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "global/matching/empty",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\ng/^.....$/p\nw /dev/null\nq\n",
+      "stdout": "amber\ncoral\ndenim\nember\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "global/nonmatching/empty",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\nv/^.....$/p\nw /dev/null\nq\n",
+      "stdout": "blue\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "global/delete",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\ng/e/d\n,p\nw /dev/null\nq\n",
+      "stdout": "coral\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "global/substitute",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\ng/e/s/e/E/g\n,p\nw /dev/null\nq\n",
+      "stdout": "ambEr\nbluE\ncoral\ndEnim\nEmbEr\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "output/number/1",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n1n\nw /dev/null\nq\n",
+      "stdout": "1\tamber\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "output/equals/1",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n1=\nw /dev/null\nq\n",
+      "stdout": "1\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "output/number/2",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n2n\nw /dev/null\nq\n",
+      "stdout": "2\tblue\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "output/equals/2",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n2=\nw /dev/null\nq\n",
+      "stdout": "2\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "output/number/3",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n3n\nw /dev/null\nq\n",
+      "stdout": "3\tcoral\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "output/equals/3",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n3=\nw /dev/null\nq\n",
+      "stdout": "3\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "output/number/4",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n4n\nw /dev/null\nq\n",
+      "stdout": "4\tdenim\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "output/equals/4",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n4=\nw /dev/null\nq\n",
+      "stdout": "4\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "output/number/5",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n5n\nw /dev/null\nq\n",
+      "stdout": "5\tember\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "output/equals/5",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n5=\nw /dev/null\nq\n",
+      "stdout": "5\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "output/number/6",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n6n\nw /dev/null\nq\n",
+      "stdout": "6\tfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "output/equals/6",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n6=\nw /dev/null\nq\n",
+      "stdout": "6\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "output/list/end-marker",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n1l\nw /dev/null\nq\n",
+      "stdout": "amber$\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "output/list/tab",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n1c\na\tb\n.\n1l\nw /dev/null\nq\n",
+      "stdout": "a\\tb$\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "output/print-range",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n2,4p\nw /dev/null\nq\n",
+      "stdout": "blue\ncoral\ndenim\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "state/mark/1",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n1ka\n'ap\nw /dev/null\nq\n",
+      "stdout": "amber\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "state/mark/2",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n2ka\n'ap\nw /dev/null\nq\n",
+      "stdout": "blue\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "state/mark/3",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n3ka\n'ap\nw /dev/null\nq\n",
+      "stdout": "coral\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "state/mark/4",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n4ka\n'ap\nw /dev/null\nq\n",
+      "stdout": "denim\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "state/mark/5",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n5ka\n'ap\nw /dev/null\nq\n",
+      "stdout": "ember\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "state/mark/6",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n6ka\n'ap\nw /dev/null\nq\n",
+      "stdout": "fawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "state/undo-delete",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n3d\nu\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\nblue\ncoral\ndenim\nember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "state/undo-change",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n2c\nchanged\n.\nu\n,p\nw /dev/null\nq\n",
+      "stdout": "amber\nblue\ncoral\ndenim\nember\nfawn\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "state/undo-substitute",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n1s/a/A/\nu\n1p\nw /dev/null\nq\n",
+      "stdout": "amber\n",
+      "stderr": "",
+      "status": 0
+    },
+    {
+      "name": "error/0p",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n0p\nw /dev/null\nq\n",
+      "stdout": "?\n",
+      "stderr": "",
+      "status": 1
+    },
+    {
+      "name": "error/7p",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n7p\nw /dev/null\nq\n",
+      "stdout": "?\n",
+      "stderr": "",
+      "status": 1
+    },
+    {
+      "name": "error/4-2p",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n4,2p\nw /dev/null\nq\n",
+      "stdout": "?\n",
+      "stderr": "",
+      "status": 1
+    },
+    {
+      "name": "error/zp",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n'zp\nw /dev/null\nq\n",
+      "stdout": "?\n",
+      "stderr": "",
+      "status": 1
+    },
+    {
+      "name": "error/missing-p",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": "a\namber\nblue\ncoral\ndenim\nember\nfawn\n.\n/missing/p\nw /dev/null\nq\n",
+      "stdout": "?\n",
+      "stderr": "",
+      "status": 1
+    }
+  ]
+}

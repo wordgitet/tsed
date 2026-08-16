@@ -25,6 +25,7 @@
     "native",
     "prebuilds",
     "src",
+    "test/portable",
     "README",
     "TOUR",
     "COPYRIGHT"
@@ -41,6 +42,8 @@
     "install": "CC=cc CXX=cc node-gyp-build",
     "make:prebuilds": "CC=${CC:-cc} CXX=${CXX:-c++} prebuildify --napi --strip --tag-libc",
     "test": "bun test",
+    "generate:portable": "bun tools/generate_portable_corpus.ts",
+    "test:portable": "bun test/portable_runner.ts",
     "test:tour": "bun test test/tour.test.ts",
     "typecheck": "tsc --noEmit",
     "check:style": "bun src/style_check.ts",
