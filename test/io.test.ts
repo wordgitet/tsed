@@ -73,6 +73,16 @@ describe("standard input line reader", () => {
         expect(string_from_bytes(line)).toBe("Q");
     });
 
+    test("remembers an interrupt before a read begins", async () => {
+        const reader = new stdin_line_reader(async () =>
+            bytes_from_string("next\n"));
+
+        reader.interrupt();
+
+        expect(await reader.read_line()).toBe(input_interrupted);
+        expect(await reader.read_line()).toEqual(bytes_from_string("next"));
+    });
+
     test("rejects NUL in text input", () => {
         expect(() => bytes_to_lines(new Uint8Array([0x61, 0x00, 0x62]))).toThrow(
             "text contains NUL",

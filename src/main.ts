@@ -37,7 +37,7 @@ main(): Promise<void>
         process.on("SIGHUP", () => {
             void instance.handle_hangup();
         });
-        process.exitCode = await instance.run(options.pathname);
+        process.exit(await instance.run(options.pathname));
     } catch (error) {
         const message = error instanceof Error ? error.message : "error";
         process.stderr.write(`ed: ${message}\n`);

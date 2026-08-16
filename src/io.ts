@@ -19,6 +19,7 @@ type chunk_reader = () => Promise<Uint8Array | null>;
 
 export class stdin_line_reader implements input_source {
     private readonly read_chunk: chunk_reader;
+    private interrupt_pending = false;
     private pending: Uint8Array<ArrayBufferLike> = new Uint8Array(0);
     private pending_next: Promise<Uint8Array | null> | undefined;
     private interrupt_resolve: (() => void) | undefined;
@@ -29,6 +30,10 @@ export class stdin_line_reader implements input_source {
 
     public async read_line(): Promise<input_line> {
         for (;;) {
+            if (this.interrupt_pending) {
+                this.interrupt_pending = false;
+                return input_interrupted;
+            }
             const line = this.take_line();
             if (line !== undefined) {
                 return line;
@@ -49,17 +54,25 @@ export class stdin_line_reader implements input_source {
     }
 
     public interrupt(): void {
+        this.interrupt_pending = true;
         this.interrupt_resolve?.();
     }
 
     private async wait_for_next(
         next: Promise<Uint8Array | null>,
     ): Promise<Uint8Array | null | typeof input_interrupted> {
+        if (this.interrupt_pending) {
+            this.interrupt_pending = false;
+            return input_interrupted;
+        }
         const interrupted = new Promise<typeof input_interrupted>((resolve) => {
             this.interrupt_resolve = () => resolve(input_interrupted);
         });
         const result = await Promise.race([next, interrupted]);
         this.interrupt_resolve = undefined;
+        if (result === input_interrupted) {
+            this.interrupt_pending = false;
+        }
         return result;
     }
 
