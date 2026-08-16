@@ -22,7 +22,6 @@ export class stdin_line_reader implements input_source {
     private pending: Uint8Array<ArrayBufferLike> = new Uint8Array(0);
     private pending_next: Promise<Uint8Array | null> | undefined;
     private interrupt_resolve: (() => void) | undefined;
-    private ended = false;
 
     public constructor(read_chunk: chunk_reader = read_standard_input) {
         this.read_chunk = read_chunk;
@@ -34,10 +33,6 @@ export class stdin_line_reader implements input_source {
             if (line !== undefined) {
                 return line;
             }
-            if (this.ended) {
-                return this.take_final_line();
-            }
-
             const next = this.pending_next ?? this.read_chunk();
             this.pending_next = next;
             const result = await this.wait_for_next(next);
@@ -46,7 +41,7 @@ export class stdin_line_reader implements input_source {
             }
             this.pending_next = undefined;
             if (result === null) {
-                this.ended = true;
+                return this.take_final_line();
             } else {
                 this.pending = concat_bytes(this.pending, result);
             }

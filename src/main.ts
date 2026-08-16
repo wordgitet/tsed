@@ -11,7 +11,7 @@ import { stdin_line_reader, process_output } from "./io";
 import { posix_regex } from "./native";
 import { ed_error, type input_kind } from "./types";
 
-interface command_line_options {
+export interface command_line_options {
     pathname: string | undefined;
     prompt: string | undefined;
     silent: boolean;
@@ -58,7 +58,7 @@ standard_input_kind(): input_kind
     }
 }
 
-function
+export function
 parse_options(arguments_list: readonly string[]): command_line_options
 {
     let prompt: string | undefined;
@@ -75,25 +75,41 @@ parse_options(arguments_list: readonly string[]): command_line_options
             options_enabled = false;
             continue;
         }
-        if (options_enabled && argument === "-s") {
-            silent = true;
-            continue;
-        }
-        if (options_enabled && argument === "-p") {
-            const next = arguments_list[index + 1];
-            if (next === undefined) {
-                throw new ed_error("option -p requires an argument");
+        if (
+            options_enabled &&
+            argument.startsWith("-") &&
+            argument.length > 1
+        ) {
+            const option_group = argument.slice(1);
+            for (
+                let option_index = 0;
+                option_index < option_group.length;
+                option_index += 1
+            ) {
+                const option = option_group[option_index];
+                if (option === "s") {
+                    silent = true;
+                    continue;
+                }
+                if (option === "p") {
+                    const attached = option_group.slice(option_index + 1);
+                    if (attached.length > 0) {
+                        prompt = attached;
+                    } else {
+                        const next = arguments_list[index + 1];
+                        if (next === undefined) {
+                            throw new ed_error(
+                                "option -p requires an argument",
+                            );
+                        }
+                        prompt = next;
+                        index += 1;
+                    }
+                    break;
+                }
+                throw new ed_error(`unknown option: -${option}`);
             }
-            prompt = next;
-            index += 1;
             continue;
-        }
-        if (options_enabled && argument.startsWith("-p") && argument.length > 2) {
-            prompt = argument.slice(2);
-            continue;
-        }
-        if (options_enabled && argument.startsWith("-")) {
-            throw new ed_error(`unknown option: ${argument}`);
         }
         if (pathname !== undefined) {
             throw new ed_error("too many pathnames");
@@ -104,4 +120,6 @@ parse_options(arguments_list: readonly string[]): command_line_options
     return { pathname, prompt, silent };
 }
 
-void main();
+if (import.meta.main) {
+    void main();
+}

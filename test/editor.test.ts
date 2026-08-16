@@ -21,12 +21,12 @@ import {
 class memory_input implements input_source {
     private index = 0;
 
-    public constructor(private readonly lines: string[]) {}
+    public constructor(private readonly lines: readonly (string | null)[]) {}
 
     public async read_line(): Promise<Uint8Array | null> {
         const value = this.lines[this.index];
         this.index += 1;
-        return value === undefined ? null : bytes_from_string(value);
+        return value == null ? null : bytes_from_string(value);
     }
 }
 
@@ -178,6 +178,57 @@ describe("editor", () => {
 
         expect(await instance.run(undefined)).toBe(0);
         expect(output.stdout).toBe("two\n2\n2\n2\n1\nthree\n0\n");
+    });
+
+    test("prints the next line for a null command", async () => {
+        const output = new memory_output();
+        const instance = new editor(
+            new memory_input([
+                "a", "one", "two", "three", ".",
+                "1p", "", "1p", ".+1p", "Q",
+            ]),
+            output,
+            { input_kind: "regular", prompt: undefined, silent: true },
+        );
+
+        expect(await instance.run(undefined)).toBe(0);
+        expect(output.stdout).toBe("one\ntwo\none\ntwo\n");
+    });
+
+    test("returns to command mode after input-mode end of file", async () => {
+        const output = new memory_output();
+        const instance = new editor(
+            new memory_input([
+                "a", "old", ".", "i", "new", null, "1,$p", "Q",
+            ]),
+            output,
+            { input_kind: "terminal", prompt: undefined, silent: true },
+        );
+
+        expect(await instance.run(undefined)).toBe(0);
+        expect(output.stdout).toBe("new\nold\n");
+    });
+
+    test("edits from shell output without replacing the pathname", async () => {
+        const directory = await mkdtemp(join(tmpdir(), "tsed-editor-"));
+        const pathname = join(directory, "shell-edit");
+        try {
+            await writeFile(pathname, "old\n");
+            const output = new memory_output();
+            const instance = new editor(
+                new memory_input([
+                    "e !printf 'new line\\n'", "f", "w", "q",
+                ]),
+                output,
+                { input_kind: "regular", prompt: undefined, silent: true },
+            );
+
+            expect(await instance.run(pathname)).toBe(0);
+            expect(output.stdout).toBe(`${pathname}\n`);
+            expect(await readFile(pathname, "utf8")).toBe("new line\n");
+        } finally {
+            await rm(directory, { recursive: true });
+        }
     });
 
     test("applies suffixes to marks and undo", async () => {

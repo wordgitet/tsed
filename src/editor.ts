@@ -145,17 +145,19 @@ export class editor {
     private async execute_line(source: string, record_undo: boolean): Promise<void> {
         this.check_interrupted();
         const parsed = parse_command(source);
-        const command = parsed.command;
-        if (command === "") {
-            return;
-        }
+        const effective = parsed.command === ""
+            ? parse_command(".+1p")
+            : parsed;
+        const command = effective.command;
         if (this.warned_command !== undefined && this.warned_command !== command) {
             this.warned_command = undefined;
         }
         if (record_undo && this.is_buffer_mutating(command)) {
-            await this.with_undo(async () => this.execute_parsed(parsed, false));
+            await this.with_undo(
+                async () => this.execute_parsed(effective, false),
+            );
         } else {
-            await this.execute_parsed(parsed, record_undo);
+            await this.execute_parsed(effective, record_undo);
         }
     }
 
@@ -550,7 +552,7 @@ export class editor {
                 throw this.take_interrupt_error();
             }
             if (line === null) {
-                throw new ed_error("unexpected end of input");
+                return lines;
             }
 			validate_text(line);
             if (line.length === 1 && line[0] === 0x2e) {
@@ -590,9 +592,19 @@ export class editor {
         if (!force && this.buffer.changed) {
             throw new ed_error("buffer modified");
         }
-        const bytes = await read_file_bytes(pathname);
+        let bytes: Uint8Array;
+        if (pathname.startsWith("!")) {
+            const command = pathname.slice(1).trimStart();
+            const result = await run_shell(command, undefined, true);
+            if (result.status !== 0) {
+                throw new ed_error("shell command failed");
+            }
+            bytes = result.stdout;
+        } else {
+            bytes = await read_file_bytes(pathname);
+            this.pathname = pathname;
+        }
         this.buffer.load(bytes_to_lines(bytes));
-        this.pathname = pathname;
         this.last_regex = undefined;
         this.undo_snapshot = undefined;
         if (!this.options.silent) {
