@@ -168,6 +168,67 @@ describe("editor", () => {
         expect(output.stdout).toBe("alpha\nalpha\nalpha$\n");
     });
 
+    test("executes multiline global command lists", async () => {
+        const output = new memory_output();
+        const instance = new editor(
+            new memory_input([
+                "a", "alpha", "beta", "alpha", ".",
+                "g/alpha/a\\", "alpha marked\\", ".\\", "s/alpha/ALPHA",
+                "1,$p", "Q",
+            ]),
+            output,
+            { input_kind: "regular", prompt: undefined, silent: true },
+        );
+
+        expect(await instance.run(undefined)).toBe(0);
+        expect(output.stdout).toBe(
+            "ALPHA marked\nALPHA marked\n" +
+            "alpha\nALPHA marked\nbeta\nalpha\nALPHA marked\n",
+        );
+    });
+
+    test("uses omitted input terminators at the end of global lists", async () => {
+        const output = new memory_output();
+        const instance = new editor(
+            new memory_input([
+                "a", "alpha", "beta", "alpha", ".",
+                "g/alpha/c\\", "replacement", "1,$p", "Q",
+            ]),
+            output,
+            { input_kind: "regular", prompt: undefined, silent: true },
+        );
+
+        expect(await instance.run(undefined)).toBe(0);
+        expect(output.stdout).toBe("replacement\nbeta\nreplacement\n");
+    });
+
+    test("defaults an empty global list to print", async () => {
+        const output = new memory_output();
+        const instance = new editor(
+            new memory_input(["a", "alpha", "beta", ".", "g/alpha", "Q"]),
+            output,
+            { input_kind: "regular", prompt: undefined, silent: true },
+        );
+
+        expect(await instance.run(undefined)).toBe(0);
+        expect(output.stdout).toBe("alpha\n");
+    });
+
+    test("stops interactive global execution at a failed command", async () => {
+        const output = new memory_output();
+        const instance = new editor(
+            new memory_input([
+                "a", "alpha", "beta", "alpha", ".",
+                "G/alpha/", "s/missing/value/", ".=", "Q",
+            ]),
+            output,
+            { input_kind: "regular", prompt: undefined, silent: true },
+        );
+
+        expect(await instance.run(undefined)).toBe(0);
+        expect(output.stdout).toBe("alpha\n1\n");
+    });
+
     test("writes an empty buffer as a complete save", async () => {
         const directory = await mkdtemp(join(tmpdir(), "tsed-editor-"));
         const pathname = join(directory, "empty-after-write");

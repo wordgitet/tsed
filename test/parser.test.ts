@@ -32,11 +32,26 @@ describe("command parser", () => {
         });
     });
 
+    test("accepts a newline-terminated search expression", () => {
+        const parsed = parse_command("/needle");
+        expect(parsed.addresses[0]?.expression).toEqual({
+            kind: "search",
+            pattern: "needle",
+            direction: "forward",
+        });
+        expect(parsed.command).toBe("p");
+    });
+
     test("preserves escaped substitute delimiters", () => {
         expect(split_substitute("/a\\/b/a\\/b/g")).toEqual({
             pattern: "a\\/b",
             replacement: "a\\/b",
             flags: "g",
+        });
+        expect(split_substitute("/a/b")).toEqual({
+            pattern: "a",
+            replacement: "b",
+            flags: "p",
         });
     });
 

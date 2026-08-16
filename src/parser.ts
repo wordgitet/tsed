@@ -107,7 +107,7 @@ function parse_address(source: string, start: number): address_result | undefine
         return { expression: { kind: "mark", name }, index: start + 2 };
     }
     if (character === "/" || character === "?") {
-        const pattern_result = read_delimited(source, start, character);
+        const pattern_result = read_delimited(source, start, character, true);
         return {
             expression: {
                 kind: "search",
@@ -165,7 +165,8 @@ export function read_delimited(
     source: string,
     start: number,
     delimiter: string,
-): { value: string; index: number } {
+    allow_end = false,
+): { value: string; index: number; terminated: boolean } {
 	const delimiter_end = character_end(source, start);
 	if (delimiter_end === undefined) {
 		throw new ed_error("unterminated delimiter");
@@ -183,7 +184,7 @@ export function read_delimited(
 		}
 		const character = source.slice(index, end);
 		if (character === actual_delimiter) {
-			return { value, index: end };
+			return { value, index: end, terminated: true };
 		}
 		if (character === "\\" && end < source.length) {
 			const escaped_end = character_end(source, end);
@@ -196,6 +197,9 @@ export function read_delimited(
 			value += character;
 			index = end;
 		}
+	}
+	if (allow_end) {
+		return { value, index, terminated: false };
 	}
 	throw new ed_error("unterminated delimiter");
 }
@@ -220,11 +224,14 @@ export function split_substitute(argument: string): {
 		argument,
 		pattern_result.index - delimiter.length,
 		delimiter,
+		true,
 	);
     return {
         pattern: pattern_result.value,
         replacement: replacement_result.value,
-        flags: argument.slice(replacement_result.index),
+        flags: replacement_result.terminated
+            ? argument.slice(replacement_result.index)
+            : "p",
     };
 }
 

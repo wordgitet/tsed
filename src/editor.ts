@@ -51,6 +51,7 @@ export class editor {
     private quit_requested = false;
     private had_error = false;
     private interrupted = false;
+    private command_input: Uint8Array[] | undefined;
 
     public constructor(
         input: input_source,
@@ -539,7 +540,9 @@ export class editor {
         const lines: Uint8Array[] = [];
         while (true) {
             this.check_interrupted();
-            const line = await this.input.read_line();
+            const line = this.command_input === undefined
+                ? await this.input.read_line()
+                : this.command_input.shift() ?? null;
             if (line === input_interrupted) {
                 throw this.take_interrupt_error();
             }
@@ -689,10 +692,18 @@ export class editor {
         if (delimiter === undefined || delimiter === " " || delimiter === "\t") {
             throw new ed_error("invalid global command");
         }
-        const pattern_result = read_delimited(parsed.argument, 0, delimiter);
-        const list = pattern_result.index >= parsed.argument.length
-            ? "p"
-            : parsed.argument.slice(pattern_result.index).replace(/^\\\n/, "");
+        const pattern_result = read_delimited(
+            parsed.argument,
+            0,
+            delimiter,
+            true,
+        );
+        const initial_list = pattern_result.index >= parsed.argument.length
+            ? ""
+            : parsed.argument.slice(pattern_result.index);
+        const list = interactive
+            ? []
+            : await this.read_global_command_list(initial_list);
         const pattern = pattern_result.value === "" ? this.last_regex : pattern_result.value;
         if (pattern === undefined) {
             throw new ed_error("no previous regular expression");
@@ -729,18 +740,86 @@ export class editor {
                         if (previous_command === undefined) {
                             throw new ed_error("no previous global command");
                         }
-                        await this.execute_line(previous_command, false);
+                        try {
+                            await this.execute_line(previous_command, false);
+                        } catch {
+                            break;
+                        }
                     } else if (command_line.length !== 0) {
                         previous_command = command_line;
-                        await this.execute_line(command_line, false);
+                        try {
+                            await this.execute_line(command_line, false);
+                        } catch {
+                            break;
+                        }
                     }
                 } else {
-                    await this.execute_line(list, false);
+                    await this.execute_global_command_list(list);
                 }
             }
             void record_undo;
         } finally {
             program.close();
+        }
+    }
+
+    private async read_global_command_list(initial: string): Promise<string[]> {
+        const lines: string[] = [];
+        let line = initial.replace(/^\\\n/, "");
+        for (;;) {
+            const continued = has_trailing_backslash(line);
+            lines.push(continued ? line.slice(0, -1) : line);
+            if (!continued) {
+                break;
+            }
+            const input_line = await this.input.read_line();
+            if (input_line === input_interrupted) {
+                throw this.take_interrupt_error();
+            }
+            if (input_line === null) {
+                throw new ed_error("unexpected end of input");
+            }
+            validate_text(input_line);
+            line = string_from_bytes(input_line);
+        }
+        if (lines.length === 1 && lines[0]?.trim().length === 0) {
+            return ["p"];
+        }
+        return lines;
+    }
+
+    private async execute_global_command_list(
+        lines: readonly string[],
+    ): Promise<void> {
+        for (let index = 0; index < lines.length; index += 1) {
+            const source = lines[index];
+            if (source === undefined) {
+                continue;
+            }
+            const command = parse_command(source).command;
+            if (!"aic".includes(command)) {
+                await this.execute_line(source, false);
+                continue;
+            }
+
+            const input_lines: Uint8Array[] = [];
+            while (index + 1 < lines.length) {
+                const input_line = lines[index + 1];
+                index += 1;
+                if (input_line === ".") {
+                    break;
+                }
+                if (input_line !== undefined) {
+                    input_lines.push(bytes_from_string(input_line));
+                }
+            }
+            input_lines.push(bytes_from_string("."));
+            this.command_input = input_lines;
+            try {
+                await this.execute_line(source, false);
+            } finally {
+                this.command_input = undefined;
+            }
         }
     }
 
@@ -882,6 +961,14 @@ function concat_line(bytes: Uint8Array): Uint8Array {
     result.set(bytes);
     result[bytes.length] = 0x0a;
     return result;
+}
+
+function has_trailing_backslash(value: string): boolean {
+    let count = 0;
+    for (let index = value.length - 1; value[index] === "\\"; index -= 1) {
+        count += 1;
+    }
+    return count % 2 === 1;
 }
 
 function format_list_line(bytes: Uint8Array): string {
