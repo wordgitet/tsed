@@ -759,16 +759,20 @@ export class editor {
         try {
             this.last_regex = pattern;
             const range = this.resolve_range(parsed, parsed.command);
-            const ids = this.buffer.ids(range.start, range.end);
-            const selected = ids.filter((id) => {
-                const address = this.buffer.address_of(id);
-                return address !== undefined && (find_bre(this.buffer.bytes(address), program) !== undefined) !== invert;
-            });
+            const selected = this.buffer.range(range.start, range.end).filter(
+                (line) => {
+                    const matches = find_bre(line.bytes, program) !== undefined;
+                    return matches !== invert;
+                },
+            );
 
             let previous_command: string | undefined;
-            for (const id of selected) {
-                const address = this.buffer.address_of(id);
-                if (address === undefined) {
+            for (const selected_line of selected) {
+                const address = this.buffer.address_of(selected_line.id);
+                if (
+                    address === undefined ||
+                    this.buffer.line(address) !== selected_line
+                ) {
                     continue;
                 }
                 this.buffer.current = address;

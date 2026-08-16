@@ -306,6 +306,42 @@ describe("editor", () => {
         expect(output.stdout).toBe("alpha\n");
     });
 
+    test("unmarks replaced lines during global execution", async () => {
+        const output = new memory_output();
+        const instance = new editor(
+            new memory_input([
+                "a", "x one", "x two", "x three", "x four", ".",
+                "1,3g/x/.+1s/$/ changed/", "1,$p", "Q",
+            ]),
+            output,
+            { input_kind: "regular", prompt: undefined, silent: true },
+        );
+
+        expect(await instance.run(undefined)).toBe(0);
+        expect(output.stdout).toBe(
+            "x one\nx two changed\nx three\nx four changed\n",
+        );
+    });
+
+    test("unmarks replaced lines during interactive globals", async () => {
+        const output = new memory_output();
+        const instance = new editor(
+            new memory_input([
+                "a", "x one", "x two", "x three", "x four", ".",
+                "1,3G/x/", ".+1s/$/ changed/", ".+1s/$/ changed/",
+                "1,$p", "Q",
+            ]),
+            output,
+            { input_kind: "terminal", prompt: undefined, silent: true },
+        );
+
+        expect(await instance.run(undefined)).toBe(0);
+        expect(output.stdout).toBe(
+            "x one\nx three\n" +
+            "x one\nx two changed\nx three\nx four changed\n",
+        );
+    });
+
     test("stops interactive global execution at a failed command", async () => {
         const output = new memory_output();
         const instance = new editor(
