@@ -23,7 +23,8 @@ class interruptible_input implements input_source {
     private next_command_ready = false;
     private pending: ((line: input_line) => void) | undefined;
 
-    public read_line(): Promise<input_line> {
+    public read_line(): Promise<input_line>
+    {
         if (!this.first_line_read) {
             this.first_line_read = true;
             return Promise.resolve(bytes_from_string("a"));
@@ -36,7 +37,8 @@ class interruptible_input implements input_source {
         });
     }
 
-    public interrupt(): void {
+    public interrupt(): void
+    {
         this.next_command_ready = true;
         const resolve = this.pending;
         this.pending = undefined;
@@ -47,13 +49,15 @@ class interruptible_input implements input_source {
 class blocking_input implements input_source {
     private pending: ((line: input_line) => void) | undefined;
 
-    public read_line(): Promise<input_line> {
+    public read_line(): Promise<input_line>
+    {
         return new Promise((resolve) => {
             this.pending = resolve;
         });
     }
 
-    public interrupt(): void {
+    public interrupt(): void
+    {
         const resolve = this.pending;
         this.pending = undefined;
         resolve?.(input_interrupted);
@@ -254,20 +258,25 @@ describe("editor", () => {
         );
     });
 
-    test("uses omitted input terminators at the end of global lists", async () => {
-        const output = new memory_output();
-        const instance = new editor(
-            new memory_input([
-                "a", "alpha", "beta", "alpha", ".",
-                "g/alpha/c\\", "replacement", "1,$p", "Q",
-            ]),
-            output,
-            { input_kind: "regular", prompt: undefined, silent: true },
-        );
+    test(
+        "uses omitted input terminators at the end of global lists",
+        async () => {
+            const output = new memory_output();
+            const instance = new editor(
+                new memory_input([
+                    "a", "alpha", "beta", "alpha", ".",
+                    "g/alpha/c\\", "replacement", "1,$p", "Q",
+                ]),
+                output,
+                { input_kind: "regular", prompt: undefined, silent: true },
+            );
 
-        expect(await instance.run(undefined)).toBe(0);
-        expect(output.stdout).toBe("replacement\nbeta\nreplacement\n");
-    });
+            expect(await instance.run(undefined)).toBe(0);
+            expect(output.stdout).toBe(
+                "replacement\nbeta\nreplacement\n",
+            );
+        },
+    );
 
     test("defaults an empty global list to print", async () => {
         const output = new memory_output();
@@ -400,21 +409,24 @@ describe("editor", () => {
         expect(output.stdout).toBe("?\nabc\n?\n");
     });
 
-    test("interrupts a pending append without consuming the next command", async () => {
-        const output = new memory_output();
-        const instance = new editor(
-            new interruptible_input(),
-            output,
-            { input_kind: "terminal", prompt: undefined, silent: true },
-        );
+    test(
+        "interrupts a pending append without consuming the next command",
+        async () => {
+            const output = new memory_output();
+            const instance = new editor(
+                new interruptible_input(),
+                output,
+                { input_kind: "terminal", prompt: undefined, silent: true },
+            );
 
-        const running = instance.run(undefined);
-        await new Promise((resolve) => setTimeout(resolve, 0));
-        instance.interrupt();
+            const running = instance.run(undefined);
+            await new Promise((resolve) => setTimeout(resolve, 0));
+            instance.interrupt();
 
-        expect(await running).toBe(0);
-        expect(output.stdout).toBe("?\n");
-    });
+            expect(await running).toBe(0);
+            expect(output.stdout).toBe("?\n");
+        },
+    );
 
     test("hangup wakes pending input and exits", async () => {
         const output = new memory_output();

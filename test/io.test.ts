@@ -84,7 +84,9 @@ describe("standard input line reader", () => {
     });
 
     test("rejects NUL in text input", () => {
-        expect(() => bytes_to_lines(new Uint8Array([0x61, 0x00, 0x62]))).toThrow(
+        expect(() => bytes_to_lines(
+            new Uint8Array([0x61, 0x00, 0x62]),
+        )).toThrow(
             "text contains NUL",
         );
     });

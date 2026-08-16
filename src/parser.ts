@@ -17,7 +17,9 @@ interface address_result {
     index: number;
 }
 
-export function parse_command(source: string): parsed_command {
+export function
+parse_command(source: string): parsed_command
+{
     let index = skip_spaces(source, 0);
     const addresses: address_spec[] = [];
     let separator: "," | ";" | null = null;
@@ -39,7 +41,7 @@ export function parse_command(source: string): parsed_command {
         index = skip_spaces(source, index + 1);
     }
 
-    while (true) {
+    for (;;) {
         const address = parse_address(source, index);
         if (address === undefined) {
             break;
@@ -90,10 +92,12 @@ export function parse_command(source: string): parsed_command {
     };
 }
 
-function parse_address(
+function
+parse_address(
     source: string,
     start: number,
-): address_result | undefined {
+): address_result | undefined
+{
     const character = source[start];
     if (character === undefined) {
         return undefined;
@@ -141,10 +145,12 @@ function parse_address(
     return { expression: { kind: "number", value }, index };
 }
 
-function parse_offset(
+function
+parse_offset(
     source: string,
     start: number,
-): { offset: number; index: number } {
+): { offset: number; index: number }
+{
     let index = start;
     let offset = 0;
     if (is_digit(source[index] ?? "")) {
@@ -172,12 +178,14 @@ function parse_offset(
     return { offset, index };
 }
 
-export function read_delimited(
+export function
+read_delimited(
     source: string,
     start: number,
     delimiter: string,
     allow_end = false,
-): { value: string; index: number; terminated: boolean } {
+): { value: string; index: number; terminated: boolean }
+{
 	const delimiter_end = character_end(source, start);
 	if (delimiter_end === undefined) {
 		throw new ed_error("unterminated delimiter");
@@ -221,11 +229,13 @@ first_character(source: string): string | undefined
 	return read_character(source, 0);
 }
 
-export function split_substitute(argument: string): {
+export function
+split_substitute(argument: string): {
     pattern: string;
     replacement: string;
     flags: string;
-} {
+}
+{
 	const delimiter = read_character(argument, 0);
 	if (delimiter === undefined || delimiter === " " || delimiter === "\t") {
 		throw new ed_error("invalid substitute command");
@@ -246,7 +256,9 @@ export function split_substitute(argument: string): {
     };
 }
 
-function skip_spaces(source: string, start: number): number {
+function
+skip_spaces(source: string, start: number): number
+{
     let index = start;
     while (source[index] === " " || source[index] === "\t") {
         index += 1;
@@ -254,7 +266,9 @@ function skip_spaces(source: string, start: number): number {
     return index;
 }
 
-function is_digit(value: string): boolean {
+function
+is_digit(value: string): boolean
+{
 	return value >= "0" && value <= "9";
 }
 

@@ -51,7 +51,8 @@ native_addon_plugin(native_path: string): BunPlugin
 {
     return {
         name: "tsed-native-addon",
-        setup(build) {
+        setup(build)
+        {
             build.onResolve({ filter: /^tsed-native-addon$/ }, () => ({
                 path: "tsed-native-addon",
                 namespace: "tsed-native-addon",

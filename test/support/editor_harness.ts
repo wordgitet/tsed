@@ -32,7 +32,9 @@ export class memory_input implements input_source {
 
     public constructor(
         private readonly lines: readonly (string | null)[],
-    ) {}
+    )
+    {
+    }
 
     public read_line(): Promise<input_line>
     {

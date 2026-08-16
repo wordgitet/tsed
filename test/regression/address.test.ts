@@ -201,7 +201,8 @@ describe("address resolution regressions", () => {
 });
 
 function
-address_text(specification: {
+address_text(specification:
+{
     expression: address_expression;
     separator: "," | ";" | null;
     offset: number;

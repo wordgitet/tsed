@@ -23,17 +23,20 @@ export class bre_program {
     private handle: unknown;
     private closed = false;
 
-    public constructor(source: string, handle: unknown) {
+    public constructor(source: string, handle: unknown)
+    {
         this.source = source;
         this.handle = handle;
     }
 
-    public close(): void {
+    public close(): void
+    {
         this.closed = true;
         this.handle = undefined;
     }
 
-    public native_handle(): unknown {
+    public native_handle(): unknown
+    {
         if (this.closed) {
             throw new ed_error("regular expression is closed");
         }

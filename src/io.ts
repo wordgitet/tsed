@@ -24,11 +24,13 @@ export class stdin_line_reader implements input_source {
     private pending_next: Promise<Uint8Array | null> | undefined;
     private interrupt_resolve: (() => void) | undefined;
 
-    public constructor(read_chunk: chunk_reader = read_standard_input) {
+    public constructor(read_chunk: chunk_reader = read_standard_input)
+    {
         this.read_chunk = read_chunk;
     }
 
-    public async read_line(): Promise<input_line> {
+    public async read_line(): Promise<input_line>
+    {
         for (;;) {
             if (this.interrupt_pending) {
                 this.interrupt_pending = false;
@@ -53,14 +55,16 @@ export class stdin_line_reader implements input_source {
         }
     }
 
-    public interrupt(): void {
+    public interrupt(): void
+    {
         this.interrupt_pending = true;
         this.interrupt_resolve?.();
     }
 
     private async wait_for_next(
         next: Promise<Uint8Array | null>,
-    ): Promise<Uint8Array | null | typeof input_interrupted> {
+    ): Promise<Uint8Array | null | typeof input_interrupted>
+    {
         if (this.interrupt_pending) {
             this.interrupt_pending = false;
             return input_interrupted;
@@ -76,7 +80,8 @@ export class stdin_line_reader implements input_source {
         return result;
     }
 
-    private take_line(): Uint8Array | undefined {
+    private take_line(): Uint8Array | undefined
+    {
         const newline = this.pending.indexOf(0x0a);
         if (newline < 0) {
             return undefined;
@@ -87,7 +92,8 @@ export class stdin_line_reader implements input_source {
         return strip_carriage_return(line);
     }
 
-    private take_final_line(): Uint8Array | null {
+    private take_final_line(): Uint8Array | null
+    {
         if (this.pending.length === 0) {
             return null;
         }
@@ -99,16 +105,20 @@ export class stdin_line_reader implements input_source {
 }
 
 export class process_output implements output_sink {
-    public write_stdout(bytes: Uint8Array): void {
+    public write_stdout(bytes: Uint8Array): void
+    {
         process.stdout.write(Buffer.from(bytes));
     }
 
-    public write_stderr(bytes: Uint8Array): void {
+    public write_stderr(bytes: Uint8Array): void
+    {
         process.stderr.write(Buffer.from(bytes));
     }
 }
 
-export function bytes_to_lines(bytes: Uint8Array): Uint8Array[] {
+export function
+bytes_to_lines(bytes: Uint8Array): Uint8Array[]
+{
 	validate_text(bytes);
 	if (bytes.length === 0) {
         return [];
@@ -128,7 +138,9 @@ export function bytes_to_lines(bytes: Uint8Array): Uint8Array[] {
     return lines;
 }
 
-export function lines_to_bytes(lines: readonly Uint8Array[]): Uint8Array {
+export function
+lines_to_bytes(lines: readonly Uint8Array[]): Uint8Array
+{
     const length = lines.reduce((total, line) => total + line.length + 1, 0);
     const bytes = new Uint8Array(length);
     let offset = 0;
@@ -141,14 +153,18 @@ export function lines_to_bytes(lines: readonly Uint8Array[]): Uint8Array {
     return bytes;
 }
 
-export async function read_file_bytes(pathname: string): Promise<Uint8Array> {
+export async function
+read_file_bytes(pathname: string): Promise<Uint8Array>
+{
     return Bun.file(pathname).bytes();
 }
 
-export async function write_file_bytes(
+export async function
+write_file_bytes(
     pathname: string,
     bytes: Uint8Array,
-): Promise<void> {
+): Promise<void>
+{
     const file = await open(pathname, "w");
     try {
         await file.write(bytes);
@@ -157,11 +173,13 @@ export async function write_file_bytes(
     }
 }
 
-export async function run_shell(
+export async function
+run_shell(
     command: string,
     input: Uint8Array | undefined,
     capture_output: boolean,
-): Promise<{ status: number; stdout: Uint8Array }> {
+): Promise<{ status: number; stdout: Uint8Array }>
+{
     const process_options: Parameters<typeof Bun.spawn>[1] = {
         stdin: input ?? "inherit",
         stdout: capture_output ? "pipe" : "inherit",
@@ -179,17 +197,21 @@ export async function run_shell(
     return { status: await child.exited, stdout };
 }
 
-export function concat_bytes(
+export function
+concat_bytes(
     first: Uint8Array,
     second: Uint8Array,
-): Uint8Array {
+): Uint8Array
+{
     const result = new Uint8Array(first.length + second.length);
     result.set(first, 0);
     result.set(second, first.length);
     return result;
 }
 
-export function text_bytes(value: string): Uint8Array {
+export function
+text_bytes(value: string): Uint8Array
+{
     return bytes_from_string(value);
 }
 

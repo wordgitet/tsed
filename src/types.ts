@@ -72,7 +72,8 @@ export class ed_error extends Error {
     public readonly reason: string;
     public readonly recoverable: boolean;
 
-    public constructor(reason: string, recoverable = false) {
+    public constructor(reason: string, recoverable = false)
+    {
         super(reason);
         this.name = "ed_error";
         this.reason = reason;
@@ -80,7 +81,9 @@ export class ed_error extends Error {
     }
 }
 
-export function bytes_from_string(value: string): Uint8Array {
+export function
+bytes_from_string(value: string): Uint8Array
+{
     const bytes = new Uint8Array(value.length);
 
     for (let index = 0; index < value.length; index += 1) {
@@ -90,7 +93,9 @@ export function bytes_from_string(value: string): Uint8Array {
     return bytes;
 }
 
-export function string_from_bytes(value: Uint8Array): string {
+export function
+string_from_bytes(value: Uint8Array): string
+{
     let result = "";
     const chunk_size = 8192;
     for (let offset = 0; offset < value.length; offset += chunk_size) {
@@ -101,6 +106,8 @@ export function string_from_bytes(value: Uint8Array): string {
     return result;
 }
 
-export function copy_bytes(value: Uint8Array): Uint8Array {
+export function
+copy_bytes(value: Uint8Array): Uint8Array
+{
     return value.slice();
 }

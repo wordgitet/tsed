@@ -63,14 +63,16 @@ export class editor {
         input: input_source,
         output: output_sink,
         options: editor_options,
-    ) {
+    )
+    {
         this.input = input;
         this.output = output;
         this.options = options;
         this.prompt_enabled = options.prompt !== undefined;
     }
 
-    public async run(initial_path: string | undefined): Promise<number> {
+    public async run(initial_path: string | undefined): Promise<number>
+    {
         if (initial_path !== undefined) {
             try {
                 await this.edit_file(initial_path, true);
@@ -117,12 +119,14 @@ export class editor {
         return this.had_error ? 1 : 0;
     }
 
-    public interrupt(): void {
+    public interrupt(): void
+    {
         this.interrupted = true;
         this.input.interrupt?.();
     }
 
-    public async handle_hangup(): Promise<void> {
+    public async handle_hangup(): Promise<void>
+    {
         if (!this.buffer.changed) {
             this.finish_hangup();
             return;
@@ -151,7 +155,8 @@ export class editor {
     private async execute_line(
         source: string,
         record_undo: boolean,
-    ): Promise<void> {
+    ): Promise<void>
+    {
         this.check_interrupted();
         const parsed = parse_command(source);
         const effective = parsed.command === ""
@@ -176,7 +181,8 @@ export class editor {
     private async execute_parsed(
         parsed: parsed_command,
         record_undo: boolean,
-    ): Promise<void> {
+    ): Promise<void>
+    {
         const command = parsed.command;
         if (!"acdeEfGghHijklmnpPqQrstuvVw=!".includes(command)) {
             throw new ed_error("unknown command");
@@ -402,13 +408,15 @@ export class editor {
         }
     }
 
-    private get last_error_message(): string | undefined {
+    private get last_error_message(): string | undefined
+    {
         return this.error_message;
     }
 
     private error_message: string | undefined;
 
-    private async with_undo(operation: () => Promise<void>): Promise<void> {
+    private async with_undo(operation: () => Promise<void>): Promise<void>
+    {
         const before = this.snapshot();
         try {
             await operation();
@@ -419,7 +427,8 @@ export class editor {
         }
     }
 
-    private snapshot(): editor_snapshot {
+    private snapshot(): editor_snapshot
+    {
         return {
             ...this.buffer.snapshot(),
             pathname: this.pathname,
@@ -431,7 +440,8 @@ export class editor {
         };
     }
 
-    private restore(snapshot: editor_snapshot): void {
+    private restore(snapshot: editor_snapshot): void
+    {
         this.buffer.restore(snapshot);
         this.pathname = snapshot.pathname;
         this.last_regex = snapshot.last_regex;
@@ -441,7 +451,8 @@ export class editor {
         this.help_enabled = snapshot.help_enabled;
     }
 
-    private undo(): void {
+    private undo(): void
+    {
         if (this.undo_snapshot === undefined) {
             throw new ed_error("nothing to undo");
         }
@@ -450,14 +461,16 @@ export class editor {
         this.undo_snapshot = current;
     }
 
-    private is_buffer_mutating(command: string): boolean {
+    private is_buffer_mutating(command: string): boolean
+    {
         return "acdgGijmrstvV".includes(command);
     }
 
     private command_suffix(
         command: string,
         argument: string,
-    ): { argument: string; suffix: string } {
+    ): { argument: string; suffix: string }
+    {
         if ("eEfgPqQrRvw!s".includes(command)) {
             return { argument, suffix: "" };
         }
@@ -481,7 +494,8 @@ export class editor {
     private resolve_range(
         parsed: parsed_command,
         command: string,
-    ): { start: number; end: number } {
+    ): { start: number; end: number }
+    {
         if (parsed.addresses.length === 0) {
             return this.default_range(command);
         }
@@ -513,7 +527,8 @@ export class editor {
         return { start: first, end: second };
     }
 
-    private maximum_address_count(command: string): number {
+    private maximum_address_count(command: string): number
+    {
         if ("eEfHhPqQu!".includes(command)) {
             return 0;
         }
@@ -523,7 +538,8 @@ export class editor {
         return 2;
     }
 
-    private default_range(command: string): { start: number; end: number } {
+    private default_range(command: string): { start: number; end: number }
+    {
         if (command === "r") {
             return {
                 start: this.buffer.line_count,
@@ -560,7 +576,8 @@ export class editor {
         };
     }
 
-    private resolve_spec(spec: address_spec, previous?: number): number {
+    private resolve_spec(spec: address_spec, previous?: number): number
+    {
         if (spec.expression.kind === "previous") {
             if (previous === undefined) {
                 throw new ed_error("invalid address");
@@ -571,7 +588,8 @@ export class editor {
         return base + spec.offset;
     }
 
-    private resolve_expression(expression: address_expression): number {
+    private resolve_expression(expression: address_expression): number
+    {
         switch (expression.kind) {
             case "current":
                 return this.buffer.current;
@@ -588,7 +606,8 @@ export class editor {
         }
     }
 
-    private search(source: string, direction: "forward" | "backward"): number {
+    private search(source: string, direction: "forward" | "backward"): number
+    {
         const pattern = source === "" ? this.last_regex : source;
         if (pattern === undefined) {
             throw new ed_error("no previous regular expression");
@@ -647,7 +666,8 @@ export class editor {
         address: number,
         command: string,
         range_address: boolean,
-    ): void {
+    ): void
+    {
         const zero_allowed = command === "=" ||
             ("acimrt".includes(command) && range_address);
         if (
@@ -659,7 +679,8 @@ export class editor {
         }
     }
 
-    private resolve_argument_address(argument: string): number {
+    private resolve_argument_address(argument: string): number
+    {
         const parsed = parse_command(argument);
         if (
             parsed.addresses.length !== 1 ||
@@ -679,9 +700,10 @@ export class editor {
         return address;
     }
 
-    private async read_input_lines(): Promise<Uint8Array[]> {
+    private async read_input_lines(): Promise<Uint8Array[]>
+    {
         const lines: Uint8Array[] = [];
-        while (true) {
+        for (;;) {
             this.check_interrupted();
             const line = this.command_input === undefined
                 ? await this.input.read_line()
@@ -700,7 +722,8 @@ export class editor {
         }
     }
 
-    private async read_command_line(initial: string): Promise<string> {
+    private async read_command_line(initial: string): Promise<string>
+    {
         let source = initial;
         if (parse_command(source).command !== "s") {
             return source;
@@ -723,7 +746,8 @@ export class editor {
     private async edit_file(
         pathname: string | undefined,
         force: boolean,
-    ): Promise<void> {
+    ): Promise<void>
+    {
         if (pathname === undefined || pathname.length === 0) {
             if (this.pathname === undefined) {
                 throw new ed_error("no pathname");
@@ -756,7 +780,8 @@ export class editor {
     private async read_after(
         address: number,
         pathname: string | undefined,
-    ): Promise<void> {
+    ): Promise<void>
+    {
         if (pathname === undefined || pathname.length === 0) {
             pathname = this.pathname;
         }
@@ -788,7 +813,8 @@ export class editor {
         start: number,
         end: number,
         pathname: string | undefined,
-    ): Promise<void> {
+    ): Promise<void>
+    {
         if (pathname === undefined || pathname.length === 0) {
             pathname = this.pathname;
         }
@@ -834,7 +860,8 @@ export class editor {
         start: number,
         end: number,
         argument: string,
-    ): Promise<void> {
+    ): Promise<void>
+    {
         const fields = split_substitute(argument);
         const pattern = fields.pattern === ""
             ? this.last_regex
@@ -898,7 +925,8 @@ export class editor {
         interactive: boolean,
         record_undo: boolean,
         invert = false,
-    ): Promise<void> {
+    ): Promise<void>
+    {
         const delimiter = first_character(parsed.argument);
         if (
             delimiter === undefined ||
@@ -990,7 +1018,8 @@ export class editor {
         }
     }
 
-    private async read_global_command_list(initial: string): Promise<string[]> {
+    private async read_global_command_list(initial: string): Promise<string[]>
+    {
         const lines: string[] = [];
         let line = initial.replace(/^\\\n/, "");
         for (;;) {
@@ -1017,7 +1046,8 @@ export class editor {
 
     private async execute_global_command_list(
         lines: readonly string[],
-    ): Promise<void> {
+    ): Promise<void>
+    {
         for (let index = 0; index < lines.length; index += 1) {
             const source = lines[index];
             if (source === undefined) {
@@ -1050,7 +1080,8 @@ export class editor {
         }
     }
 
-    private async shell_escape(argument: string): Promise<void> {
+    private async shell_escape(argument: string): Promise<void>
+    {
         let command = argument.trimStart();
         if (command.startsWith("!")) {
             if (this.last_shell_command === undefined) {
@@ -1073,12 +1104,14 @@ export class editor {
         }
     }
 
-    private pathname_argument(argument: string): string | undefined {
+    private pathname_argument(argument: string): string | undefined
+    {
         const pathname = argument.trim();
         return pathname.length === 0 ? undefined : pathname;
     }
 
-    private set_mark(argument: string, address: number): void {
+    private set_mark(argument: string, address: number): void
+    {
         const name = argument.trim();
         if (name.length !== 1) {
             throw new ed_error("invalid mark name");
@@ -1086,7 +1119,8 @@ export class editor {
         this.buffer.mark(name, address);
     }
 
-    private set_filename(argument: string): void {
+    private set_filename(argument: string): void
+    {
         const pathname = this.pathname_argument(argument);
         if (pathname !== undefined) {
             this.pathname = pathname;
@@ -1096,7 +1130,8 @@ export class editor {
         }
     }
 
-    private async check_modified(command: string): Promise<void> {
+    private async check_modified(command: string): Promise<void>
+    {
         if (!this.buffer.changed) {
             return;
         }
@@ -1108,7 +1143,8 @@ export class editor {
         throw new ed_error("buffer modified", true);
     }
 
-    private handle_command_error(error: unknown): void {
+    private handle_command_error(error: unknown): void
+    {
         this.report_error(error);
         if (error instanceof ed_error && error.recoverable) {
             return;
@@ -1119,7 +1155,8 @@ export class editor {
         }
     }
 
-    private write_suffix(suffix: string, start: number, end: number): void {
+    private write_suffix(suffix: string, start: number, end: number): void
+    {
         if (suffix.includes("p")) {
             this.write_plain(start, end);
         }
@@ -1131,14 +1168,16 @@ export class editor {
         }
     }
 
-    private write_plain(start: number, end: number): void {
+    private write_plain(start: number, end: number): void
+    {
         for (const line of this.buffer.range(start, end)) {
             this.output.write_stdout(concat_line(line.bytes));
         }
         this.buffer.current = end;
     }
 
-    private write_numbered(start: number, end: number): void {
+    private write_numbered(start: number, end: number): void
+    {
         for (let address = start; address <= end; address += 1) {
             this.write_stdout(`${address}\t`);
             this.output.write_stdout(concat_line(this.buffer.bytes(address)));
@@ -1146,18 +1185,21 @@ export class editor {
         this.buffer.current = end;
     }
 
-    private write_list(start: number, end: number): void {
+    private write_list(start: number, end: number): void
+    {
         for (const line of this.buffer.range(start, end)) {
             this.write_stdout(format_list_line(line.bytes));
         }
         this.buffer.current = end;
     }
 
-    private write_stdout(value: string): void {
+    private write_stdout(value: string): void
+    {
         this.output.write_stdout(bytes_from_string(value));
     }
 
-    private report_error(error: unknown): void {
+    private report_error(error: unknown): void
+    {
         const reason = error instanceof Error ? error.message : "error";
         this.error_message = `${reason}\n`;
         this.write_stdout("?\n");
@@ -1166,31 +1208,38 @@ export class editor {
         }
     }
 
-    private check_interrupted(): void {
+    private check_interrupted(): void
+    {
         if (this.interrupted) {
             throw this.take_interrupt_error();
         }
     }
 
-    private take_interrupt_error(): ed_error {
+    private take_interrupt_error(): ed_error
+    {
         this.interrupted = false;
         return new ed_error("interrupt", true);
     }
 
-    private finish_hangup(): void {
+    private finish_hangup(): void
+    {
         this.quit_requested = true;
         this.input.interrupt?.();
     }
 }
 
-function concat_line(bytes: Uint8Array): Uint8Array {
+function
+concat_line(bytes: Uint8Array): Uint8Array
+{
     const result = new Uint8Array(bytes.length + 1);
     result.set(bytes);
     result[bytes.length] = 0x0a;
     return result;
 }
 
-function has_trailing_backslash(value: string): boolean {
+function
+has_trailing_backslash(value: string): boolean
+{
     let count = 0;
     for (let index = value.length - 1; value[index] === "\\"; index -= 1) {
         count += 1;
@@ -1198,7 +1247,9 @@ function has_trailing_backslash(value: string): boolean {
     return count % 2 === 1;
 }
 
-function format_list_line(bytes: Uint8Array): string {
+function
+format_list_line(bytes: Uint8Array): string
+{
 	let result = "";
 	for (const character of text_characters(bytes)) {
 		const value = bytes[character.start];
@@ -1243,7 +1294,9 @@ function format_list_line(bytes: Uint8Array): string {
     return `${fold_list_line(result)}$\n`;
 }
 
-function fold_list_line(value: string): string {
+function
+fold_list_line(value: string): string
+{
     if (value.length <= 70) {
         return value;
     }
@@ -1254,7 +1307,9 @@ function fold_list_line(value: string): string {
     return parts.join("\\\n");
 }
 
-function replace_shell_tokens(command: string, pathname: string): string {
+function
+replace_shell_tokens(command: string, pathname: string): string
+{
     let result = "";
     let escaped = false;
     for (const character of command) {

@@ -19,22 +19,26 @@ export class line_buffer {
     private lines: line_record[] = [];
     private marks = new Map<string, number>();
 
-    public get line_count(): number {
+    public get line_count(): number
+    {
         return this.lines.length;
     }
 
-    public get all_lines(): readonly line_record[] {
+    public get all_lines(): readonly line_record[]
+    {
         return this.lines;
     }
 
-    public load(values: readonly Uint8Array[]): void {
+    public load(values: readonly Uint8Array[]): void
+    {
         this.lines = values.map((bytes) => this.new_line(bytes));
         this.current = this.lines.length;
         this.marks.clear();
         this.changed = false;
     }
 
-    public snapshot(): buffer_snapshot {
+    public snapshot(): buffer_snapshot
+    {
         return {
             lines: this.lines.map((line) => ({
                 id: line.id,
@@ -47,7 +51,8 @@ export class line_buffer {
         };
     }
 
-    public restore(snapshot: buffer_snapshot): void {
+    public restore(snapshot: buffer_snapshot): void
+    {
         this.lines = snapshot.lines.map((line) => ({
             id: line.id,
             bytes: copy_bytes(line.bytes),
@@ -58,7 +63,8 @@ export class line_buffer {
         this.changed = snapshot.changed;
     }
 
-    public line(address: number): line_record {
+    public line(address: number): line_record
+    {
         if (address < 1 || address > this.line_count) {
             throw new ed_error("invalid address");
         }
@@ -71,11 +77,13 @@ export class line_buffer {
         return line;
     }
 
-    public bytes(address: number): Uint8Array {
+    public bytes(address: number): Uint8Array
+    {
         return copy_bytes(this.line(address).bytes);
     }
 
-    public range(start: number, end: number): line_record[] {
+    public range(start: number, end: number): line_record[]
+    {
         if (start < 1 || end < start || end > this.line_count) {
             throw new ed_error("invalid address range");
         }
@@ -83,7 +91,8 @@ export class line_buffer {
         return this.lines.slice(start - 1, end);
     }
 
-    public insert_after(address: number, values: readonly Uint8Array[]): void {
+    public insert_after(address: number, values: readonly Uint8Array[]): void
+    {
         if (address < 0 || address > this.line_count) {
             throw new ed_error("invalid address");
         }
@@ -96,7 +105,8 @@ export class line_buffer {
         this.changed = this.changed || records.length !== 0;
     }
 
-    public delete(start: number, end: number): void {
+    public delete(start: number, end: number): void
+    {
         this.range(start, end);
         const removed = this.lines.splice(start - 1, end - start + 1);
         const removed_ids = new Set(removed.map((line) => line.id));
@@ -115,7 +125,8 @@ export class line_buffer {
         start: number,
         end: number,
         values: readonly Uint8Array[],
-    ): void {
+    ): void
+    {
         const removed = this.range(start, end);
         const first_id = removed[0]?.id;
         const records = values.map((bytes, index) => ({
@@ -139,7 +150,8 @@ export class line_buffer {
         this.changed = true;
     }
 
-    public move(start: number, end: number, target: number): void {
+    public move(start: number, end: number, target: number): void
+    {
         this.range(start, end);
         if (target < 0 || target > this.line_count) {
             throw new ed_error("invalid address");
@@ -156,7 +168,8 @@ export class line_buffer {
         this.changed = true;
     }
 
-    public copy(start: number, end: number, target: number): void {
+    public copy(start: number, end: number, target: number): void
+    {
         this.range(start, end);
         if (target < 0 || target > this.line_count) {
             throw new ed_error("invalid address");
@@ -170,7 +183,8 @@ export class line_buffer {
         this.changed = true;
     }
 
-    public join(start: number, end: number): void {
+    public join(start: number, end: number): void
+    {
         this.range(start, end);
         if (start === end) {
             return;
@@ -203,19 +217,22 @@ export class line_buffer {
         this.changed = true;
     }
 
-    public set_bytes(address: number, bytes: Uint8Array): void {
+    public set_bytes(address: number, bytes: Uint8Array): void
+    {
         const line = this.line(address);
         line.bytes = copy_bytes(bytes);
         this.current = address;
         this.changed = true;
     }
 
-    public mark(name: string, address: number): void {
+    public mark(name: string, address: number): void
+    {
         this.line(address);
         this.marks.set(name, this.line(address).id);
     }
 
-    public marked(name: string): number {
+    public marked(name: string): number
+    {
         const id = this.marks.get(name);
         if (id === undefined) {
             throw new ed_error("undefined mark");
@@ -229,16 +246,19 @@ export class line_buffer {
         return index + 1;
     }
 
-    public ids(start: number, end: number): number[] {
+    public ids(start: number, end: number): number[]
+    {
         return this.range(start, end).map((line) => line.id);
     }
 
-    public address_of(id: number): number | undefined {
+    public address_of(id: number): number | undefined
+    {
         const index = this.lines.findIndex((line) => line.id === id);
         return index < 0 ? undefined : index + 1;
     }
 
-    private range_ids(start: number, end: number): number[] {
+    private range_ids(start: number, end: number): number[]
+    {
         if (start > end) {
             return [];
         }
@@ -246,7 +266,8 @@ export class line_buffer {
         return this.lines.slice(start - 1, end).map((line) => line.id);
     }
 
-    private new_line(bytes: Uint8Array): line_record {
+    private new_line(bytes: Uint8Array): line_record
+    {
         return {
             id: this.next_id++,
             bytes: copy_bytes(bytes),
