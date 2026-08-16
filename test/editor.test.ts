@@ -15,20 +15,8 @@ import {
     input_interrupted,
     type input_line,
     type input_source,
-    type output_sink,
 } from "../src/types";
-
-class memory_input implements input_source {
-    private index = 0;
-
-    public constructor(private readonly lines: readonly (string | null)[]) {}
-
-    public async read_line(): Promise<Uint8Array | null> {
-        const value = this.lines[this.index];
-        this.index += 1;
-        return value == null ? null : bytes_from_string(value);
-    }
-}
+import { memory_input, memory_output } from "./support/editor_harness";
 
 class interruptible_input implements input_source {
     private first_line_read = false;
@@ -53,19 +41,6 @@ class interruptible_input implements input_source {
         const resolve = this.pending;
         this.pending = undefined;
         resolve?.(input_interrupted);
-    }
-}
-
-class memory_output implements output_sink {
-    public stdout = "";
-    public stderr = "";
-
-    public write_stdout(bytes: Uint8Array): void {
-        this.stdout += String.fromCharCode(...bytes);
-    }
-
-    public write_stderr(bytes: Uint8Array): void {
-        this.stderr += String.fromCharCode(...bytes);
     }
 }
 
