@@ -13,7 +13,7 @@ describe("basic regular expressions", () => {
     test("matches BRE anchors, repetition, classes, and groups", () => {
         expect(find_bre(bytes_from_string("abc123"), compile_bre("^[a-z]*[[:digit:]]\\{3\\}$"))).toBeDefined();
         expect(find_bre(bytes_from_string("abab"), compile_bre("\\(ab\\)\\1"))).toBeDefined();
-        expect(find_bre(bytes_from_string("^abc"), compile_bre("\\(^a\\)bc"))).toBeDefined();
+        expect(find_bre(bytes_from_string("^abc"), compile_bre("\\(\\^a\\)bc"))).toBeDefined();
         expect(find_bre(bytes_from_string("]"), compile_bre("[]]"))).toBeDefined();
         expect(find_bre(bytes_from_string("*bc"), compile_bre("^*"))).toBeDefined();
         expect(find_bre(bytes_from_string("a*c"), compile_bre("^*"))).toBeUndefined();
@@ -26,8 +26,8 @@ describe("basic regular expressions", () => {
         expect(() => compile_bre("[[.ch.]]")).toThrow();
         expect(() => compile_bre("[b-a]")).toThrow();
         expect(find_bre(bytes_from_string("a".repeat(256)), compile_bre("a\\{256\\}"))).toBeDefined();
-        expect(find_bre(bytes_from_string("ab$"), compile_bre("\\(ab$\\)"))).toBeDefined();
-        expect(find_bre(bytes_from_string("ab"), compile_bre("\\(ab$\\)"))).toBeUndefined();
+        expect(find_bre(bytes_from_string("ab$"), compile_bre("\\(ab\\$\\)"))).toBeDefined();
+        expect(find_bre(bytes_from_string("ab"), compile_bre("\\(ab\\$\\)"))).toBeUndefined();
     });
 
     test("substitutes matches and expands ampersand", () => {

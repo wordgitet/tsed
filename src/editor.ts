@@ -7,7 +7,13 @@
 import { line_buffer } from "./buffer";
 import { compile_bre, find_bre, substitute_bre, type bre_program } from "./bre";
 import { bytes_to_lines, lines_to_bytes, read_file_bytes, run_shell, write_file_bytes } from "./io";
-import { parse_command, read_delimited, split_substitute } from "./parser";
+import { text_characters, validate_text } from "./locale";
+import {
+	first_character,
+	parse_command,
+	read_delimited,
+	split_substitute,
+} from "./parser";
 import {
     bytes_from_string,
     copy_bytes,
@@ -90,8 +96,9 @@ export class editor {
                 continue;
             }
 
-            try {
-                await this.execute_line(string_from_bytes(line), true);
+			try {
+				validate_text(line);
+				await this.execute_line(string_from_bytes(line), true);
             } catch (error) {
                 this.handle_command_error(error);
             }
@@ -424,27 +431,31 @@ export class editor {
             throw new ed_error("no previous regular expression");
         }
         const program = compile_bre(pattern);
-        this.last_regex = pattern;
-        if (this.buffer.line_count === 0) {
-            throw new ed_error("buffer is empty");
-        }
-        if (direction === "forward") {
-            for (let offset = 1; offset <= this.buffer.line_count; offset += 1) {
-                const address = ((this.buffer.current + offset - 1) % this.buffer.line_count) + 1;
-                if (find_bre(this.buffer.bytes(address), program) !== undefined) {
-                    return address;
+        try {
+            this.last_regex = pattern;
+            if (this.buffer.line_count === 0) {
+                throw new ed_error("buffer is empty");
+            }
+            if (direction === "forward") {
+                for (let offset = 1; offset <= this.buffer.line_count; offset += 1) {
+                    const address = ((this.buffer.current + offset - 1) % this.buffer.line_count) + 1;
+                    if (find_bre(this.buffer.bytes(address), program) !== undefined) {
+                        return address;
+                    }
+                }
+            } else {
+                for (let offset = 1; offset <= this.buffer.line_count; offset += 1) {
+                    const address =
+                        ((this.buffer.current - offset - 1 + this.buffer.line_count * 2) % this.buffer.line_count) + 1;
+                    if (find_bre(this.buffer.bytes(address), program) !== undefined) {
+                        return address;
+                    }
                 }
             }
-        } else {
-            for (let offset = 1; offset <= this.buffer.line_count; offset += 1) {
-                const address =
-                    ((this.buffer.current - offset - 1 + this.buffer.line_count * 2) % this.buffer.line_count) + 1;
-                if (find_bre(this.buffer.bytes(address), program) !== undefined) {
-                    return address;
-                }
-            }
+            throw new ed_error("regular expression not found");
+        } finally {
+            program.close();
         }
-        throw new ed_error("regular expression not found");
     }
 
     private validate_address(address: number, command: string, range_address: boolean): void {
@@ -485,6 +496,7 @@ export class editor {
             if (line === null) {
                 throw new ed_error("unexpected end of input");
             }
+			validate_text(line);
             if (line.length === 1 && line[0] === 0x2e) {
                 return lines;
             }
@@ -578,35 +590,39 @@ export class editor {
             throw new ed_error("no previous regular expression");
         }
         const program = compile_bre(pattern);
-        this.last_regex = pattern;
-        const occurrence_match = fields.flags.match(/[0-9]+/);
-        const occurrence = occurrence_match === null ? undefined : Number(occurrence_match[0]);
-        const global = fields.flags.includes("g");
-        this.last_replacement = fields.replacement;
-        let changed = false;
-        let last_address = this.buffer.current;
-        const ids = this.buffer.ids(start, end);
-        for (const id of ids) {
-            const address = this.buffer.address_of(id);
-            if (address === undefined) {
-                continue;
+        try {
+            this.last_regex = pattern;
+            const occurrence_match = fields.flags.match(/[0-9]+/);
+            const occurrence = occurrence_match === null ? undefined : Number(occurrence_match[0]);
+            const global = fields.flags.includes("g");
+            this.last_replacement = fields.replacement;
+            let changed = false;
+            let last_address = this.buffer.current;
+            const ids = this.buffer.ids(start, end);
+            for (const id of ids) {
+                const address = this.buffer.address_of(id);
+                if (address === undefined) {
+                    continue;
+                }
+                const result = substitute_bre(this.buffer.bytes(address), program, fields.replacement, global, occurrence);
+                if (result.changed) {
+                    changed = true;
+                    this.buffer.replace(address, address, result.lines);
+                    last_address = this.buffer.current;
+                }
             }
-            const result = substitute_bre(this.buffer.bytes(address), program, fields.replacement, global, occurrence);
-            if (result.changed) {
-                changed = true;
-                this.buffer.replace(address, address, result.lines);
-                last_address = this.buffer.current;
+            if (!changed) {
+                throw new ed_error("substitute failed");
             }
-        }
-        if (!changed) {
-            throw new ed_error("substitute failed");
-        }
-        if (fields.flags.includes("p")) {
-            this.write_plain(last_address, last_address);
-        } else if (fields.flags.includes("n")) {
-            this.write_numbered(last_address, last_address);
-        } else if (fields.flags.includes("l")) {
-            this.write_list(last_address, last_address);
+            if (fields.flags.includes("p")) {
+                this.write_plain(last_address, last_address);
+            } else if (fields.flags.includes("n")) {
+                this.write_numbered(last_address, last_address);
+            } else if (fields.flags.includes("l")) {
+                this.write_list(last_address, last_address);
+            }
+        } finally {
+            program.close();
         }
     }
 
@@ -616,7 +632,7 @@ export class editor {
         record_undo: boolean,
         invert = false,
     ): Promise<void> {
-        const delimiter = parsed.argument[0];
+        const delimiter = first_character(parsed.argument);
         if (delimiter === undefined || delimiter === " " || delimiter === "\t") {
             throw new ed_error("invalid global command");
         }
@@ -629,45 +645,50 @@ export class editor {
             throw new ed_error("no previous regular expression");
         }
         const program = compile_bre(pattern);
-        this.last_regex = pattern;
-        const range = this.resolve_range(parsed, parsed.command);
-        const ids = this.buffer.ids(range.start, range.end);
-        const selected = ids.filter((id) => {
-            const address = this.buffer.address_of(id);
-            return address !== undefined && (find_bre(this.buffer.bytes(address), program) !== undefined) !== invert;
-        });
+        try {
+            this.last_regex = pattern;
+            const range = this.resolve_range(parsed, parsed.command);
+            const ids = this.buffer.ids(range.start, range.end);
+            const selected = ids.filter((id) => {
+                const address = this.buffer.address_of(id);
+                return address !== undefined && (find_bre(this.buffer.bytes(address), program) !== undefined) !== invert;
+            });
 
-        let previous_command: string | undefined;
-        for (const id of selected) {
-            const address = this.buffer.address_of(id);
-            if (address === undefined) {
-                continue;
-            }
-            this.buffer.current = address;
-            if (interactive) {
-                this.write_plain(address, address);
-                const line = await this.input.read_line();
-                if (line === input_interrupted) {
-                    throw this.take_interrupt_error();
+            let previous_command: string | undefined;
+            for (const id of selected) {
+                const address = this.buffer.address_of(id);
+                if (address === undefined) {
+                    continue;
                 }
-                if (line === null) {
-                    throw new ed_error("unexpected end of input");
-                }
-                const command_line = string_from_bytes(line);
-                if (command_line === "&") {
-                    if (previous_command === undefined) {
-                        throw new ed_error("no previous global command");
+                this.buffer.current = address;
+                if (interactive) {
+                    this.write_plain(address, address);
+                    const line = await this.input.read_line();
+                    if (line === input_interrupted) {
+                        throw this.take_interrupt_error();
                     }
-                    await this.execute_line(previous_command, false);
-                } else if (command_line.length !== 0) {
-                    previous_command = command_line;
-                    await this.execute_line(command_line, false);
+                    if (line === null) {
+                        throw new ed_error("unexpected end of input");
+                    }
+                    validate_text(line);
+                    const command_line = string_from_bytes(line);
+                    if (command_line === "&") {
+                        if (previous_command === undefined) {
+                            throw new ed_error("no previous global command");
+                        }
+                        await this.execute_line(previous_command, false);
+                    } else if (command_line.length !== 0) {
+                        previous_command = command_line;
+                        await this.execute_line(command_line, false);
+                    }
+                } else {
+                    await this.execute_line(list, false);
                 }
-            } else {
-                await this.execute_line(list, false);
             }
+            void record_undo;
+        } finally {
+            program.close();
         }
-        void record_undo;
     }
 
     private async shell_escape(argument: string): Promise<void> {
@@ -811,9 +832,13 @@ function concat_line(bytes: Uint8Array): Uint8Array {
 }
 
 function format_list_line(bytes: Uint8Array): string {
-    let result = "";
-    for (const value of bytes) {
-        switch (value) {
+	let result = "";
+	for (const character of text_characters(bytes)) {
+		const value = bytes[character.start];
+		if (value === undefined) {
+			continue;
+		}
+		switch (value) {
             case 0x08:
                 result += "\\b";
                 break;
@@ -835,14 +860,18 @@ function format_list_line(bytes: Uint8Array): string {
             case 0x5c:
                 result += "\\\\";
                 break;
-            case 0x24:
-                result += "\\$";
-                break;
-            default:
-                result += value >= 0x20 && value <= 0x7e
-                    ? String.fromCharCode(value)
-                    : `\\${value.toString(8).padStart(3, "0")}`;
-        }
+			case 0x24:
+				result += "\\$";
+				break;
+			default:
+				if (character.printable) {
+					result += string_from_bytes(bytes.slice(character.start, character.end));
+				} else {
+					for (const item of bytes.slice(character.start, character.end)) {
+						result += `\\${item.toString(8).padStart(3, "0")}`;
+					}
+				}
+		}
     }
     return `${fold_list_line(result)}$\n`;
 }

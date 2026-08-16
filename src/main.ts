@@ -8,6 +8,7 @@ import { fstatSync } from "node:fs";
 
 import { editor } from "./editor";
 import { stdin_line_reader, process_output } from "./io";
+import { posix_regex } from "./native";
 import { ed_error, type input_kind } from "./types";
 
 interface command_line_options {
@@ -21,6 +22,7 @@ main(): Promise<void>
 {
     try {
         const options = parse_options(process.argv.slice(2));
+        posix_regex();
         const instance = new editor(
             new stdin_line_reader(),
             new process_output(),

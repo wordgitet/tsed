@@ -19,6 +19,11 @@ PROJECT SNAPSHOT
 This is a research toy, not a claim of complete POSIX conformance.  It targets
 POSIX platforms only.  Windows is not supported.
 
+Regular expressions use a small native Node-API binding to the host POSIX libc.
+The active LC_CTYPE and LC_COLLATE locales therefore define character classes,
+ranges, equivalence classes, and collating elements.  Bun and a compatible
+native build are required when a matching npm prebuild is unavailable.
+
 ------------------------------------------------------------------------
 INSTALLING FROM NPM
 ------------------------------------------------------------------------
@@ -41,6 +46,10 @@ Install Bun and build the editor from the repository root:
 
     bun install
     bun run build
+
+On a platform without a bundled native prebuild, build the backend explicitly:
+
+    bun run build:native
 
 The build creates two command names:
 

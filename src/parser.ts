@@ -4,11 +4,12 @@
  * SPDX-License-Identifier: 0BSD
  */
 
+import { next_character } from "./locale";
 import {
-    ed_error,
-    type address_expression,
-    type address_spec,
-    type parsed_command,
+	ed_error,
+	type address_expression,
+	type address_spec,
+	type parsed_command,
 } from "./types";
 
 interface address_result {
@@ -154,22 +155,44 @@ export function read_delimited(
     start: number,
     delimiter: string,
 ): { value: string; index: number } {
-    let index = start + 1;
-    let value = "";
-    while (index < source.length) {
-        const character = source[index];
-        if (character === delimiter) {
-            return { value, index: index + 1 };
-        }
-        if (character === "\\" && source[index + 1] !== undefined) {
-            value += character + source[index + 1];
-            index += 2;
-        } else {
-            value += character;
-            index += 1;
-        }
-    }
-    throw new ed_error("unterminated delimiter");
+	const delimiter_end = character_end(source, start);
+	if (delimiter_end === undefined) {
+		throw new ed_error("unterminated delimiter");
+	}
+	const actual_delimiter = source.slice(start, delimiter_end);
+	if (actual_delimiter !== delimiter) {
+		throw new ed_error("invalid delimiter");
+	}
+	let index = delimiter_end;
+	let value = "";
+	while (index < source.length) {
+		const end = character_end(source, index);
+		if (end === undefined) {
+			throw new ed_error("unterminated delimiter");
+		}
+		const character = source.slice(index, end);
+		if (character === actual_delimiter) {
+			return { value, index: end };
+		}
+		if (character === "\\" && end < source.length) {
+			const escaped_end = character_end(source, end);
+			if (escaped_end === undefined) {
+				throw new ed_error("unterminated delimiter");
+			}
+			value += source.slice(index, escaped_end);
+			index = escaped_end;
+		} else {
+			value += character;
+			index = end;
+		}
+	}
+	throw new ed_error("unterminated delimiter");
+}
+
+export function
+first_character(source: string): string | undefined
+{
+	return read_character(source, 0);
 }
 
 export function split_substitute(argument: string): {
@@ -177,12 +200,16 @@ export function split_substitute(argument: string): {
     replacement: string;
     flags: string;
 } {
-    const delimiter = argument[0];
-    if (delimiter === undefined || delimiter === " " || delimiter === "\t") {
-        throw new ed_error("invalid substitute command");
-    }
-    const pattern_result = read_delimited(argument, 0, delimiter);
-    const replacement_result = read_delimited(argument, pattern_result.index - 1, delimiter);
+	const delimiter = read_character(argument, 0);
+	if (delimiter === undefined || delimiter === " " || delimiter === "\t") {
+		throw new ed_error("invalid substitute command");
+	}
+	const pattern_result = read_delimited(argument, 0, delimiter);
+	const replacement_result = read_delimited(
+		argument,
+		pattern_result.index - delimiter.length,
+		delimiter,
+	);
     return {
         pattern: pattern_result.value,
         replacement: replacement_result.value,
@@ -199,5 +226,28 @@ function skip_spaces(source: string, start: number): number {
 }
 
 function is_digit(value: string): boolean {
-    return value >= "0" && value <= "9";
+	return value >= "0" && value <= "9";
+}
+
+function
+read_character(source: string, start: number): string | undefined
+{
+	const end = character_end(source, start);
+	return end === undefined ? undefined : source.slice(start, end);
+}
+
+function
+character_end(source: string, start: number): number | undefined
+{
+	if (start >= source.length) {
+		return undefined;
+	}
+	if ((source.charCodeAt(start) ?? 0) < 0x80) {
+		return start + 1;
+	}
+	const bytes = new Uint8Array(source.length);
+	for (let index = 0; index < source.length; index += 1) {
+		bytes[index] = source.charCodeAt(index) & 0xff;
+	}
+	return next_character(bytes, start);
 }

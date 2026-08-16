@@ -39,6 +39,12 @@ $ bun run test:tour
 `bun run test:tour` runs the executable documentation examples and also
 requires a prior build.
 
+The editor's regular-expression backend is a POSIX Node-API addon.  `bun run
+build` compiles it for the current host before compiling the standalone
+executable.  Release prebuilds are produced with `bun run make:prebuilds` on
+the target platform; generated `build/` and `prebuilds/` directories remain
+ignored local artifacts.
+
 ## Changes
 
 - Follow [AGENTS.md](AGENTS.md). In particular, project-owned TypeScript names

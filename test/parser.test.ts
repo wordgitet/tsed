@@ -7,6 +7,7 @@
 import { describe, expect, test } from "bun:test";
 
 import { parse_command, split_substitute } from "../src/parser";
+import { string_from_bytes } from "../src/types";
 
 describe("command parser", () => {
     test("parses ranges and offsets", () => {
@@ -24,4 +25,28 @@ describe("command parser", () => {
             flags: "g",
         });
     });
+
+    test.skipIf(!active_utf8_locale())(
+        "accepts a multibyte substitute delimiter",
+        () => {
+            const source = string_from_bytes(
+                new TextEncoder().encode("éaébég"),
+            );
+            expect(split_substitute(source)).toEqual({
+                pattern: "a",
+                replacement: "b",
+                flags: "g",
+            });
+        },
+    );
 });
+
+function
+active_utf8_locale(): boolean
+{
+    const locale = process.env.LC_ALL ??
+        process.env.LC_CTYPE ??
+        process.env.LANG ??
+        "C";
+	return /utf-?8/i.test(locale);
+}

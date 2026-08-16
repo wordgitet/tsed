@@ -21,6 +21,9 @@
   "type": "module",
   "files": [
     "bin",
+    "binding.gyp",
+    "native",
+    "prebuilds",
     "src",
     "README",
     "TOUR",
@@ -34,15 +37,23 @@
     "access": "public"
   },
   "scripts": {
+    "build:native": "CC=${CC:-cc} CXX=${CXX:-c++} node-gyp rebuild",
+    "install": "CC=cc CXX=cc node-gyp-build",
+    "make:prebuilds": "CC=${CC:-cc} CXX=${CXX:-c++} prebuildify --napi --strip --tag-libc",
     "test": "bun test",
     "test:tour": "bun test test/tour.test.ts",
     "typecheck": "tsc --noEmit",
     "check:style": "bun src/style_check.ts",
     "check": "bun run typecheck && bun run build && bun test && bun run check:style",
-    "build": "bun src/build.ts"
+    "build": "bun run build:native && bun src/build.ts"
+  },
+  "dependencies": {
+    "node-gyp-build": "^4.8.4"
   },
   "devDependencies": {
     "@types/bun": "latest",
+    "node-gyp": "^13.0.1",
+    "prebuildify": "^6.0.1",
     "typescript": "latest"
   }
 }

@@ -6,7 +6,7 @@
 
 import { describe, expect, test } from "bun:test";
 
-import { stdin_line_reader } from "../src/io";
+import { bytes_to_lines, stdin_line_reader } from "../src/io";
 import {
     bytes_from_string,
     input_interrupted,
@@ -47,5 +47,11 @@ describe("standard input line reader", () => {
             throw new Error("expected a line");
         }
         expect(string_from_bytes(line)).toBe("Q");
+    });
+
+    test("rejects NUL in text input", () => {
+        expect(() => bytes_to_lines(new Uint8Array([0x61, 0x00, 0x62]))).toThrow(
+            "text contains NUL",
+        );
     });
 });

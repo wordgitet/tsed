@@ -42,7 +42,7 @@ Input passes through a small set of explicit boundaries:
            v
     stdin bytes -> line reader -> parser -> editor
                                            |   |
-                                           |   +-> BRE matcher
+                                      |   +-> libc BRE matcher
                                            v
                                       line buffer
                                            |
@@ -101,12 +101,18 @@ marks, current-line updates, modified state, and snapshots.  Undo swaps the
 current snapshot with the previous one, so repeated u commands toggle between
 two states.
 
-Basic regular expressions live in src/bre.ts.
+Basic regular expressions live behind src/bre.ts and the native
+native/posix_regex.c binding.
 
-The local BRE engine parses patterns into a small tree and matches them against
-the editor's byte-preserving string representation.  It supports literals,
-dot, anchors, bracket expressions, ASCII POSIX character classes, star,
-intervals, captured groups, back-references, and replacement expansion.
+The TypeScript adapter keeps the editor's byte-preserving representation while
+the host libc supplies POSIX BRE parsing, matching, character classes, ranges,
+equivalence classes, and collating elements.  LC_CTYPE controls character
+interpretation and classes; LC_COLLATE controls ranges and collation.  Captures
+remain byte offsets, so replacement expansion preserves the original bytes.
+
+The native binding also validates text, reports locale character boundaries,
+and tells the l command which characters are printable.  The parser uses those
+boundaries when a substitute or global command has a multibyte delimiter.
 
 Substitution can replace one match, every match, or a numbered match.
 Ampersand inserts the complete match.  Backslash followed by 1 through 9
@@ -546,10 +552,11 @@ temporary backing file.
 File writes truncate and replace their destination directly.  They are not an
 atomic rename transaction.
 
-Text and regular-expression behavior is byte-oriented.  Character classes are
-ASCII definitions, not locale-sensitive multibyte collation.  Bracket
-collating and equivalence forms accept one byte-like character; they do not
-implement a locale database.
+Regular-expression and character behavior follows the host libc and the active
+LC_CTYPE and LC_COLLATE locales.  Exact ranges, equivalence classes, and
+collating elements therefore depend on locale data installed on the system.
+Input containing NUL or an invalid multibyte sequence for the active locale is
+rejected as non-text before it can change the buffer.
 
 A final input line without a newline is accepted.  Writing reconstructs every
 buffer line with a trailing newline.

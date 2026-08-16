@@ -6,12 +6,13 @@
 
 import { read } from "node:fs";
 import { open } from "node:fs/promises";
+import { validate_text } from "./locale";
 import {
-    bytes_from_string,
-    input_interrupted,
+	bytes_from_string,
+	input_interrupted,
     type input_line,
-    type input_source,
-    type output_sink,
+	type input_source,
+	type output_sink,
 } from "./types";
 
 type chunk_reader = () => Promise<Uint8Array | null>;
@@ -100,7 +101,8 @@ export class process_output implements output_sink {
 }
 
 export function bytes_to_lines(bytes: Uint8Array): Uint8Array[] {
-    if (bytes.length === 0) {
+	validate_text(bytes);
+	if (bytes.length === 0) {
         return [];
     }
 
