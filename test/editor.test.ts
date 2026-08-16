@@ -108,6 +108,47 @@ describe("editor", () => {
         expect(output.stdout).toBe("One\ntwO\none\ntwo\n");
     });
 
+    test("reuses the previous substitution replacement", async () => {
+        const output = new memory_output();
+        const instance = new editor(
+            new memory_input([
+                "a", "one two", ".", "1s/one/ONE/", "1s/two/%/", "1p",
+                "Q",
+            ]),
+            output,
+            { input_kind: "regular", prompt: undefined, silent: true },
+        );
+
+        expect(await instance.run(undefined)).toBe(0);
+        expect(output.stdout).toBe("ONE ONE\n");
+    });
+
+    test("rejects percent without a previous replacement", async () => {
+        const output = new memory_output();
+        const instance = new editor(
+            new memory_input(["a", "line", ".", "1s/line/%/"]),
+            output,
+            { input_kind: "regular", prompt: undefined, silent: true },
+        );
+
+        expect(await instance.run(undefined)).toBe(1);
+        expect(output.stdout).toBe("?\n");
+    });
+
+    test("continues escaped-newline substitution replacements", async () => {
+        const output = new memory_output();
+        const instance = new editor(
+            new memory_input([
+                "a", "abac", ".", "1s/a/a\\", "/g", ".=", "1,$p", "Q",
+            ]),
+            output,
+            { input_kind: "regular", prompt: undefined, silent: true },
+        );
+
+        expect(await instance.run(undefined)).toBe(0);
+        expect(output.stdout).toBe("3\na\nba\nc\n");
+    });
+
     test("resolves excess, trailing, and unsigned addresses", async () => {
         const output = new memory_output();
         const instance = new editor(

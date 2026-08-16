@@ -99,7 +99,10 @@ export class editor {
 
 			try {
 				validate_text(line);
-				await this.execute_line(string_from_bytes(line), true);
+				const source = await this.read_command_line(
+					string_from_bytes(line),
+				);
+				await this.execute_line(source, true);
             } catch (error) {
                 this.handle_command_error(error);
             }
@@ -557,6 +560,26 @@ export class editor {
         }
     }
 
+    private async read_command_line(initial: string): Promise<string> {
+        let source = initial;
+        if (parse_command(source).command !== "s") {
+            return source;
+        }
+        while (has_trailing_backslash(source)) {
+            source = `${source.slice(0, -1)}\n`;
+            const line = await this.input.read_line();
+            if (line === input_interrupted) {
+                throw this.take_interrupt_error();
+            }
+            if (line === null) {
+                throw new ed_error("unexpected end of input");
+            }
+            validate_text(line);
+            source += string_from_bytes(line);
+        }
+        return source;
+    }
+
     private async edit_file(pathname: string | undefined, force: boolean): Promise<void> {
         if (pathname === undefined || pathname.length === 0) {
             if (this.pathname === undefined) {
@@ -645,13 +668,19 @@ export class editor {
         if (pattern === undefined) {
             throw new ed_error("no previous regular expression");
         }
+        const replacement = fields.replacement === "%"
+            ? this.last_replacement
+            : fields.replacement;
+        if (replacement === undefined) {
+            throw new ed_error("no previous replacement");
+        }
         const program = compile_bre(pattern);
         try {
             this.last_regex = pattern;
             const occurrence_match = fields.flags.match(/[0-9]+/);
             const occurrence = occurrence_match === null ? undefined : Number(occurrence_match[0]);
             const global = fields.flags.includes("g");
-            this.last_replacement = fields.replacement;
+            this.last_replacement = replacement;
             let changed = false;
             let last_address = this.buffer.current;
             const ids = this.buffer.ids(start, end);
@@ -660,7 +689,13 @@ export class editor {
                 if (address === undefined) {
                     continue;
                 }
-                const result = substitute_bre(this.buffer.bytes(address), program, fields.replacement, global, occurrence);
+                const result = substitute_bre(
+                    this.buffer.bytes(address),
+                    program,
+                    replacement,
+                    global,
+                    occurrence,
+                );
                 if (result.changed) {
                     changed = true;
                     this.buffer.replace(address, address, result.lines);
