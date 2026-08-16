@@ -6,7 +6,13 @@
 
 import { line_buffer } from "./buffer";
 import { compile_bre, find_bre, substitute_bre, type bre_program } from "./bre";
-import { bytes_to_lines, lines_to_bytes, read_file_bytes, run_shell, write_file_bytes } from "./io";
+import {
+    bytes_to_lines,
+    lines_to_bytes,
+    read_file_bytes,
+    run_shell,
+    write_file_bytes,
+} from "./io";
 import { text_characters, validate_text } from "./locale";
 import {
 	first_character,
@@ -142,14 +148,20 @@ export class editor {
         this.finish_hangup();
     }
 
-    private async execute_line(source: string, record_undo: boolean): Promise<void> {
+    private async execute_line(
+        source: string,
+        record_undo: boolean,
+    ): Promise<void> {
         this.check_interrupted();
         const parsed = parse_command(source);
         const effective = parsed.command === ""
             ? parse_command(".+1p")
             : parsed;
         const command = effective.command;
-        if (this.warned_command !== undefined && this.warned_command !== command) {
+        if (
+            this.warned_command !== undefined &&
+            this.warned_command !== command
+        ) {
             this.warned_command = undefined;
         }
         if (record_undo && this.is_buffer_mutating(command)) {
@@ -161,7 +173,10 @@ export class editor {
         }
     }
 
-    private async execute_parsed(parsed: parsed_command, record_undo: boolean): Promise<void> {
+    private async execute_parsed(
+        parsed: parsed_command,
+        record_undo: boolean,
+    ): Promise<void> {
         const command = parsed.command;
         if (!"acdeEfGghHijklmnpPqQrstuvVw=!".includes(command)) {
             throw new ed_error("unknown command");
@@ -176,7 +191,11 @@ export class editor {
             case "a": {
                 const lines = await this.read_input_lines();
                 this.buffer.insert_after(range.start, lines);
-                this.write_suffix(suffix, this.buffer.current, this.buffer.current);
+                this.write_suffix(
+                    suffix,
+                    this.buffer.current,
+                    this.buffer.current,
+                );
                 return;
             }
             case "i": {
@@ -186,22 +205,38 @@ export class editor {
                 if (lines.length === 0) {
                     this.buffer.current = range.start;
                 }
-                this.write_suffix(suffix, this.buffer.current, this.buffer.current);
+                this.write_suffix(
+                    suffix,
+                    this.buffer.current,
+                    this.buffer.current,
+                );
                 return;
             }
             case "c": {
                 const lines = await this.read_input_lines();
                 if (this.buffer.line_count > 0) {
-                    this.buffer.replace(Math.max(1, range.start), range.end, lines);
+                    this.buffer.replace(
+                        Math.max(1, range.start),
+                        range.end,
+                        lines,
+                    );
                 } else {
                     this.buffer.insert_after(0, lines);
                 }
-                this.write_suffix(suffix, this.buffer.current, this.buffer.current);
+                this.write_suffix(
+                    suffix,
+                    this.buffer.current,
+                    this.buffer.current,
+                );
                 return;
             }
             case "d":
                 this.buffer.delete(range.start, range.end);
-                this.write_suffix(suffix, this.buffer.current, this.buffer.current);
+                this.write_suffix(
+                    suffix,
+                    this.buffer.current,
+                    this.buffer.current,
+                );
                 return;
             case "e":
                 await this.check_modified("e");
@@ -222,7 +257,11 @@ export class editor {
                     true,
                     record_undo,
                 );
-                this.write_suffix(suffix, this.buffer.current, this.buffer.current);
+                this.write_suffix(
+                    suffix,
+                    this.buffer.current,
+                    this.buffer.current,
+                );
                 return;
             case "v":
                 await this.global_command(parsed, false, record_undo, true);
@@ -234,35 +273,66 @@ export class editor {
                     record_undo,
                     true,
                 );
-                this.write_suffix(suffix, this.buffer.current, this.buffer.current);
+                this.write_suffix(
+                    suffix,
+                    this.buffer.current,
+                    this.buffer.current,
+                );
                 return;
             case "h":
                 if (this.last_error_message !== undefined) {
                     this.write_stdout(this.last_error_message);
                 }
-                this.write_suffix(suffix, this.buffer.current, this.buffer.current);
+                this.write_suffix(
+                    suffix,
+                    this.buffer.current,
+                    this.buffer.current,
+                );
                 return;
             case "H":
                 this.help_enabled = !this.help_enabled;
-                if (this.help_enabled && this.last_error_message !== undefined) {
+                if (
+                    this.help_enabled &&
+                    this.last_error_message !== undefined
+                ) {
                     this.write_stdout(this.last_error_message);
                 }
-                this.write_suffix(suffix, this.buffer.current, this.buffer.current);
+                this.write_suffix(
+                    suffix,
+                    this.buffer.current,
+                    this.buffer.current,
+                );
                 return;
             case "j":
                 this.buffer.join(range.start, range.end);
-                this.write_suffix(suffix, this.buffer.current, this.buffer.current);
+                this.write_suffix(
+                    suffix,
+                    this.buffer.current,
+                    this.buffer.current,
+                );
                 return;
             case "k":
                 this.set_mark(argument, range.start);
-                this.write_suffix(suffix, this.buffer.current, this.buffer.current);
+                this.write_suffix(
+                    suffix,
+                    this.buffer.current,
+                    this.buffer.current,
+                );
                 return;
             case "l":
                 this.write_list(range.start, range.end);
                 return;
             case "m":
-                this.buffer.move(range.start, range.end, this.resolve_argument_address(argument));
-                this.write_suffix(suffix, this.buffer.current, this.buffer.current);
+                this.buffer.move(
+                    range.start,
+                    range.end,
+                    this.resolve_argument_address(argument),
+                );
+                this.write_suffix(
+                    suffix,
+                    this.buffer.current,
+                    this.buffer.current,
+                );
                 return;
             case "n":
                 this.write_numbered(range.start, range.end);
@@ -281,25 +351,48 @@ export class editor {
                 this.quit_requested = true;
                 return;
             case "r":
-                await this.read_after(range.start, this.pathname_argument(argument));
+                await this.read_after(
+                    range.start,
+                    this.pathname_argument(argument),
+                );
                 return;
             case "s":
                 await this.substitute(range.start, range.end, argument);
                 return;
             case "t":
-                this.buffer.copy(range.start, range.end, this.resolve_argument_address(argument));
-                this.write_suffix(suffix, this.buffer.current, this.buffer.current);
+                this.buffer.copy(
+                    range.start,
+                    range.end,
+                    this.resolve_argument_address(argument),
+                );
+                this.write_suffix(
+                    suffix,
+                    this.buffer.current,
+                    this.buffer.current,
+                );
                 return;
             case "u":
                 this.undo();
-                this.write_suffix(suffix, this.buffer.current, this.buffer.current);
+                this.write_suffix(
+                    suffix,
+                    this.buffer.current,
+                    this.buffer.current,
+                );
                 return;
             case "w":
-                await this.write_range(range.start, range.end, this.pathname_argument(argument));
+                await this.write_range(
+                    range.start,
+                    range.end,
+                    this.pathname_argument(argument),
+                );
                 return;
             case "=":
                 this.write_stdout(`${range.end}\n`);
-                this.write_suffix(suffix, this.buffer.current, this.buffer.current);
+                this.write_suffix(
+                    suffix,
+                    this.buffer.current,
+                    this.buffer.current,
+                );
                 return;
             case "!":
                 await this.shell_escape(argument);
@@ -361,7 +454,10 @@ export class editor {
         return "acdgGijmrstvV".includes(command);
     }
 
-    private command_suffix(command: string, argument: string): { argument: string; suffix: string } {
+    private command_suffix(
+        command: string,
+        argument: string,
+    ): { argument: string; suffix: string } {
         if ("eEfgPqQrRvw!s".includes(command)) {
             return { argument, suffix: "" };
         }
@@ -382,7 +478,10 @@ export class editor {
         return { argument: argument.slice(0, index), suffix };
     }
 
-    private resolve_range(parsed: parsed_command, command: string): { start: number; end: number } {
+    private resolve_range(
+        parsed: parsed_command,
+        command: string,
+    ): { start: number; end: number } {
         if (parsed.addresses.length === 0) {
             return this.default_range(command);
         }
@@ -426,10 +525,16 @@ export class editor {
 
     private default_range(command: string): { start: number; end: number } {
         if (command === "r") {
-            return { start: this.buffer.line_count, end: this.buffer.line_count };
+            return {
+                start: this.buffer.line_count,
+                end: this.buffer.line_count,
+            };
         }
         if (command === "=") {
-            return { start: this.buffer.line_count, end: this.buffer.line_count };
+            return {
+                start: this.buffer.line_count,
+                end: this.buffer.line_count,
+            };
         }
         if ("eEfHhPqQu!".includes(command)) {
             return { start: 0, end: 0 };
@@ -449,7 +554,10 @@ export class editor {
         if (command === "j") {
             return { start: this.buffer.current, end: this.buffer.current + 1 };
         }
-        return { start: this.buffer.current || 1, end: this.buffer.current || 1 };
+        return {
+            start: this.buffer.current || 1,
+            end: this.buffer.current || 1,
+        };
     }
 
     private resolve_spec(spec: address_spec, previous?: number): number {
@@ -492,17 +600,39 @@ export class editor {
                 throw new ed_error("buffer is empty");
             }
             if (direction === "forward") {
-                for (let offset = 1; offset <= this.buffer.line_count; offset += 1) {
-                    const address = ((this.buffer.current + offset - 1) % this.buffer.line_count) + 1;
-                    if (find_bre(this.buffer.bytes(address), program) !== undefined) {
+                for (
+                    let offset = 1;
+                    offset <= this.buffer.line_count;
+                    offset += 1
+                ) {
+                    const address = (
+                        (this.buffer.current + offset - 1) %
+                        this.buffer.line_count
+                    ) + 1;
+                    if (
+                        find_bre(this.buffer.bytes(address), program) !==
+                        undefined
+                    ) {
                         return address;
                     }
                 }
             } else {
-                for (let offset = 1; offset <= this.buffer.line_count; offset += 1) {
+                for (
+                    let offset = 1;
+                    offset <= this.buffer.line_count;
+                    offset += 1
+                ) {
                     const address =
-                        ((this.buffer.current - offset - 1 + this.buffer.line_count * 2) % this.buffer.line_count) + 1;
-                    if (find_bre(this.buffer.bytes(address), program) !== undefined) {
+                        (
+                            (
+                                this.buffer.current - offset - 1 +
+                                this.buffer.line_count * 2
+                            ) % this.buffer.line_count
+                        ) + 1;
+                    if (
+                        find_bre(this.buffer.bytes(address), program) !==
+                        undefined
+                    ) {
                         return address;
                     }
                 }
@@ -513,10 +643,18 @@ export class editor {
         }
     }
 
-    private validate_address(address: number, command: string, range_address: boolean): void {
+    private validate_address(
+        address: number,
+        command: string,
+        range_address: boolean,
+    ): void {
         const zero_allowed = command === "=" ||
             ("acimrt".includes(command) && range_address);
-        if (address < 0 || address > this.buffer.line_count || (address === 0 && !zero_allowed)) {
+        if (
+            address < 0 ||
+            address > this.buffer.line_count ||
+            (address === 0 && !zero_allowed)
+        ) {
             throw new ed_error("invalid address");
         }
     }
@@ -582,7 +720,10 @@ export class editor {
         return source;
     }
 
-    private async edit_file(pathname: string | undefined, force: boolean): Promise<void> {
+    private async edit_file(
+        pathname: string | undefined,
+        force: boolean,
+    ): Promise<void> {
         if (pathname === undefined || pathname.length === 0) {
             if (this.pathname === undefined) {
                 throw new ed_error("no pathname");
@@ -612,7 +753,10 @@ export class editor {
         }
     }
 
-    private async read_after(address: number, pathname: string | undefined): Promise<void> {
+    private async read_after(
+        address: number,
+        pathname: string | undefined,
+    ): Promise<void> {
         if (pathname === undefined || pathname.length === 0) {
             pathname = this.pathname;
         }
@@ -621,7 +765,11 @@ export class editor {
         }
         let bytes: Uint8Array;
         if (pathname.startsWith("!")) {
-            const result = await run_shell(pathname.slice(1).trimStart(), undefined, true);
+            const result = await run_shell(
+                pathname.slice(1).trimStart(),
+                undefined,
+                true,
+            );
             bytes = result.stdout;
         } else {
             bytes = await read_file_bytes(pathname);
@@ -636,7 +784,11 @@ export class editor {
         }
     }
 
-    private async write_range(start: number, end: number, pathname: string | undefined): Promise<void> {
+    private async write_range(
+        start: number,
+        end: number,
+        pathname: string | undefined,
+    ): Promise<void> {
         if (pathname === undefined || pathname.length === 0) {
             pathname = this.pathname;
         }
@@ -648,7 +800,11 @@ export class editor {
             const lines = start === 0 && end === 0
                 ? []
                 : this.buffer.range(start, end).map((line) => line.bytes);
-            const result = await run_shell(command, lines_to_bytes(lines), false);
+            const result = await run_shell(
+                command,
+                lines_to_bytes(lines),
+                false,
+            );
             if (result.status !== 0) {
                 throw new ed_error("shell command failed");
             }
@@ -674,9 +830,15 @@ export class editor {
         }
     }
 
-    private async substitute(start: number, end: number, argument: string): Promise<void> {
+    private async substitute(
+        start: number,
+        end: number,
+        argument: string,
+    ): Promise<void> {
         const fields = split_substitute(argument);
-        const pattern = fields.pattern === "" ? this.last_regex : fields.pattern;
+        const pattern = fields.pattern === ""
+            ? this.last_regex
+            : fields.pattern;
         if (pattern === undefined) {
             throw new ed_error("no previous regular expression");
         }
@@ -690,7 +852,9 @@ export class editor {
         try {
             this.last_regex = pattern;
             const occurrence_match = fields.flags.match(/[0-9]+/);
-            const occurrence = occurrence_match === null ? undefined : Number(occurrence_match[0]);
+            const occurrence = occurrence_match === null
+                ? undefined
+                : Number(occurrence_match[0]);
             const global = fields.flags.includes("g");
             this.last_replacement = replacement;
             let changed = false;
@@ -736,7 +900,11 @@ export class editor {
         invert = false,
     ): Promise<void> {
         const delimiter = first_character(parsed.argument);
-        if (delimiter === undefined || delimiter === " " || delimiter === "\t") {
+        if (
+            delimiter === undefined ||
+            delimiter === " " ||
+            delimiter === "\t"
+        ) {
             throw new ed_error("invalid global command");
         }
         const pattern_result = read_delimited(
@@ -751,7 +919,9 @@ export class editor {
         const list = interactive
             ? []
             : await this.read_global_command_list(initial_list);
-        const pattern = pattern_result.value === "" ? this.last_regex : pattern_result.value;
+        const pattern = pattern_result.value === ""
+            ? this.last_regex
+            : pattern_result.value;
         if (pattern === undefined) {
             throw new ed_error("no previous regular expression");
         }

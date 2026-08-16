@@ -24,7 +24,10 @@ export function parse_command(source: string): parsed_command {
     let trailing_separator = false;
 
     const leading_separator = source[index];
-    if (addresses.length === 0 && (leading_separator === "," || leading_separator === ";")) {
+    if (
+        addresses.length === 0 &&
+        (leading_separator === "," || leading_separator === ";")
+    ) {
         addresses.push({
             expression: leading_separator === ","
                 ? { kind: "number", value: 1 }
@@ -87,7 +90,10 @@ export function parse_command(source: string): parsed_command {
     };
 }
 
-function parse_address(source: string, start: number): address_result | undefined {
+function parse_address(
+    source: string,
+    start: number,
+): address_result | undefined {
     const character = source[start];
     if (character === undefined) {
         return undefined;
@@ -135,7 +141,10 @@ function parse_address(source: string, start: number): address_result | undefine
     return { expression: { kind: "number", value }, index };
 }
 
-function parse_offset(source: string, start: number): { offset: number; index: number } {
+function parse_offset(
+    source: string,
+    start: number,
+): { offset: number; index: number } {
     let index = start;
     let offset = 0;
     if (is_digit(source[index] ?? "")) {
@@ -152,7 +161,9 @@ function parse_offset(source: string, start: number): { offset: number; index: n
         while (index < source.length && is_digit(source[index] ?? "")) {
             index += 1;
         }
-        const distance = index === number_start ? 1 : Number(source.slice(number_start, index));
+        const distance = index === number_start
+            ? 1
+            : Number(source.slice(number_start, index));
         if (!Number.isSafeInteger(distance)) {
             throw new ed_error("invalid address offset");
         }

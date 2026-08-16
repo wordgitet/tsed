@@ -4,7 +4,12 @@
  * SPDX-License-Identifier: 0BSD
  */
 
-import { copy_bytes, ed_error, type buffer_snapshot, type line_record } from "./types";
+import {
+    copy_bytes,
+    ed_error,
+    type buffer_snapshot,
+    type line_record,
+} from "./types";
 
 export class line_buffer {
     public current = 0;
@@ -85,7 +90,9 @@ export class line_buffer {
 
         const records = values.map((bytes) => this.new_line(bytes));
         this.lines.splice(address, 0, ...records);
-        this.current = records.length === 0 ? address : address + records.length;
+        this.current = records.length === 0
+            ? address
+            : address + records.length;
         this.changed = this.changed || records.length !== 0;
     }
 
@@ -104,7 +111,11 @@ export class line_buffer {
         this.changed = true;
     }
 
-    public replace(start: number, end: number, values: readonly Uint8Array[]): void {
+    public replace(
+        start: number,
+        end: number,
+        values: readonly Uint8Array[],
+    ): void {
         const removed = this.range(start, end);
         const first_id = removed[0]?.id;
         const records = values.map((bytes, index) => ({
@@ -151,7 +162,9 @@ export class line_buffer {
             throw new ed_error("invalid address");
         }
 
-        const records = this.range(start, end).map((line) => this.new_line(line.bytes));
+        const records = this.range(start, end).map(
+            (line) => this.new_line(line.bytes),
+        );
         this.lines.splice(target, 0, ...records);
         this.current = target + records.length;
         this.changed = true;

@@ -132,7 +132,10 @@ export async function read_file_bytes(pathname: string): Promise<Uint8Array> {
     return Bun.file(pathname).bytes();
 }
 
-export async function write_file_bytes(pathname: string, bytes: Uint8Array): Promise<void> {
+export async function write_file_bytes(
+    pathname: string,
+    bytes: Uint8Array,
+): Promise<void> {
     const file = await open(pathname, "w");
     try {
         await file.write(bytes);
@@ -153,13 +156,20 @@ export async function run_shell(
     };
     const child = Bun.spawn(["sh", "-c", command], process_options);
     let stdout = new Uint8Array(0);
-    if (capture_output && child.stdout !== null && typeof child.stdout !== "number") {
+    if (
+        capture_output &&
+        child.stdout !== null &&
+        typeof child.stdout !== "number"
+    ) {
         stdout = new Uint8Array(await new Response(child.stdout).arrayBuffer());
     }
     return { status: await child.exited, stdout };
 }
 
-export function concat_bytes(first: Uint8Array, second: Uint8Array): Uint8Array {
+export function concat_bytes(
+    first: Uint8Array,
+    second: Uint8Array,
+): Uint8Array {
     const result = new Uint8Array(first.length + second.length);
     result.set(first, 0);
     result.set(second, first.length);

@@ -23,7 +23,9 @@ main(): Promise<void>
                 failed = true;
             }
             if (line.length > maximum_line_length) {
-                console.error(`${pathname}:${index + 1}: line exceeds 80 columns`);
+                console.error(
+                    `${pathname}:${index + 1}: line exceeds 80 columns`,
+                );
                 failed = true;
             }
         }
