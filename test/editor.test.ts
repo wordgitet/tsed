@@ -5,6 +5,9 @@
  */
 
 import { describe, expect, test } from "bun:test";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 import { editor } from "../src/editor";
 import {
@@ -103,6 +106,86 @@ describe("editor", () => {
 
         expect(await instance.run(undefined)).toBe(0);
         expect(output.stdout).toBe("One\ntwO\none\ntwo\n");
+    });
+
+    test("resolves excess, trailing, and unsigned addresses", async () => {
+        const output = new memory_output();
+        const instance = new editor(
+            new memory_input([
+                "a", "one", "two", "three", "four", ".",
+                "1", ".2p", "1,2,3d", "2,p", "Q",
+            ]),
+            output,
+            { input_kind: "terminal", prompt: undefined, silent: true },
+        );
+
+        expect(await instance.run(undefined)).toBe(0);
+        expect(output.stdout).toBe("one\nthree\nfour\n");
+    });
+
+    test("preserves current-line edge cases", async () => {
+        const output = new memory_output();
+        const instance = new editor(
+            new memory_input([
+                "a", "one", "two", "three", ".",
+                "2", "h", ".=", "2i", ".", ".=", "2,2j", ".=",
+                "1,2c", ".", ".=", "p", "1,$d", ".=", "Q",
+            ]),
+            output,
+            { input_kind: "terminal", prompt: undefined, silent: true },
+        );
+
+        expect(await instance.run(undefined)).toBe(0);
+        expect(output.stdout).toBe("two\n2\n2\n2\n1\nthree\n0\n");
+    });
+
+    test("applies suffixes to marks and undo", async () => {
+        const output = new memory_output();
+        const instance = new editor(
+            new memory_input([
+                "a", "one", "two", ".", "1kal", "'al", "1d", "ul",
+                "=l", "Q",
+            ]),
+            output,
+            { input_kind: "terminal", prompt: undefined, silent: true },
+        );
+
+        expect(await instance.run(undefined)).toBe(0);
+        expect(output.stdout).toBe("two$\none$\none$\n2\none$\n");
+    });
+
+    test("applies a suffix after interactive global commands", async () => {
+        const output = new memory_output();
+        const instance = new editor(
+            new memory_input([
+                "a", "alpha", "beta", ".", "G/alpha/l", "p", "Q",
+            ]),
+            output,
+            { input_kind: "terminal", prompt: undefined, silent: true },
+        );
+
+        expect(await instance.run(undefined)).toBe(0);
+        expect(output.stdout).toBe("alpha\nalpha\nalpha$\n");
+    });
+
+    test("writes an empty buffer as a complete save", async () => {
+        const directory = await mkdtemp(join(tmpdir(), "tsed-editor-"));
+        const pathname = join(directory, "empty-after-write");
+        try {
+            await writeFile(pathname, "one\n");
+            const output = new memory_output();
+            const instance = new editor(
+                new memory_input(["1,$d", ".=", "w", "q"]),
+                output,
+                { input_kind: "regular", prompt: undefined, silent: true },
+            );
+
+            expect(await instance.run(pathname)).toBe(0);
+            expect(output.stdout).toBe("0\n");
+            expect(await readFile(pathname, "utf8")).toBe("");
+        } finally {
+            await rm(directory, { recursive: true });
+        }
     });
 
     test("stops a regular-file script after a command error", async () => {

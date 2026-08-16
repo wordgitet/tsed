@@ -18,6 +18,20 @@ describe("command parser", () => {
         expect(parse_command(",p").addresses).toHaveLength(2);
     });
 
+    test("parses unsigned offsets and trailing separators", () => {
+        expect(parse_command(".2p").addresses[0]?.offset).toBe(2);
+        expect(parse_command("'a3p").addresses[0]?.offset).toBe(3);
+        expect(parse_command("4,d").addresses[1]?.expression).toEqual({
+            kind: "previous",
+        });
+        expect(parse_command("4;d").addresses[1]?.expression).toEqual({
+            kind: "previous",
+        });
+        expect(parse_command(",p").addresses[1]?.expression).toEqual({
+            kind: "last",
+        });
+    });
+
     test("preserves escaped substitute delimiters", () => {
         expect(split_substitute("/a\\/b/a\\/b/g")).toEqual({
             pattern: "a\\/b",

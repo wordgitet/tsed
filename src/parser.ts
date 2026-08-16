@@ -21,6 +21,7 @@ export function parse_command(source: string): parsed_command {
     let index = skip_spaces(source, 0);
     const addresses: address_spec[] = [];
     let separator: "," | ";" | null = null;
+    let trailing_separator = false;
 
     const leading_separator = source[index];
     if (addresses.length === 0 && (leading_separator === "," || leading_separator === ";")) {
@@ -54,12 +55,15 @@ export function parse_command(source: string): parsed_command {
             break;
         }
         separator = next;
+        trailing_separator = true;
         index = skip_spaces(source, index + 1);
     }
 
     if (addresses.length === 1 && separator !== null) {
         addresses.push({
-            expression: { kind: "last" },
+            expression: trailing_separator
+                ? { kind: "previous" }
+                : { kind: "last" },
             separator,
             offset: 0,
         });
@@ -134,6 +138,13 @@ function parse_address(source: string, start: number): address_result | undefine
 function parse_offset(source: string, start: number): { offset: number; index: number } {
     let index = start;
     let offset = 0;
+    if (is_digit(source[index] ?? "")) {
+        const number_start = index;
+        while (index < source.length && is_digit(source[index] ?? "")) {
+            index += 1;
+        }
+        offset = Number(source.slice(number_start, index));
+    }
     while (source[index] === "+" || source[index] === "-") {
         const sign = source[index] === "+" ? 1 : -1;
         index += 1;

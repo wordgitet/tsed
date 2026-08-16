@@ -13,6 +13,7 @@ export type address_expression =
     | { kind: "current" }
     | { kind: "last" }
     | { kind: "number"; value: number }
+    | { kind: "previous" }
     | { kind: "mark"; name: string }
     | { kind: "search"; pattern: string; direction: "forward" | "backward" }
 

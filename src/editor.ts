@@ -177,15 +177,19 @@ export class editor {
                 const lines = await this.read_input_lines();
                 const address = Math.max(0, range.start - 1);
                 this.buffer.insert_after(address, lines);
+                if (lines.length === 0) {
+                    this.buffer.current = range.start;
+                }
                 this.write_suffix(suffix, this.buffer.current, this.buffer.current);
                 return;
             }
             case "c": {
                 const lines = await this.read_input_lines();
                 if (this.buffer.line_count > 0) {
-                    this.buffer.delete(Math.max(1, range.start), range.end);
+                    this.buffer.replace(Math.max(1, range.start), range.end, lines);
+                } else {
+                    this.buffer.insert_after(0, lines);
                 }
-                this.buffer.insert_after(Math.max(0, range.start - 1), lines);
                 this.write_suffix(suffix, this.buffer.current, this.buffer.current);
                 return;
             }
@@ -207,22 +211,37 @@ export class editor {
                 await this.global_command(parsed, false, record_undo);
                 return;
             case "G":
-                await this.global_command(parsed, true, record_undo);
+                await this.global_command(
+                    { ...parsed, argument },
+                    true,
+                    record_undo,
+                );
+                this.write_suffix(suffix, this.buffer.current, this.buffer.current);
                 return;
             case "v":
                 await this.global_command(parsed, false, record_undo, true);
                 return;
             case "V":
-                await this.global_command(parsed, true, record_undo, true);
+                await this.global_command(
+                    { ...parsed, argument },
+                    true,
+                    record_undo,
+                    true,
+                );
+                this.write_suffix(suffix, this.buffer.current, this.buffer.current);
                 return;
             case "h":
-                this.write_stdout(this.last_error_message ?? "\n");
+                if (this.last_error_message !== undefined) {
+                    this.write_stdout(this.last_error_message);
+                }
+                this.write_suffix(suffix, this.buffer.current, this.buffer.current);
                 return;
             case "H":
                 this.help_enabled = !this.help_enabled;
                 if (this.help_enabled && this.last_error_message !== undefined) {
                     this.write_stdout(this.last_error_message);
                 }
+                this.write_suffix(suffix, this.buffer.current, this.buffer.current);
                 return;
             case "j":
                 this.buffer.join(range.start, range.end);
@@ -230,6 +249,7 @@ export class editor {
                 return;
             case "k":
                 this.set_mark(argument, range.start);
+                this.write_suffix(suffix, this.buffer.current, this.buffer.current);
                 return;
             case "l":
                 this.write_list(range.start, range.end);
@@ -266,12 +286,14 @@ export class editor {
                 return;
             case "u":
                 this.undo();
+                this.write_suffix(suffix, this.buffer.current, this.buffer.current);
                 return;
             case "w":
                 await this.write_range(range.start, range.end, this.pathname_argument(argument));
                 return;
             case "=":
                 this.write_stdout(`${range.end}\n`);
+                this.write_suffix(suffix, this.buffer.current, this.buffer.current);
                 return;
             case "!":
                 await this.shell_escape(argument);
@@ -334,7 +356,15 @@ export class editor {
     }
 
     private command_suffix(command: string, argument: string): { argument: string; suffix: string } {
-        if ("eEfghHkPqQrRw=!s".includes(command)) {
+        if ("eEfgPqQrRvw!s".includes(command)) {
+            return { argument, suffix: "" };
+        }
+        if (command === "k") {
+            const mark = argument[0] ?? "";
+            const suffix = argument.slice(1);
+            if (mark !== "" && /^[lnp]*$/.test(suffix)) {
+                return { argument: mark, suffix };
+            }
             return { argument, suffix: "" };
         }
         let index = argument.length;
@@ -351,35 +381,46 @@ export class editor {
             return this.default_range(command);
         }
 
-        const first_spec = parsed.addresses[0];
-        if (first_spec === undefined) {
+        const maximum = this.maximum_address_count(command);
+        if (maximum === 0) {
+            throw new ed_error("unexpected address");
+        }
+        const resolved: number[] = [];
+        let previous: number | undefined;
+        for (const spec of parsed.addresses) {
+            if (spec.separator === ";" && previous !== undefined) {
+                this.buffer.current = previous;
+            }
+            const address = this.resolve_spec(spec, previous);
+            this.validate_address(address, command, true);
+            resolved.push(address);
+            previous = address;
+        }
+        const selected = resolved.slice(-maximum);
+        const first = selected[0];
+        const second = selected[selected.length - 1];
+        if (first === undefined || second === undefined) {
             throw new ed_error("invalid address range");
         }
-        const first = this.resolve_spec(first_spec);
-        if (parsed.addresses.length === 1) {
-            this.validate_address(first, command, true);
-            return { start: first, end: first };
-        }
-
-        const second_spec = parsed.addresses[1];
-        if (second_spec === undefined) {
-            throw new ed_error("invalid address range");
-        }
-        if (second_spec.separator === ";") {
-            this.buffer.current = first;
-        }
-        const second = this.resolve_spec(second_spec);
-        this.validate_address(first, command, true);
-        this.validate_address(second, command, true);
         if (second < first) {
             throw new ed_error("invalid address range");
         }
         return { start: first, end: second };
     }
 
+    private maximum_address_count(command: string): number {
+        if ("eEfHhPqQu!".includes(command)) {
+            return 0;
+        }
+        if ("aikr=".includes(command)) {
+            return 1;
+        }
+        return 2;
+    }
+
     private default_range(command: string): { start: number; end: number } {
         if (command === "r") {
-            return { start: this.buffer.current, end: this.buffer.current };
+            return { start: this.buffer.line_count, end: this.buffer.line_count };
         }
         if (command === "=") {
             return { start: this.buffer.line_count, end: this.buffer.line_count };
@@ -405,7 +446,13 @@ export class editor {
         return { start: this.buffer.current || 1, end: this.buffer.current || 1 };
     }
 
-    private resolve_spec(spec: address_spec): number {
+    private resolve_spec(spec: address_spec, previous?: number): number {
+        if (spec.expression.kind === "previous") {
+            if (previous === undefined) {
+                throw new ed_error("invalid address");
+            }
+            return previous + spec.offset;
+        }
         const base = this.resolve_expression(spec.expression);
         return base + spec.offset;
     }
@@ -418,6 +465,8 @@ export class editor {
                 return this.buffer.line_count;
             case "number":
                 return expression.value;
+            case "previous":
+                throw new ed_error("invalid address");
             case "mark":
                 return this.buffer.marked(expression.name);
             case "search":
@@ -459,7 +508,8 @@ export class editor {
     }
 
     private validate_address(address: number, command: string, range_address: boolean): void {
-        const zero_allowed = "acimrt".includes(command) && range_address;
+        const zero_allowed = command === "=" ||
+            ("acimrt".includes(command) && range_address);
         if (address < 0 || address > this.buffer.line_count || (address === 0 && !zero_allowed)) {
             throw new ed_error("invalid address");
         }
@@ -571,7 +621,10 @@ export class editor {
             : this.buffer.range(start, end).map((line) => line.bytes);
         const bytes = lines_to_bytes(lines);
         await write_file_bytes(pathname, bytes);
-        if (start === 1 && end === this.buffer.line_count) {
+        if (
+            (start === 1 && end === this.buffer.line_count) ||
+            (start === 0 && end === 0 && this.buffer.line_count === 0)
+        ) {
             this.buffer.changed = false;
         }
         if (this.pathname === undefined) {

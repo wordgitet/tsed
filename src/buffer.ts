@@ -105,9 +105,27 @@ export class line_buffer {
     }
 
     public replace(start: number, end: number, values: readonly Uint8Array[]): void {
-        this.range(start, end);
-        this.delete(start, end);
-        this.insert_after(start - 1, values);
+        const removed = this.range(start, end);
+        const first_id = removed[0]?.id;
+        const records = values.map((bytes, index) => ({
+            id: index === 0 && first_id !== undefined
+                ? first_id
+                : this.next_id++,
+            bytes: copy_bytes(bytes),
+        }));
+        const retained_ids = new Set(records.map((line) => line.id));
+        const removed_ids = new Set(removed.map((line) => line.id));
+
+        this.lines.splice(start - 1, end - start + 1, ...records);
+        for (const [name, id] of this.marks) {
+            if (removed_ids.has(id) && !retained_ids.has(id)) {
+                this.marks.delete(name);
+            }
+        }
+        this.current = records.length === 0
+            ? Math.min(start, this.line_count)
+            : start + records.length - 1;
+        this.changed = true;
     }
 
     public move(start: number, end: number, target: number): void {
@@ -142,7 +160,6 @@ export class line_buffer {
     public join(start: number, end: number): void {
         this.range(start, end);
         if (start === end) {
-            this.current = start;
             return;
         }
 

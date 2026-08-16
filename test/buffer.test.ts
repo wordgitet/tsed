@@ -43,4 +43,15 @@ describe("line_buffer", () => {
         expect(text(buffer)).toEqual(["one", "two"]);
         expect(buffer.marked("a")).toBe(1);
     });
+
+    test("preserves a mark on the first replaced line", () => {
+        const buffer = new line_buffer();
+        buffer.load([line("one"), line("two")]);
+        buffer.mark("a", 2);
+
+        buffer.replace(2, 2, [line("TWO")]);
+
+        expect(buffer.marked("a")).toBe(2);
+        expect(text(buffer)).toEqual(["one", "TWO"]);
+    });
 });
