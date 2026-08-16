@@ -1,11 +1,37 @@
 {
-  "name": "tsed",
-  "version": "0.1.0",
-  "private": true,
+  "name": "@wordgitet/tsed",
+  "version": "0.1.0-alpha.1",
+  "description": "A POSIX-oriented ed line editor implemented in TypeScript for Bun",
+  "license": "0BSD",
+  "repository": {
+    "type": "git",
+    "url": "git+https://codeberg.org/wordgitet/tsed.git"
+  },
+  "bugs": {
+    "url": "https://codeberg.org/wordgitet/tsed/issues"
+  },
+  "homepage": "https://codeberg.org/wordgitet/tsed",
+  "keywords": [
+    "ed",
+    "editor",
+    "posix",
+    "bun",
+    "typescript"
+  ],
   "type": "module",
+  "files": [
+    "bin",
+    "src",
+    "README",
+    "TOUR",
+    "COPYRIGHT"
+  ],
   "bin": {
-    "tsed": "src/main.ts",
-    "ed": "src/main.ts"
+    "tsed": "bin/tsed",
+    "ed": "bin/tsed"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "test": "bun test",

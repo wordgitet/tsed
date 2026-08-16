@@ -20,6 +20,20 @@ This is a research toy, not a claim of complete POSIX conformance.  It targets
 POSIX platforms only.  Windows is not supported.
 
 ------------------------------------------------------------------------
+INSTALLING FROM NPM
+------------------------------------------------------------------------
+
+The alpha package includes the TypeScript implementation and a small Bun
+launcher.  Bun must already be installed and available in PATH:
+
+    npm install --global @wordgitet/tsed@alpha
+
+This installs both command names:
+
+    tsed
+    ed
+
+------------------------------------------------------------------------
 BUILDING AND RUNNING
 ------------------------------------------------------------------------
 

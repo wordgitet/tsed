@@ -1,0 +1,22 @@
+#!/usr/bin/env bun
+/*
+ * Copyright (c) 2026 wordgitet
+ *
+ * SPDX-License-Identifier: 0BSD
+ */
+
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const package_root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const source_path = join(package_root, "src", "main.ts");
+const child_process = Bun.spawn(
+    ["bun", source_path, ...process.argv.slice(2)],
+    {
+        stdin: "inherit",
+        stdout: "inherit",
+        stderr: "inherit",
+    },
+);
+
+process.exit(await child_process.exited);
