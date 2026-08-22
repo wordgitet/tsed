@@ -89,7 +89,7 @@ export class stdin_line_reader implements input_source {
 
         const line = this.pending.slice(0, newline);
         this.pending = this.pending.slice(newline + 1);
-        return strip_carriage_return(line);
+        return line;
     }
 
     private take_final_line(): Uint8Array | null
@@ -100,7 +100,7 @@ export class stdin_line_reader implements input_source {
 
         const line = this.pending;
         this.pending = new Uint8Array(0);
-        return strip_carriage_return(line);
+        return line;
     }
 }
 
@@ -167,9 +167,30 @@ write_file_bytes(
 {
     const file = await open(pathname, "w");
     try {
-        await file.write(bytes);
+        await write_all_bytes(file, bytes);
     } finally {
         await file.close();
+    }
+}
+
+export interface byte_writer {
+    write(
+        buffer: Uint8Array,
+        offset: number,
+        length: number,
+    ): Promise<{ bytesWritten: number }>;
+}
+
+export async function
+write_all_bytes(writer: byte_writer, bytes: Uint8Array): Promise<void>
+{
+    let offset = 0;
+    while (offset < bytes.length) {
+        const result = await writer.write(bytes, offset, bytes.length - offset);
+        if (result.bytesWritten <= 0) {
+            throw new Error("file write made no progress");
+        }
+        offset += result.bytesWritten;
     }
 }
 
@@ -213,12 +234,6 @@ export function
 text_bytes(value: string): Uint8Array
 {
     return bytes_from_string(value);
-}
-
-function
-strip_carriage_return(line: Uint8Array): Uint8Array
-{
-    return line[line.length - 1] === 0x0d ? line.slice(0, -1) : line;
 }
 
 function

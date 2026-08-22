@@ -6,7 +6,12 @@
 
 import { describe, expect, test } from "bun:test";
 
-import { bytes_to_lines, stdin_line_reader } from "../src/io";
+import {
+    type byte_writer,
+    bytes_to_lines,
+    stdin_line_reader,
+    write_all_bytes,
+} from "../src/io";
 import {
     bytes_from_string,
     input_interrupted,
@@ -27,6 +32,15 @@ describe("standard input line reader", () => {
 
         expect(string_from_bytes(line)).toBe("q");
         expect(await reader.read_line()).toBeNull();
+    });
+
+    test("preserves carriage return before newline", async () => {
+        const chunks = [bytes_from_string("text\r\n"), null];
+        const reader = new stdin_line_reader(
+            async () => chunks.shift() ?? null,
+        );
+
+        expect(await reader.read_line()).toEqual(bytes_from_string("text\r"));
     });
 
     test("resumes after a terminal end-of-file indication", async () => {
@@ -89,5 +103,31 @@ describe("standard input line reader", () => {
         )).toThrow(
             "text contains NUL",
         );
+    });
+
+    test("retries short file writes", async () => {
+        const written: number[] = [];
+        const writer: byte_writer = {
+            async write(_buffer, offset, length) {
+                const count = Math.min(2, length);
+                written.push(offset, count);
+                return { bytesWritten: count };
+            },
+        };
+
+        await write_all_bytes(writer, bytes_from_string("abcde"));
+
+        expect(written).toEqual([0, 2, 2, 2, 4, 1]);
+    });
+
+    test("rejects a file write that makes no progress", async () => {
+        const writer: byte_writer = {
+            async write() {
+                return { bytesWritten: 0 };
+            },
+        };
+
+        expect(write_all_bytes(writer, bytes_from_string("x")))
+            .rejects.toThrow("file write made no progress");
     });
 });
