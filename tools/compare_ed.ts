@@ -16,9 +16,16 @@ interface editor_reference {
 interface portable_result {
 	name: string;
 	requirement: string;
-	result: "PASS" | "FAIL";
+	result: torture_result;
 	differences: readonly string[];
 }
+
+type torture_result =
+	| "OK"
+	| "MISMATCH"
+	| "SKIP"
+	| "RUNNER_LIMIT"
+	| "HARNESS_ERROR";
 
 interface editor_report {
 	name: string;
@@ -32,13 +39,14 @@ interface editor_report {
 interface comparison_row {
 	name: string;
 	requirement: string;
-	normative: "PASS" | "FAIL";
+	normative: torture_result;
 	comparison:
 		| "all-agree"
 		| "tsed-differs"
 		| "references-split"
-		| "reference-unavailable";
-	editors: Readonly<Record<string, "PASS" | "FAIL" | "UNAVAILABLE">>;
+		| "reference-unavailable"
+		| "not-evaluated";
+	editors: Readonly<Record<string, torture_result | "UNAVAILABLE">>;
 }
 
 interface comparison_options {
@@ -95,7 +103,7 @@ main(): Promise<void>
 	await mkdir(dirname(options.output), { recursive: true });
 	await Bun.write(options.output, `${JSON.stringify(report, null, 2)}\n`);
 	write_summary(comparisons, references, options.output);
-	if (comparisons.some((item) => item.normative === "FAIL")) {
+	if (comparisons.some((item) => item.normative === "MISMATCH")) {
 		process.exitCode = 1;
 	}
 }
@@ -204,10 +212,10 @@ compare_reports(
 {
 	const rows: comparison_row[] = [];
 	for (const actual of tsed.results ?? []) {
-		const editors: Record<string, "PASS" | "FAIL" | "UNAVAILABLE"> = {
+		const editors: Record<string, torture_result | "UNAVAILABLE"> = {
 			tsed: actual.result,
 		};
-		const reference_results: Array<"PASS" | "FAIL"> = [];
+		const reference_results: torture_result[] = [];
 		let unavailable_seen = false;
 		for (const reference of references) {
 			if (!reference.available || reference.results === undefined) {
@@ -242,18 +250,24 @@ compare_reports(
 
 function
 comparison_kind(
-	actual: "PASS" | "FAIL",
-	references: readonly ("PASS" | "FAIL")[],
+	actual: torture_result,
+	references: readonly torture_result[],
 	unavailable: boolean,
 ): comparison_row["comparison"]
 {
-	if (references.length === 0 || unavailable) {
+	if (actual !== "OK" && actual !== "MISMATCH") {
+		return "not-evaluated";
+	}
+	const evaluated = references.filter((item) =>
+		item === "OK" || item === "MISMATCH");
+	if (evaluated.length === 0 || unavailable ||
+	    evaluated.length !== references.length) {
 		return "reference-unavailable";
 	}
-	if (new Set(references).size > 1) {
+	if (new Set(evaluated).size > 1) {
 		return "references-split";
 	}
-	return references[0] === actual ? "all-agree" : "tsed-differs";
+	return evaluated[0] === actual ? "all-agree" : "tsed-differs";
 }
 
 function
@@ -277,12 +291,14 @@ write_summary(
 		"tsed-differs",
 		"references-split",
 		"reference-unavailable",
+		"not-evaluated",
 	];
 	for (const kind of kinds) {
 		const count = rows.filter((item) => item.comparison === kind).length;
 		process.stdout.write(`${kind}: ${count}\n`);
 	}
-	const failures = rows.filter((item) => item.normative === "FAIL").length;
+	const failures = rows.filter((item) =>
+		item.normative === "MISMATCH").length;
 	process.stdout.write(`normative failures: ${failures}\n`);
 	process.stdout.write(`report: ${output}\n`);
 }
@@ -399,9 +415,16 @@ is_portable_result(value: unknown): value is portable_result
 {
 	return is_record(value) && typeof value.name === "string" &&
 		typeof value.requirement === "string" &&
-		(value.result === "PASS" || value.result === "FAIL") &&
+		is_torture_result(value.result) &&
 		Array.isArray(value.differences) &&
 		value.differences.every((item) => typeof item === "string");
+}
+
+function
+is_torture_result(value: unknown): value is torture_result
+{
+	return value === "OK" || value === "MISMATCH" || value === "SKIP" ||
+		value === "RUNNER_LIMIT" || value === "HARNESS_ERROR";
 }
 
 function

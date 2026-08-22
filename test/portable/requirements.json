@@ -11,7 +11,9 @@
       "disposition": "covered",
       "coverage": [
         "process/rejects-unknown-option",
-        "test/main.test.ts"
+        "torture/options/combined-silent-prompt",
+        "torture/options/attached-prompt",
+        "torture/options/end-options-before-hyphen-file"
       ]
     },
     {
@@ -21,7 +23,8 @@
       "disposition": "covered",
       "coverage": [
         "output/prompt-string",
-        "terminal/prompt-and-quit"
+        "terminal/prompt-and-quit",
+        "torture/terminal/default-prompt-toggle"
       ]
     },
     {
@@ -31,7 +34,8 @@
       "disposition": "covered",
       "coverage": [
         "output/silent-suppresses-counts",
-        "test/editor.test.ts"
+        "torture/options/silent-write-count",
+        "torture/options/silent-shell-completion"
       ]
     },
     {
@@ -41,7 +45,9 @@
       "disposition": "covered",
       "coverage": [
         "file/initial-byte-count",
-        "process/rejects-too-many-operands"
+        "process/rejects-too-many-operands",
+        "torture/operand/loads-and-remembers-pathname",
+        "torture/operand/empty-file-has-line-zero"
       ]
     },
     {
@@ -50,8 +56,9 @@
       "summary": "Apply locale rules to text and BRE processing.",
       "disposition": "platform-dependent",
       "coverage": [
-        "test/locale.test.ts",
-        "private locale conformance campaign"
+        "torture/locale/environment-lang-selects-ctype",
+        "torture/locale/environment-lc-ctype-overrides-lang",
+        "torture/locale/environment-lc-all-overrides-ctype"
       ]
     },
     {
@@ -60,7 +67,9 @@
       "summary": "Interrupt input and return to command mode.",
       "disposition": "covered",
       "coverage": [
-        "terminal/sigint-interrupts-input"
+        "terminal/sigint-interrupts-input",
+        "torture/terminal/sigint-in-command-mode",
+        "torture/terminal/repeated-sigint"
       ]
     },
     {
@@ -69,7 +78,9 @@
       "summary": "Ignore SIGQUIT.",
       "disposition": "covered",
       "coverage": [
-        "terminal/sigquit-is-ignored"
+        "terminal/sigquit-is-ignored",
+        "torture/terminal/sigquit-command-mode",
+        "torture/terminal/sigquit-input-mode"
       ]
     },
     {
@@ -78,7 +89,10 @@
       "summary": "Save changed text on SIGHUP.",
       "disposition": "covered",
       "coverage": [
-        "terminal/sighup-saves-buffer"
+        "terminal/sighup-saves-buffer",
+        "terminal/sighup-falls-back-to-home",
+        "torture/terminal/sighup-unchanged-buffer-does-not-save",
+        "torture/terminal/sighup-after-full-write-does-not-save"
       ]
     },
     {
@@ -88,8 +102,9 @@
       "disposition": "covered",
       "coverage": [
         "input/command-looking-lines-are-text",
-        "test/io.test.ts",
-        "output/list-preserves-carriage-return"
+        "torture/input/empty-lines-are-text",
+        "torture/input/backslash-period-is-literal",
+        "torture/input/long-line"
       ]
     },
     {
@@ -98,7 +113,8 @@
       "summary": "Maintain unchanged, changed, and warned buffer states.",
       "disposition": "covered",
       "coverage": [
-        "issue8/change-state/",
+        "issue8/change-state/warning-survives-print",
+        "issue8/change-state/new-change-rearms-warning",
         "terminal/modified-warning"
       ]
     },
@@ -108,9 +124,19 @@
       "summary": "Use POSIX BRE matching.",
       "disposition": "covered",
       "coverage": [
-        "regex/",
-        "test/bre.test.ts",
-        "test/regression/bre_substitute.test.ts"
+        "regex/delimiter-in-bracket-expression",
+        "regex/escaped-address-delimiter",
+        "regex/null-expression-in-substitute",
+        "torture/regex/bracket-delimiter-21",
+        "torture/regex/bracket-delimiter-23",
+        "torture/regex/bracket-delimiter-25",
+        "torture/regex/bracket-delimiter-2b",
+        "torture/regex/bracket-delimiter-2d",
+        "torture/regex/bracket-delimiter-2f",
+        "torture/regex/bracket-delimiter-3a",
+        "torture/regex/bracket-delimiter-3d",
+        "torture/regex/bracket-delimiter-3f",
+        "torture/regex/bracket-delimiter-40"
       ]
     },
     {
@@ -119,8 +145,10 @@
       "summary": "Use locale classes, collation, and multibyte characters.",
       "disposition": "platform-dependent",
       "coverage": [
-        "test/locale.test.ts",
-        "native/posix_regex.c"
+        "torture/locale/dot-is-one-character",
+        "torture/locale/two-dots-are-two-characters",
+        "torture/locale/backreferences-preserve-characters",
+        "torture/locale/global-literal"
       ]
     },
     {
@@ -130,8 +158,36 @@
       "disposition": "covered",
       "coverage": [
         "address/intermediate-out-of-range",
-        "address/",
-        "test/regression/address.test.ts"
+        "torture/address/offset/target-1-form-1",
+        "torture/address/offset/target-1-form-2",
+        "torture/address/offset/target-1-form-3",
+        "torture/address/offset/target-1-form-4",
+        "torture/address/offset/target-1-form-5",
+        "torture/address/offset/target-2-form-1",
+        "torture/address/offset/target-2-form-2",
+        "torture/address/offset/target-2-form-3",
+        "torture/address/offset/target-2-form-4",
+        "torture/address/offset/target-2-form-5",
+        "torture/address/offset/target-3-form-1",
+        "torture/address/offset/target-3-form-2",
+        "torture/address/offset/target-3-form-3",
+        "torture/address/offset/target-3-form-4",
+        "torture/address/offset/target-3-form-5",
+        "torture/address/offset/target-4-form-1",
+        "torture/address/offset/target-4-form-2",
+        "torture/address/offset/target-4-form-3",
+        "torture/address/offset/target-4-form-4",
+        "torture/address/offset/target-4-form-5",
+        "torture/address/offset/target-5-form-1",
+        "torture/address/offset/target-5-form-2",
+        "torture/address/offset/target-5-form-3",
+        "torture/address/offset/target-5-form-4",
+        "torture/address/offset/target-5-form-5",
+        "torture/address/offset/target-6-form-1",
+        "torture/address/offset/target-6-form-2",
+        "torture/address/offset/target-6-form-3",
+        "torture/address/offset/target-6-form-4",
+        "torture/address/offset/target-6-form-5"
       ]
     },
     {
@@ -141,7 +197,8 @@
       "disposition": "covered",
       "coverage": [
         "address/mark-follows-moved-line",
-        "test/regression/address.test.ts"
+        "torture/mark/reassign-mark",
+        "torture/mark/deleted-mark-errors"
       ]
     },
     {
@@ -151,7 +208,8 @@
       "disposition": "covered",
       "coverage": [
         "issue8/delimiter/omitted-forward-search",
-        "test/regression/address.test.ts"
+        "issue8/delimiter/omitted-backward-search",
+        "torture/locale/literal-search"
       ]
     },
     {
@@ -160,7 +218,332 @@
       "summary": "Expand omitted addresses and evaluate excess addresses in order.",
       "disposition": "covered",
       "coverage": [
-        "issue8/address/"
+        "issue8/address/repeated-leading-comma",
+        "issue8/address/repeated-leading-semicolon",
+        "issue8/address/mixed-leading-comma-semicolon",
+        "issue8/address/mixed-leading-semicolon-comma",
+        "issue8/address/omitted-middle-comma",
+        "issue8/address/omitted-middle-semicolon",
+        "issue8/address/discard-leading-address",
+        "issue8/address/evaluate-before-discard",
+        "issue8/address/blank-separated-positive-offsets",
+        "issue8/address/blank-separated-negative-offsets",
+        "torture/address/separators/omitted-c",
+        "torture/address/separators/omitted-s",
+        "torture/address/separators/omitted-cc",
+        "torture/address/separators/omitted-cs",
+        "torture/address/separators/omitted-sc",
+        "torture/address/separators/omitted-ss",
+        "torture/address/separators/omitted-ccc",
+        "torture/address/separators/omitted-ccs",
+        "torture/address/separators/omitted-csc",
+        "torture/address/separators/omitted-css",
+        "torture/address/separators/omitted-scc",
+        "torture/address/separators/omitted-scs",
+        "torture/address/separators/omitted-ssc",
+        "torture/address/separators/omitted-sss",
+        "torture/address/separators/omitted-cccc",
+        "torture/address/separators/omitted-cccs",
+        "torture/address/separators/omitted-ccsc",
+        "torture/address/separators/omitted-ccss",
+        "torture/address/separators/omitted-cscc",
+        "torture/address/separators/omitted-cscs",
+        "torture/address/separators/omitted-cssc",
+        "torture/address/separators/omitted-csss",
+        "torture/address/separators/omitted-sccc",
+        "torture/address/separators/omitted-sccs",
+        "torture/address/separators/omitted-scsc",
+        "torture/address/separators/omitted-scss",
+        "torture/address/separators/omitted-sscc",
+        "torture/address/separators/omitted-sscs",
+        "torture/address/separators/omitted-sssc",
+        "torture/address/separators/omitted-ssss",
+        "torture/address/separators/omitted-ccccc",
+        "torture/address/separators/omitted-ccccs",
+        "torture/address/separators/omitted-cccsc",
+        "torture/address/separators/omitted-cccss",
+        "torture/address/separators/omitted-ccscc",
+        "torture/address/separators/omitted-ccscs",
+        "torture/address/separators/omitted-ccssc",
+        "torture/address/separators/omitted-ccsss",
+        "torture/address/separators/omitted-csccc",
+        "torture/address/separators/omitted-csccs",
+        "torture/address/separators/omitted-cscsc",
+        "torture/address/separators/omitted-cscss",
+        "torture/address/separators/omitted-csscc",
+        "torture/address/separators/omitted-csscs",
+        "torture/address/separators/omitted-csssc",
+        "torture/address/separators/omitted-cssss",
+        "torture/address/separators/omitted-scccc",
+        "torture/address/separators/omitted-scccs",
+        "torture/address/separators/omitted-sccsc",
+        "torture/address/separators/omitted-sccss",
+        "torture/address/separators/omitted-scscc",
+        "torture/address/separators/omitted-scscs",
+        "torture/address/separators/omitted-scssc",
+        "torture/address/separators/omitted-scsss",
+        "torture/address/separators/omitted-ssccc",
+        "torture/address/separators/omitted-ssccs",
+        "torture/address/separators/omitted-sscsc",
+        "torture/address/separators/omitted-sscss",
+        "torture/address/separators/omitted-ssscc",
+        "torture/address/separators/omitted-ssscs",
+        "torture/address/separators/omitted-ssssc",
+        "torture/address/separators/omitted-sssss",
+        "torture/address/separators/omitted-cccccc",
+        "torture/address/separators/omitted-cccccs",
+        "torture/address/separators/omitted-ccccsc",
+        "torture/address/separators/omitted-ccccss",
+        "torture/address/separators/omitted-cccscc",
+        "torture/address/separators/omitted-cccscs",
+        "torture/address/separators/omitted-cccssc",
+        "torture/address/separators/omitted-cccsss",
+        "torture/address/separators/omitted-ccsccc",
+        "torture/address/separators/omitted-ccsccs",
+        "torture/address/separators/omitted-ccscsc",
+        "torture/address/separators/omitted-ccscss",
+        "torture/address/separators/omitted-ccsscc",
+        "torture/address/separators/omitted-ccsscs",
+        "torture/address/separators/omitted-ccsssc",
+        "torture/address/separators/omitted-ccssss",
+        "torture/address/separators/omitted-cscccc",
+        "torture/address/separators/omitted-cscccs",
+        "torture/address/separators/omitted-csccsc",
+        "torture/address/separators/omitted-csccss",
+        "torture/address/separators/omitted-cscscc",
+        "torture/address/separators/omitted-cscscs",
+        "torture/address/separators/omitted-cscssc",
+        "torture/address/separators/omitted-cscsss",
+        "torture/address/separators/omitted-cssccc",
+        "torture/address/separators/omitted-cssccs",
+        "torture/address/separators/omitted-csscsc",
+        "torture/address/separators/omitted-csscss",
+        "torture/address/separators/omitted-cssscc",
+        "torture/address/separators/omitted-cssscs",
+        "torture/address/separators/omitted-cssssc",
+        "torture/address/separators/omitted-csssss",
+        "torture/address/separators/omitted-sccccc",
+        "torture/address/separators/omitted-sccccs",
+        "torture/address/separators/omitted-scccsc",
+        "torture/address/separators/omitted-scccss",
+        "torture/address/separators/omitted-sccscc",
+        "torture/address/separators/omitted-sccscs",
+        "torture/address/separators/omitted-sccssc",
+        "torture/address/separators/omitted-sccsss",
+        "torture/address/separators/omitted-scsccc",
+        "torture/address/separators/omitted-scsccs",
+        "torture/address/separators/omitted-scscsc",
+        "torture/address/separators/omitted-scscss",
+        "torture/address/separators/omitted-scsscc",
+        "torture/address/separators/omitted-scsscs",
+        "torture/address/separators/omitted-scsssc",
+        "torture/address/separators/omitted-scssss",
+        "torture/address/separators/omitted-sscccc",
+        "torture/address/separators/omitted-sscccs",
+        "torture/address/separators/omitted-ssccsc",
+        "torture/address/separators/omitted-ssccss",
+        "torture/address/separators/omitted-sscscc",
+        "torture/address/separators/omitted-sscscs",
+        "torture/address/separators/omitted-sscssc",
+        "torture/address/separators/omitted-sscsss",
+        "torture/address/separators/omitted-sssccc",
+        "torture/address/separators/omitted-sssccs",
+        "torture/address/separators/omitted-ssscsc",
+        "torture/address/separators/omitted-ssscss",
+        "torture/address/separators/omitted-sssscc",
+        "torture/address/separators/omitted-sssscs",
+        "torture/address/separators/omitted-sssssc",
+        "torture/address/separators/omitted-ssssss",
+        "torture/address/separators/omitted-ccccccc",
+        "torture/address/separators/omitted-ccccccs",
+        "torture/address/separators/omitted-cccccsc",
+        "torture/address/separators/omitted-cccccss",
+        "torture/address/separators/omitted-ccccscc",
+        "torture/address/separators/omitted-ccccscs",
+        "torture/address/separators/omitted-ccccssc",
+        "torture/address/separators/omitted-ccccsss",
+        "torture/address/separators/omitted-cccsccc",
+        "torture/address/separators/omitted-cccsccs",
+        "torture/address/separators/omitted-cccscsc",
+        "torture/address/separators/omitted-cccscss",
+        "torture/address/separators/omitted-cccsscc",
+        "torture/address/separators/omitted-cccsscs",
+        "torture/address/separators/omitted-cccsssc",
+        "torture/address/separators/omitted-cccssss",
+        "torture/address/separators/omitted-ccscccc",
+        "torture/address/separators/omitted-ccscccs",
+        "torture/address/separators/omitted-ccsccsc",
+        "torture/address/separators/omitted-ccsccss",
+        "torture/address/separators/omitted-ccscscc",
+        "torture/address/separators/omitted-ccscscs",
+        "torture/address/separators/omitted-ccscssc",
+        "torture/address/separators/omitted-ccscsss",
+        "torture/address/separators/omitted-ccssccc",
+        "torture/address/separators/omitted-ccssccs",
+        "torture/address/separators/omitted-ccsscsc",
+        "torture/address/separators/omitted-ccsscss",
+        "torture/address/separators/omitted-ccssscc",
+        "torture/address/separators/omitted-ccssscs",
+        "torture/address/separators/omitted-ccssssc",
+        "torture/address/separators/omitted-ccsssss",
+        "torture/address/separators/omitted-csccccc",
+        "torture/address/separators/omitted-csccccs",
+        "torture/address/separators/omitted-cscccsc",
+        "torture/address/separators/omitted-cscccss",
+        "torture/address/separators/omitted-csccscc",
+        "torture/address/separators/omitted-csccscs",
+        "torture/address/separators/omitted-csccssc",
+        "torture/address/separators/omitted-csccsss",
+        "torture/address/separators/omitted-cscsccc",
+        "torture/address/separators/omitted-cscsccs",
+        "torture/address/separators/omitted-cscscsc",
+        "torture/address/separators/omitted-cscscss",
+        "torture/address/separators/omitted-cscsscc",
+        "torture/address/separators/omitted-cscsscs",
+        "torture/address/separators/omitted-cscsssc",
+        "torture/address/separators/omitted-cscssss",
+        "torture/address/separators/omitted-csscccc",
+        "torture/address/separators/omitted-csscccs",
+        "torture/address/separators/omitted-cssccsc",
+        "torture/address/separators/omitted-cssccss",
+        "torture/address/separators/omitted-csscscc",
+        "torture/address/separators/omitted-csscscs",
+        "torture/address/separators/omitted-csscssc",
+        "torture/address/separators/omitted-csscsss",
+        "torture/address/separators/omitted-csssccc",
+        "torture/address/separators/omitted-csssccs",
+        "torture/address/separators/omitted-cssscsc",
+        "torture/address/separators/omitted-cssscss",
+        "torture/address/separators/omitted-csssscc",
+        "torture/address/separators/omitted-csssscs",
+        "torture/address/separators/omitted-csssssc",
+        "torture/address/separators/omitted-cssssss",
+        "torture/address/separators/omitted-scccccc",
+        "torture/address/separators/omitted-scccccs",
+        "torture/address/separators/omitted-sccccsc",
+        "torture/address/separators/omitted-sccccss",
+        "torture/address/separators/omitted-scccscc",
+        "torture/address/separators/omitted-scccscs",
+        "torture/address/separators/omitted-scccssc",
+        "torture/address/separators/omitted-scccsss",
+        "torture/address/separators/omitted-sccsccc",
+        "torture/address/separators/omitted-sccsccs",
+        "torture/address/separators/omitted-sccscsc",
+        "torture/address/separators/omitted-sccscss",
+        "torture/address/separators/omitted-sccsscc",
+        "torture/address/separators/omitted-sccsscs",
+        "torture/address/separators/omitted-sccsssc",
+        "torture/address/separators/omitted-sccssss",
+        "torture/address/separators/omitted-scscccc",
+        "torture/address/separators/omitted-scscccs",
+        "torture/address/separators/omitted-scsccsc",
+        "torture/address/separators/omitted-scsccss",
+        "torture/address/separators/omitted-scscscc",
+        "torture/address/separators/omitted-scscscs",
+        "torture/address/separators/omitted-scscssc",
+        "torture/address/separators/omitted-scscsss",
+        "torture/address/separators/omitted-scssccc",
+        "torture/address/separators/omitted-scssccs",
+        "torture/address/separators/omitted-scsscsc",
+        "torture/address/separators/omitted-scsscss",
+        "torture/address/separators/omitted-scssscc",
+        "torture/address/separators/omitted-scssscs",
+        "torture/address/separators/omitted-scssssc",
+        "torture/address/separators/omitted-scsssss",
+        "torture/address/separators/omitted-ssccccc",
+        "torture/address/separators/omitted-ssccccs",
+        "torture/address/separators/omitted-sscccsc",
+        "torture/address/separators/omitted-sscccss",
+        "torture/address/separators/omitted-ssccscc",
+        "torture/address/separators/omitted-ssccscs",
+        "torture/address/separators/omitted-ssccssc",
+        "torture/address/separators/omitted-ssccsss",
+        "torture/address/separators/omitted-sscsccc",
+        "torture/address/separators/omitted-sscsccs",
+        "torture/address/separators/omitted-sscscsc",
+        "torture/address/separators/omitted-sscscss",
+        "torture/address/separators/omitted-sscsscc",
+        "torture/address/separators/omitted-sscsscs",
+        "torture/address/separators/omitted-sscsssc",
+        "torture/address/separators/omitted-sscssss",
+        "torture/address/separators/omitted-ssscccc",
+        "torture/address/separators/omitted-ssscccs",
+        "torture/address/separators/omitted-sssccsc",
+        "torture/address/separators/omitted-sssccss",
+        "torture/address/separators/omitted-ssscscc",
+        "torture/address/separators/omitted-ssscscs",
+        "torture/address/separators/omitted-ssscssc",
+        "torture/address/separators/omitted-ssscsss",
+        "torture/address/separators/omitted-ssssccc",
+        "torture/address/separators/omitted-ssssccs",
+        "torture/address/separators/omitted-sssscsc",
+        "torture/address/separators/omitted-sssscss",
+        "torture/address/separators/omitted-ssssscc",
+        "torture/address/separators/omitted-ssssscs",
+        "torture/address/separators/omitted-ssssssc",
+        "torture/address/separators/omitted-sssssss",
+        "torture/address/separators/prefixed-c",
+        "torture/address/separators/prefixed-s",
+        "torture/address/separators/prefixed-cc",
+        "torture/address/separators/prefixed-cs",
+        "torture/address/separators/prefixed-sc",
+        "torture/address/separators/prefixed-ss",
+        "torture/address/separators/prefixed-ccc",
+        "torture/address/separators/prefixed-ccs",
+        "torture/address/separators/prefixed-csc",
+        "torture/address/separators/prefixed-css",
+        "torture/address/separators/prefixed-scc",
+        "torture/address/separators/prefixed-scs",
+        "torture/address/separators/prefixed-ssc",
+        "torture/address/separators/prefixed-sss",
+        "torture/address/separators/prefixed-cccc",
+        "torture/address/separators/prefixed-cccs",
+        "torture/address/separators/prefixed-ccsc",
+        "torture/address/separators/prefixed-ccss",
+        "torture/address/separators/prefixed-cscc",
+        "torture/address/separators/prefixed-cscs",
+        "torture/address/separators/prefixed-cssc",
+        "torture/address/separators/prefixed-csss",
+        "torture/address/separators/prefixed-sccc",
+        "torture/address/separators/prefixed-sccs",
+        "torture/address/separators/prefixed-scsc",
+        "torture/address/separators/prefixed-scss",
+        "torture/address/separators/prefixed-sscc",
+        "torture/address/separators/prefixed-sscs",
+        "torture/address/separators/prefixed-sssc",
+        "torture/address/separators/prefixed-ssss",
+        "torture/address/separators/prefixed-ccccc",
+        "torture/address/separators/prefixed-ccccs",
+        "torture/address/separators/prefixed-cccsc",
+        "torture/address/separators/prefixed-cccss",
+        "torture/address/separators/prefixed-ccscc",
+        "torture/address/separators/prefixed-ccscs",
+        "torture/address/separators/prefixed-ccssc",
+        "torture/address/separators/prefixed-ccsss",
+        "torture/address/separators/prefixed-csccc",
+        "torture/address/separators/prefixed-csccs",
+        "torture/address/separators/prefixed-cscsc",
+        "torture/address/separators/prefixed-cscss",
+        "torture/address/separators/prefixed-csscc",
+        "torture/address/separators/prefixed-csscs",
+        "torture/address/separators/prefixed-csssc",
+        "torture/address/separators/prefixed-cssss",
+        "torture/address/separators/prefixed-scccc",
+        "torture/address/separators/prefixed-scccs",
+        "torture/address/separators/prefixed-sccsc",
+        "torture/address/separators/prefixed-sccss",
+        "torture/address/separators/prefixed-scscc",
+        "torture/address/separators/prefixed-scscs",
+        "torture/address/separators/prefixed-scssc",
+        "torture/address/separators/prefixed-scsss",
+        "torture/address/separators/prefixed-ssccc",
+        "torture/address/separators/prefixed-ssccs",
+        "torture/address/separators/prefixed-sscsc",
+        "torture/address/separators/prefixed-sscss",
+        "torture/address/separators/prefixed-ssscc",
+        "torture/address/separators/prefixed-ssscs",
+        "torture/address/separators/prefixed-ssssc",
+        "torture/address/separators/prefixed-sssss"
       ]
     },
     {
@@ -171,7 +554,9 @@
       "coverage": [
         "command/delete-print-suffix",
         "command/move-number-suffix",
-        "test/regression/command.test.ts"
+        "torture/suffix/delete-print",
+        "torture/suffix/delete-number",
+        "torture/suffix/delete-list"
       ]
     },
     {
@@ -180,8 +565,14 @@
       "summary": "Append input after an address.",
       "disposition": "covered",
       "coverage": [
-        "edit/append/",
-        "empty-append-is-unchanged"
+        "issue8/change-state/empty-append-is-unchanged",
+        "torture/edit/append/address-0",
+        "torture/edit/append/address-1",
+        "torture/edit/append/address-2",
+        "torture/edit/append/address-3",
+        "torture/edit/append/address-4",
+        "torture/edit/append/address-5",
+        "torture/edit/append/address-6"
       ]
     },
     {
@@ -191,7 +582,27 @@
       "disposition": "covered",
       "coverage": [
         "command/change-empty-final-range",
-        "edit/change/"
+        "torture/edit/change/1-1",
+        "torture/edit/change/1-2",
+        "torture/edit/change/1-3",
+        "torture/edit/change/1-4",
+        "torture/edit/change/1-5",
+        "torture/edit/change/1-6",
+        "torture/edit/change/2-2",
+        "torture/edit/change/2-3",
+        "torture/edit/change/2-4",
+        "torture/edit/change/2-5",
+        "torture/edit/change/2-6",
+        "torture/edit/change/3-3",
+        "torture/edit/change/3-4",
+        "torture/edit/change/3-5",
+        "torture/edit/change/3-6",
+        "torture/edit/change/4-4",
+        "torture/edit/change/4-5",
+        "torture/edit/change/4-6",
+        "torture/edit/change/5-5",
+        "torture/edit/change/5-6",
+        "torture/edit/change/6-6"
       ]
     },
     {
@@ -201,7 +612,27 @@
       "disposition": "covered",
       "coverage": [
         "command/delete-selects-following-line",
-        "edit/delete/"
+        "torture/edit/delete/1-1",
+        "torture/edit/delete/1-2",
+        "torture/edit/delete/1-3",
+        "torture/edit/delete/1-4",
+        "torture/edit/delete/1-5",
+        "torture/edit/delete/1-6",
+        "torture/edit/delete/2-2",
+        "torture/edit/delete/2-3",
+        "torture/edit/delete/2-4",
+        "torture/edit/delete/2-5",
+        "torture/edit/delete/2-6",
+        "torture/edit/delete/3-3",
+        "torture/edit/delete/3-4",
+        "torture/edit/delete/3-5",
+        "torture/edit/delete/3-6",
+        "torture/edit/delete/4-4",
+        "torture/edit/delete/4-5",
+        "torture/edit/delete/4-6",
+        "torture/edit/delete/5-5",
+        "torture/edit/delete/5-6",
+        "torture/edit/delete/6-6"
       ]
     },
     {
@@ -210,8 +641,10 @@
       "summary": "Replace the buffer from a file.",
       "disposition": "covered",
       "coverage": [
-        "warned-edit-takes-effect",
-        "test/editor.test.ts"
+        "issue8/change-state/warned-edit-takes-effect",
+        "torture/edit-command/unchanged-load",
+        "torture/edit-command/unchecked-discards-change",
+        "torture/edit-command/discards-marks"
       ]
     },
     {
@@ -220,7 +653,9 @@
       "summary": "Set and print the pathname.",
       "disposition": "covered",
       "coverage": [
-        "file/filename-"
+        "file/filename-set-and-print",
+        "file/filename-without-memory-errors",
+        "torture/file/pathname-with-spaces"
       ]
     },
     {
@@ -229,8 +664,21 @@
       "summary": "Execute commands on selected lines.",
       "disposition": "covered",
       "coverage": [
-        "test/regression/global.test.ts",
-        "omitted-global"
+        "issue8/delimiter/omitted-global",
+        "issue8/delimiter/omitted-inverse-global",
+        "issue8/delimiter/omitted-interactive-global",
+        "issue8/delimiter/omitted-interactive-inverse-global",
+        "torture/global/matching-starts-a",
+        "torture/global/inverse-starts-a",
+        "torture/global/matching-ends-ta",
+        "torture/global/inverse-ends-ta",
+        "torture/global/matching-starts-b-or-g",
+        "torture/global/inverse-starts-b-or-g",
+        "torture/global/matching-not-start-a-or-e",
+        "torture/global/inverse-not-start-a-or-e",
+        "torture/global/matching-contains-digit",
+        "torture/global/inverse-contains-digit",
+        "torture/global/delete-is-single-undo-unit"
       ]
     },
     {
@@ -239,8 +687,9 @@
       "summary": "Report and toggle error explanations.",
       "disposition": "covered",
       "coverage": [
-        "process/help-mode",
-        "test/regression/command.test.ts"
+        "process/help-mode-explains-terminal-error",
+        "torture/terminal/help-after-error",
+        "torture/terminal/help-mode-explains-error"
       ]
     },
     {
@@ -249,9 +698,14 @@
       "summary": "Insert input before an address.",
       "disposition": "permitted-choice",
       "coverage": [
-        "edit/insert/",
-        "empty-insert-is-unchanged",
-        "test/regression/command.test.ts"
+        "issue8/change-state/empty-insert-is-unchanged",
+        "torture/edit/insert/address-0",
+        "torture/edit/insert/address-1",
+        "torture/edit/insert/address-2",
+        "torture/edit/insert/address-3",
+        "torture/edit/insert/address-4",
+        "torture/edit/insert/address-5",
+        "torture/edit/insert/address-6"
       ]
     },
     {
@@ -262,8 +716,21 @@
       "coverage": [
         "command/one-address-join-is-noop",
         "command/join-selects-joined-line",
-        "edit/join/",
-        "test/regression/command.test.ts"
+        "torture/edit/join/1-2",
+        "torture/edit/join/1-3",
+        "torture/edit/join/1-4",
+        "torture/edit/join/1-5",
+        "torture/edit/join/1-6",
+        "torture/edit/join/2-3",
+        "torture/edit/join/2-4",
+        "torture/edit/join/2-5",
+        "torture/edit/join/2-6",
+        "torture/edit/join/3-4",
+        "torture/edit/join/3-5",
+        "torture/edit/join/3-6",
+        "torture/edit/join/4-5",
+        "torture/edit/join/4-6",
+        "torture/edit/join/5-6"
       ]
     },
     {
@@ -273,7 +740,8 @@
       "disposition": "covered",
       "coverage": [
         "command/mark-preserves-current-line",
-        "test/regression/command.test.ts"
+        "torture/mark/multiple-names",
+        "torture/mark/current-line-stays-put"
       ]
     },
     {
@@ -282,8 +750,10 @@
       "summary": "Write visually unambiguous lines.",
       "disposition": "covered",
       "coverage": [
-        "output/list-",
-        "test/regression/command.test.ts"
+        "output/list-preserves-carriage-return",
+        "output/list-escapes-controls",
+        "torture/list/printable-and-trailing-space",
+        "torture/list/dollar-and-backslash"
       ]
     },
     {
@@ -293,7 +763,97 @@
       "disposition": "covered",
       "coverage": [
         "command/move-range-to-start",
-        "test/regression/command.test.ts"
+        "torture/edit/move/1-1-to-0",
+        "torture/edit/move/1-1-to-2",
+        "torture/edit/move/1-1-to-3",
+        "torture/edit/move/1-1-to-4",
+        "torture/edit/move/1-1-to-5",
+        "torture/edit/move/1-1-to-6",
+        "torture/edit/move/1-2-to-0",
+        "torture/edit/move/1-2-to-3",
+        "torture/edit/move/1-2-to-4",
+        "torture/edit/move/1-2-to-5",
+        "torture/edit/move/1-2-to-6",
+        "torture/edit/move/1-3-to-0",
+        "torture/edit/move/1-3-to-4",
+        "torture/edit/move/1-3-to-5",
+        "torture/edit/move/1-3-to-6",
+        "torture/edit/move/1-4-to-0",
+        "torture/edit/move/1-4-to-5",
+        "torture/edit/move/1-4-to-6",
+        "torture/edit/move/1-5-to-0",
+        "torture/edit/move/1-5-to-6",
+        "torture/edit/move/1-6-to-0",
+        "torture/edit/move/2-2-to-0",
+        "torture/edit/move/2-2-to-1",
+        "torture/edit/move/2-2-to-3",
+        "torture/edit/move/2-2-to-4",
+        "torture/edit/move/2-2-to-5",
+        "torture/edit/move/2-2-to-6",
+        "torture/edit/move/2-3-to-0",
+        "torture/edit/move/2-3-to-1",
+        "torture/edit/move/2-3-to-4",
+        "torture/edit/move/2-3-to-5",
+        "torture/edit/move/2-3-to-6",
+        "torture/edit/move/2-4-to-0",
+        "torture/edit/move/2-4-to-1",
+        "torture/edit/move/2-4-to-5",
+        "torture/edit/move/2-4-to-6",
+        "torture/edit/move/2-5-to-0",
+        "torture/edit/move/2-5-to-1",
+        "torture/edit/move/2-5-to-6",
+        "torture/edit/move/2-6-to-0",
+        "torture/edit/move/2-6-to-1",
+        "torture/edit/move/3-3-to-0",
+        "torture/edit/move/3-3-to-1",
+        "torture/edit/move/3-3-to-2",
+        "torture/edit/move/3-3-to-4",
+        "torture/edit/move/3-3-to-5",
+        "torture/edit/move/3-3-to-6",
+        "torture/edit/move/3-4-to-0",
+        "torture/edit/move/3-4-to-1",
+        "torture/edit/move/3-4-to-2",
+        "torture/edit/move/3-4-to-5",
+        "torture/edit/move/3-4-to-6",
+        "torture/edit/move/3-5-to-0",
+        "torture/edit/move/3-5-to-1",
+        "torture/edit/move/3-5-to-2",
+        "torture/edit/move/3-5-to-6",
+        "torture/edit/move/3-6-to-0",
+        "torture/edit/move/3-6-to-1",
+        "torture/edit/move/3-6-to-2",
+        "torture/edit/move/4-4-to-0",
+        "torture/edit/move/4-4-to-1",
+        "torture/edit/move/4-4-to-2",
+        "torture/edit/move/4-4-to-3",
+        "torture/edit/move/4-4-to-5",
+        "torture/edit/move/4-4-to-6",
+        "torture/edit/move/4-5-to-0",
+        "torture/edit/move/4-5-to-1",
+        "torture/edit/move/4-5-to-2",
+        "torture/edit/move/4-5-to-3",
+        "torture/edit/move/4-5-to-6",
+        "torture/edit/move/4-6-to-0",
+        "torture/edit/move/4-6-to-1",
+        "torture/edit/move/4-6-to-2",
+        "torture/edit/move/4-6-to-3",
+        "torture/edit/move/5-5-to-0",
+        "torture/edit/move/5-5-to-1",
+        "torture/edit/move/5-5-to-2",
+        "torture/edit/move/5-5-to-3",
+        "torture/edit/move/5-5-to-4",
+        "torture/edit/move/5-5-to-6",
+        "torture/edit/move/5-6-to-0",
+        "torture/edit/move/5-6-to-1",
+        "torture/edit/move/5-6-to-2",
+        "torture/edit/move/5-6-to-3",
+        "torture/edit/move/5-6-to-4",
+        "torture/edit/move/6-6-to-0",
+        "torture/edit/move/6-6-to-1",
+        "torture/edit/move/6-6-to-2",
+        "torture/edit/move/6-6-to-3",
+        "torture/edit/move/6-6-to-4",
+        "torture/edit/move/6-6-to-5"
       ]
     },
     {
@@ -302,7 +862,9 @@
       "summary": "Write numbered lines.",
       "disposition": "covered",
       "coverage": [
-        "output/numbered-lines"
+        "output/numbered-lines",
+        "torture/number/range",
+        "torture/number/default-current"
       ]
     },
     {
@@ -312,8 +874,8 @@
       "disposition": "covered",
       "coverage": [
         "command/print-updates-current-line",
-        "address/",
-        "test/regression/command.test.ts"
+        "torture/print/default-current",
+        "torture/print/range-selects-last"
       ]
     },
     {
@@ -323,8 +885,8 @@
       "disposition": "covered",
       "coverage": [
         "command/quit-without-checking-discards-change",
-        "issue8/change-state/",
-        "terminal/modified-warning"
+        "torture/quit/warn-then-quit",
+        "torture/quit/unchecked-never-warns"
       ]
     },
     {
@@ -333,7 +895,14 @@
       "summary": "Append file or shell output.",
       "disposition": "covered",
       "coverage": [
-        "file/read-"
+        "file/read-byte-count",
+        "file/read-remembers-first-pathname",
+        "file/read-at-address-zero",
+        "shell/read-does-not-remember-pathname",
+        "torture/file/read-at-0",
+        "torture/file/read-at-1",
+        "torture/file/read-at-2",
+        "torture/file/read-at-3"
       ]
     },
     {
@@ -342,8 +911,86 @@
       "summary": "Replace BRE matches and apply substitute flags.",
       "disposition": "covered",
       "coverage": [
-        "test/regression/bre_substitute.test.ts",
-        "issue8/delimiter/"
+        "issue8/change-state/no-op-substitution-is-a-change",
+        "issue8/delimiter/omitted-substitute",
+        "issue8/delimiter/reject-omitted-substitute-pattern",
+        "torture/substitute/count-1",
+        "torture/substitute/count-2",
+        "torture/substitute/count-3",
+        "torture/substitute/count-4",
+        "torture/substitute/count-5",
+        "torture/substitute/count-6",
+        "torture/substitute/count-7",
+        "torture/substitute/count-8",
+        "torture/substitute/count-9",
+        "torture/substitute/count-10",
+        "torture/substitute/count-11",
+        "torture/substitute/count-12",
+        "torture/substitute/count-13",
+        "torture/substitute/count-14",
+        "torture/substitute/count-15",
+        "torture/substitute/count-16",
+        "torture/substitute/count-17",
+        "torture/substitute/count-18",
+        "torture/substitute/count-19",
+        "torture/substitute/count-20",
+        "torture/substitute/count-21",
+        "torture/substitute/count-22",
+        "torture/substitute/count-23",
+        "torture/substitute/count-24",
+        "torture/substitute/count-25",
+        "torture/substitute/count-26",
+        "torture/substitute/count-27",
+        "torture/substitute/count-28",
+        "torture/substitute/count-29",
+        "torture/substitute/count-30",
+        "torture/substitute/count-31",
+        "torture/substitute/count-32",
+        "torture/substitute/delimiter-21",
+        "torture/substitute/delimiter-22",
+        "torture/substitute/delimiter-23",
+        "torture/substitute/delimiter-24",
+        "torture/substitute/delimiter-25",
+        "torture/substitute/delimiter-26",
+        "torture/substitute/delimiter-27",
+        "torture/substitute/delimiter-28",
+        "torture/substitute/delimiter-29",
+        "torture/substitute/delimiter-2a",
+        "torture/substitute/delimiter-2b",
+        "torture/substitute/delimiter-2c",
+        "torture/substitute/delimiter-2d",
+        "torture/substitute/delimiter-2e",
+        "torture/substitute/delimiter-2f",
+        "torture/substitute/delimiter-3a",
+        "torture/substitute/delimiter-3b",
+        "torture/substitute/delimiter-3c",
+        "torture/substitute/delimiter-3d",
+        "torture/substitute/delimiter-3e",
+        "torture/substitute/delimiter-3f",
+        "torture/substitute/delimiter-40",
+        "torture/substitute/delimiter-5b",
+        "torture/substitute/delimiter-5d",
+        "torture/substitute/delimiter-5e",
+        "torture/substitute/delimiter-5f",
+        "torture/substitute/delimiter-60",
+        "torture/substitute/delimiter-7b",
+        "torture/substitute/delimiter-7c",
+        "torture/substitute/delimiter-7d",
+        "torture/substitute/delimiter-7e",
+        "torture/substitute/replacement-backreference-order",
+        "torture/substitute/replacement-ampersand",
+        "torture/substitute/replacement-escaped-ampersand",
+        "torture/substitute/replacement-previous-replacement",
+        "torture/substitute/replacement-mixed-percent-literal",
+        "torture/substitute/replacement-escaped-percent",
+        "torture/substitute/replacement-newline",
+        "torture/substitute/flag-first",
+        "torture/substitute/flag-global",
+        "torture/substitute/flag-second",
+        "torture/substitute/flag-fourth",
+        "torture/substitute/flag-print",
+        "torture/substitute/flag-number",
+        "torture/substitute/flag-list"
       ]
     },
     {
@@ -353,7 +1000,153 @@
       "disposition": "covered",
       "coverage": [
         "command/copy-range-to-start",
-        "test/regression/command.test.ts"
+        "torture/edit/copy/1-1-to-0",
+        "torture/edit/copy/1-1-to-1",
+        "torture/edit/copy/1-1-to-2",
+        "torture/edit/copy/1-1-to-3",
+        "torture/edit/copy/1-1-to-4",
+        "torture/edit/copy/1-1-to-5",
+        "torture/edit/copy/1-1-to-6",
+        "torture/edit/copy/1-2-to-0",
+        "torture/edit/copy/1-2-to-1",
+        "torture/edit/copy/1-2-to-2",
+        "torture/edit/copy/1-2-to-3",
+        "torture/edit/copy/1-2-to-4",
+        "torture/edit/copy/1-2-to-5",
+        "torture/edit/copy/1-2-to-6",
+        "torture/edit/copy/1-3-to-0",
+        "torture/edit/copy/1-3-to-1",
+        "torture/edit/copy/1-3-to-2",
+        "torture/edit/copy/1-3-to-3",
+        "torture/edit/copy/1-3-to-4",
+        "torture/edit/copy/1-3-to-5",
+        "torture/edit/copy/1-3-to-6",
+        "torture/edit/copy/1-4-to-0",
+        "torture/edit/copy/1-4-to-1",
+        "torture/edit/copy/1-4-to-2",
+        "torture/edit/copy/1-4-to-3",
+        "torture/edit/copy/1-4-to-4",
+        "torture/edit/copy/1-4-to-5",
+        "torture/edit/copy/1-4-to-6",
+        "torture/edit/copy/1-5-to-0",
+        "torture/edit/copy/1-5-to-1",
+        "torture/edit/copy/1-5-to-2",
+        "torture/edit/copy/1-5-to-3",
+        "torture/edit/copy/1-5-to-4",
+        "torture/edit/copy/1-5-to-5",
+        "torture/edit/copy/1-5-to-6",
+        "torture/edit/copy/1-6-to-0",
+        "torture/edit/copy/1-6-to-1",
+        "torture/edit/copy/1-6-to-2",
+        "torture/edit/copy/1-6-to-3",
+        "torture/edit/copy/1-6-to-4",
+        "torture/edit/copy/1-6-to-5",
+        "torture/edit/copy/1-6-to-6",
+        "torture/edit/copy/2-2-to-0",
+        "torture/edit/copy/2-2-to-1",
+        "torture/edit/copy/2-2-to-2",
+        "torture/edit/copy/2-2-to-3",
+        "torture/edit/copy/2-2-to-4",
+        "torture/edit/copy/2-2-to-5",
+        "torture/edit/copy/2-2-to-6",
+        "torture/edit/copy/2-3-to-0",
+        "torture/edit/copy/2-3-to-1",
+        "torture/edit/copy/2-3-to-2",
+        "torture/edit/copy/2-3-to-3",
+        "torture/edit/copy/2-3-to-4",
+        "torture/edit/copy/2-3-to-5",
+        "torture/edit/copy/2-3-to-6",
+        "torture/edit/copy/2-4-to-0",
+        "torture/edit/copy/2-4-to-1",
+        "torture/edit/copy/2-4-to-2",
+        "torture/edit/copy/2-4-to-3",
+        "torture/edit/copy/2-4-to-4",
+        "torture/edit/copy/2-4-to-5",
+        "torture/edit/copy/2-4-to-6",
+        "torture/edit/copy/2-5-to-0",
+        "torture/edit/copy/2-5-to-1",
+        "torture/edit/copy/2-5-to-2",
+        "torture/edit/copy/2-5-to-3",
+        "torture/edit/copy/2-5-to-4",
+        "torture/edit/copy/2-5-to-5",
+        "torture/edit/copy/2-5-to-6",
+        "torture/edit/copy/2-6-to-0",
+        "torture/edit/copy/2-6-to-1",
+        "torture/edit/copy/2-6-to-2",
+        "torture/edit/copy/2-6-to-3",
+        "torture/edit/copy/2-6-to-4",
+        "torture/edit/copy/2-6-to-5",
+        "torture/edit/copy/2-6-to-6",
+        "torture/edit/copy/3-3-to-0",
+        "torture/edit/copy/3-3-to-1",
+        "torture/edit/copy/3-3-to-2",
+        "torture/edit/copy/3-3-to-3",
+        "torture/edit/copy/3-3-to-4",
+        "torture/edit/copy/3-3-to-5",
+        "torture/edit/copy/3-3-to-6",
+        "torture/edit/copy/3-4-to-0",
+        "torture/edit/copy/3-4-to-1",
+        "torture/edit/copy/3-4-to-2",
+        "torture/edit/copy/3-4-to-3",
+        "torture/edit/copy/3-4-to-4",
+        "torture/edit/copy/3-4-to-5",
+        "torture/edit/copy/3-4-to-6",
+        "torture/edit/copy/3-5-to-0",
+        "torture/edit/copy/3-5-to-1",
+        "torture/edit/copy/3-5-to-2",
+        "torture/edit/copy/3-5-to-3",
+        "torture/edit/copy/3-5-to-4",
+        "torture/edit/copy/3-5-to-5",
+        "torture/edit/copy/3-5-to-6",
+        "torture/edit/copy/3-6-to-0",
+        "torture/edit/copy/3-6-to-1",
+        "torture/edit/copy/3-6-to-2",
+        "torture/edit/copy/3-6-to-3",
+        "torture/edit/copy/3-6-to-4",
+        "torture/edit/copy/3-6-to-5",
+        "torture/edit/copy/3-6-to-6",
+        "torture/edit/copy/4-4-to-0",
+        "torture/edit/copy/4-4-to-1",
+        "torture/edit/copy/4-4-to-2",
+        "torture/edit/copy/4-4-to-3",
+        "torture/edit/copy/4-4-to-4",
+        "torture/edit/copy/4-4-to-5",
+        "torture/edit/copy/4-4-to-6",
+        "torture/edit/copy/4-5-to-0",
+        "torture/edit/copy/4-5-to-1",
+        "torture/edit/copy/4-5-to-2",
+        "torture/edit/copy/4-5-to-3",
+        "torture/edit/copy/4-5-to-4",
+        "torture/edit/copy/4-5-to-5",
+        "torture/edit/copy/4-5-to-6",
+        "torture/edit/copy/4-6-to-0",
+        "torture/edit/copy/4-6-to-1",
+        "torture/edit/copy/4-6-to-2",
+        "torture/edit/copy/4-6-to-3",
+        "torture/edit/copy/4-6-to-4",
+        "torture/edit/copy/4-6-to-5",
+        "torture/edit/copy/4-6-to-6",
+        "torture/edit/copy/5-5-to-0",
+        "torture/edit/copy/5-5-to-1",
+        "torture/edit/copy/5-5-to-2",
+        "torture/edit/copy/5-5-to-3",
+        "torture/edit/copy/5-5-to-4",
+        "torture/edit/copy/5-5-to-5",
+        "torture/edit/copy/5-5-to-6",
+        "torture/edit/copy/5-6-to-0",
+        "torture/edit/copy/5-6-to-1",
+        "torture/edit/copy/5-6-to-2",
+        "torture/edit/copy/5-6-to-3",
+        "torture/edit/copy/5-6-to-4",
+        "torture/edit/copy/5-6-to-5",
+        "torture/edit/copy/5-6-to-6",
+        "torture/edit/copy/6-6-to-0",
+        "torture/edit/copy/6-6-to-1",
+        "torture/edit/copy/6-6-to-2",
+        "torture/edit/copy/6-6-to-3",
+        "torture/edit/copy/6-6-to-4",
+        "torture/edit/copy/6-6-to-5",
+        "torture/edit/copy/6-6-to-6"
       ]
     },
     {
@@ -362,9 +1155,17 @@
       "summary": "Toggle the most recent real change.",
       "disposition": "covered",
       "coverage": [
-        "undo-is-a-change",
-        "global-no-change-undo-noop",
-        "test/regression/command.test.ts"
+        "issue8/change-state/undo-is-a-change",
+        "issue8/change-state/global-no-change-undo-noop",
+        "torture/undo/append",
+        "torture/undo/change",
+        "torture/undo/delete",
+        "torture/undo/insert",
+        "torture/undo/join",
+        "torture/undo/move",
+        "torture/undo/read",
+        "torture/undo/substitute",
+        "torture/undo/copy"
       ]
     },
     {
@@ -373,10 +1174,11 @@
       "summary": "Write complete addressed lines.",
       "disposition": "covered",
       "coverage": [
-        "file/write-",
+        "issue8/change-state/full-write-clears-change",
+        "file/write-byte-count-and-content",
         "file/partial-write-preserves-change-state",
         "shell/write-does-not-clear-change-state",
-        "full-write-clears-change"
+        "torture/file/write-truncates-existing-file"
       ]
     },
     {
@@ -386,7 +1188,8 @@
       "disposition": "covered",
       "coverage": [
         "command/equals-preserves-current-line",
-        "test/regression/address.test.ts"
+        "torture/equals/default-last-line",
+        "torture/equals/explicit-preserves-current"
       ]
     },
     {
@@ -395,9 +1198,10 @@
       "summary": "Execute POSIX shell commands.",
       "disposition": "covered",
       "coverage": [
-        "shell/",
-        "test/editor.test.ts",
-        "TOUR"
+        "shell/pathname-substitution",
+        "shell/repeat-previous-command",
+        "torture/shell/completion-marker",
+        "torture/shell/escaped-percent-is-literal"
       ]
     },
     {
@@ -407,8 +1211,8 @@
       "disposition": "covered",
       "coverage": [
         "command/address-and-null-command",
-        "test/editor.test.ts",
-        "test/regression/address.test.ts"
+        "torture/null/blank-advances",
+        "torture/null/address-alone"
       ]
     },
     {
@@ -417,7 +1221,9 @@
       "summary": "Stop non-terminal input after an ordinary error.",
       "disposition": "covered",
       "coverage": [
-        "process/non-terminal-error-stops-input"
+        "process/non-terminal-error-stops-input",
+        "torture/error/non-terminal-invalid-command-stops",
+        "torture/error/non-terminal-substitute-failure-stops"
       ]
     },
     {
@@ -427,7 +1233,8 @@
       "disposition": "covered",
       "coverage": [
         "terminal/error-recovers-to-command-mode",
-        "test/integration/process.test.ts"
+        "torture/terminal/recover-after-two-errors",
+        "torture/terminal/unknown-command-recovers"
       ]
     }
   ]

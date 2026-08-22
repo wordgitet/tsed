@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codeberg.org/wordgitet/tsed/raw/branch/main/test/portable/requirements-schema-v1.json",
+  "title": "Portable ed POSIX requirement map version 1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "version",
+    "standard",
+    "source",
+    "requirements"
+  ],
+  "properties": {
+    "format": {
+      "const": "tsed-posix-requirements"
+    },
+    "version": {
+      "const": 1
+    },
+    "standard": {
+      "const": "POSIX.1-2024"
+    },
+    "source": {
+      "type": "string",
+      "format": "uri"
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/requirement"
+      }
+    }
+  },
+  "$defs": {
+    "requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "section",
+        "summary",
+        "disposition",
+        "coverage"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "section": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "disposition": {
+          "enum": [
+            "covered",
+            "platform-dependent",
+            "permitted-choice"
+          ]
+        },
+        "coverage": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

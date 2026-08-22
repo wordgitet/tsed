@@ -26,6 +26,9 @@
     "prebuilds",
     "src",
     "test/portable",
+    "test/portable_runner.ts",
+    "test/portable_v2_runner.ts",
+    "test/support/pty_harness.ts",
     "README",
     "TOUR",
     "COPYRIGHT"
@@ -46,7 +49,7 @@
     "generate:portable:v2": "bun tools/generate_posix_corpus.ts",
     "generate:portable": "bun run generate:portable:v1 && bun run generate:portable:v2",
     "test:portable:v1": "bun test/portable_runner.ts",
-    "test:portable:v2": "bun test/portable_v2_runner.ts",
+    "test:portable:v2": "bun test/portable_v2_runner.ts --quiet",
     "test:portable": "bun run test:portable:v1 && bun run test:portable:v2",
     "test:integration": "bun test --path-ignore-patterns='__never__' test/integration --timeout=10000",
     "test:locale": "bun tools/run_locale_tests.ts",

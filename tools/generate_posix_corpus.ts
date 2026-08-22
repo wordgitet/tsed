@@ -7,6 +7,12 @@
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { build_torture_cases } from "./generate_torture_cases";
+import {
+	build_portable_schema,
+	build_requirements_schema,
+} from "./portable_schema";
+
 export interface encoded_data {
 	encoding: "utf8" | "base64";
 	data: string;
@@ -18,7 +24,7 @@ export interface portable_fixture {
 }
 
 export type portable_action =
-	| { kind: "wait"; text: string }
+	| { kind: "wait"; text: string; occurrences?: number }
 	| { kind: "write"; data: encoded_data }
 	| { kind: "signal"; signal: "SIGINT" | "SIGQUIT" | "SIGHUP" };
 
@@ -37,9 +43,16 @@ export interface expected_outcome {
 	stderr_minimum_bytes?: number;
 	transcript_contains?: readonly string[];
 	files?: readonly expected_file[];
+	absent_files?: readonly string[];
 }
 
 export type expected_status = number | "nonzero" | "any";
+
+export type portable_capability =
+	| "posix-shell"
+	| "pty"
+	| "signals"
+	| "utf8-locale";
 
 export interface portable_case_v2 {
 	name: string;
@@ -50,6 +63,7 @@ export interface portable_case_v2 {
 	stdin?: encoded_data;
 	actions?: readonly portable_action[];
 	fixtures?: readonly portable_fixture[];
+	requires?: readonly portable_capability[];
 	expect: readonly expected_outcome[];
 	timeout_ms?: number;
 }
@@ -98,6 +112,7 @@ build_posix_corpus(): portable_corpus_v2
 	add_process_cases(cases);
 	add_shell_cases(cases);
 	add_terminal_cases(cases);
+	cases.push(...build_torture_cases());
 
 	return {
 		format: "portable-ed-corpus",
@@ -110,19 +125,23 @@ build_posix_corpus(): portable_corpus_v2
 }
 
 export function
-build_posix_requirements(): posix_requirements
+build_posix_requirements(
+    cases: readonly portable_case_v2[] = build_posix_corpus().cases,
+): posix_requirements
 {
 	return {
 		format: "tsed-posix-requirements",
 		version: 1,
 		standard: "POSIX.1-2024",
 		source: STANDARD_SOURCE,
-		requirements: requirement_rows.map((row) => ({
+			requirements: requirement_rows.map((row) => ({
 			id: row[0],
 			section: row[1],
 			summary: row[2],
 			disposition: row[3],
-			coverage: row[4],
+			coverage: cases
+				.filter((item) => item.requirement === row[0])
+				.map((item) => item.name),
 		})),
 	};
 }
@@ -388,12 +407,14 @@ add_shell_cases(cases: portable_case_v2[]): void
 		requirement: "command.shell",
 		stdin: "f token\n!echo %\nQ\n",
 		stdout: "token\necho token\ntoken\n",
+		requires: ["posix-shell"],
 	});
 	add_pipe_case(cases, {
 		name: "shell/repeat-previous-command",
 		requirement: "command.shell",
 		stdin: "!echo first\n!!\nQ\n",
 		stdout: "first\necho first\nfirst\n",
+		requires: ["posix-shell"],
 	});
 	add_pipe_case(cases, {
 		name: "shell/write-does-not-clear-change-state",
@@ -401,12 +422,14 @@ add_shell_cases(cases: portable_case_v2[]): void
 		stdin: "a\none\n.\nw !cat >/dev/null\nq\nq\n",
 		stdout: "?\n",
 		status: "any",
+		requires: ["posix-shell"],
 	});
 	add_pipe_case(cases, {
 		name: "shell/read-does-not-remember-pathname",
 		requirement: "command.read",
 		stdin: "f @TMP@/remembered\nr !printf 'one\\n'\nf\n,p\nQ\n",
 		stdout: "@TMP@/remembered\n@TMP@/remembered\none\n",
+		requires: ["posix-shell"],
 	});
 }
 
@@ -553,6 +576,7 @@ add_terminal_cases(cases: portable_case_v2[]): void
 		requirement: "errors.terminal",
 		mode: "pty",
 		arguments: ["-s", "-p", ": "],
+		requires: ["pty"],
 		actions: [
 			{ kind: "wait", text: ": " },
 			{ kind: "write", data: utf8("0p\n") },
@@ -566,6 +590,7 @@ add_terminal_cases(cases: portable_case_v2[]): void
 		requirement: "option.prompt",
 		mode: "pty",
 		arguments: ["-p", ": "],
+		requires: ["pty"],
 		actions: [
 			{ kind: "wait", text: ": " },
 			{ kind: "write", data: utf8("q\n") },
@@ -577,6 +602,7 @@ add_terminal_cases(cases: portable_case_v2[]): void
 		requirement: "buffer.change-state",
 		mode: "pty",
 		arguments: ["-s", "-p", ": "],
+		requires: ["pty"],
 		actions: [
 			{ kind: "wait", text: ": " },
 			{ kind: "write", data: utf8("a\none\n.\nq\n") },
@@ -590,6 +616,7 @@ add_terminal_cases(cases: portable_case_v2[]): void
 		requirement: "signal.int",
 		mode: "pty",
 		arguments: ["-s", "-p", ": "],
+		requires: ["pty", "signals"],
 		actions: [
 			{ kind: "wait", text: ": " },
 			{ kind: "write", data: utf8("a\npartial\n") },
@@ -605,6 +632,7 @@ add_terminal_cases(cases: portable_case_v2[]): void
 		requirement: "signal.quit",
 		mode: "pty",
 		arguments: ["-s", "-p", ": "],
+		requires: ["pty", "signals"],
 		actions: [
 			{ kind: "wait", text: ": " },
 			{ kind: "signal", signal: "SIGQUIT" },
@@ -617,6 +645,7 @@ add_terminal_cases(cases: portable_case_v2[]): void
 		requirement: "signal.hup",
 		mode: "pty",
 		arguments: ["-s", "-p", ": "],
+		requires: ["pty", "signals"],
 		actions: [
 			{ kind: "wait", text: ": " },
 			{ kind: "write", data: utf8("a\none\n.\n") },
@@ -633,6 +662,7 @@ add_terminal_cases(cases: portable_case_v2[]): void
 		requirement: "signal.hup",
 		mode: "pty",
 		arguments: ["-s", "-p", ": "],
+		requires: ["pty", "signals"],
 		environment: { HOME: "@TMP@/home" },
 		fixtures: [
 			{ path: "ed.hup/sentinel", data: utf8("") },
@@ -663,6 +693,7 @@ interface pipe_case_options {
 	stderr_minimum_bytes?: number;
 	status?: expected_status;
 	arguments?: readonly string[];
+	requires?: readonly portable_capability[];
 	fixtures?: readonly portable_fixture[];
 	files?: readonly expected_file[];
 }
@@ -679,6 +710,9 @@ add_pipe_case(
 		mode: "pipe",
 		arguments: options.arguments ?? ["-s"],
 		stdin: utf8(options.stdin),
+		...(options.requires === undefined
+			? {}
+			: { requires: options.requires }),
 		...(options.fixtures === undefined
 			? {}
 			: { fixtures: options.fixtures }),
@@ -868,7 +902,7 @@ main(): Promise<void>
 	const project_root = dirname(dirname(fileURLToPath(import.meta.url)));
 	const portable_directory = join(project_root, "test", "portable");
 	const corpus = build_posix_corpus();
-	const requirements = build_posix_requirements();
+	const requirements = build_posix_requirements(corpus.cases);
 
 	await Bun.write(
 		join(portable_directory, "cases-v2.json"),
@@ -877,6 +911,14 @@ main(): Promise<void>
 	await Bun.write(
 		join(portable_directory, "requirements.json"),
 		`${JSON.stringify(requirements, null, 2)}\n`,
+	);
+	await Bun.write(
+		join(portable_directory, "schema-v2.json"),
+		`${JSON.stringify(build_portable_schema(), null, 2)}\n`,
+	);
+	await Bun.write(
+		join(portable_directory, "requirements-schema-v1.json"),
+		`${JSON.stringify(build_requirements_schema(), null, 2)}\n`,
 	);
 	process.stdout.write(
 		`generated ${corpus.cases.length} POSIX cases and ` +

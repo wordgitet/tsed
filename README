@@ -89,6 +89,21 @@ substitutes text, p prints the current line, and Q quits without a
 modified-buffer warning.
 
 ------------------------------------------------------------------------
+PORTABLE TORTURE SUITE
+------------------------------------------------------------------------
+
+The repository includes more than 1,000 black-box ed cases across two corpus
+versions.  The larger POSIX.1-2024 collection generates exhaustive address,
+range-editing, move, copy, substitution, file, locale, signal, and PTY
+families.  It can test an editor written in any language:
+
+    bun test/portable_v2_runner.ts --editor /path/to/another/ed --quiet
+
+The corpus itself is language-neutral JSON under 0BSD.  Machine-readable
+schemas, a public POSIX requirement map, capability probes, and reusable
+runners are documented in test/portable/README.
+
+------------------------------------------------------------------------
 WHERE TO GO NEXT
 ------------------------------------------------------------------------
 

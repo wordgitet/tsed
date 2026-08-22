@@ -1,78 +1,171 @@
 ========================================================================
-                    PORTABLE ED TEST CORPUS
+                      PORTABLE ED TORTURE SUITE
 ========================================================================
 
-cases.json is the stable version 1 collection of black-box ed tests.  It can be
-used by implementations written in C, Rust, TypeScript, Go, or any other
-language.  The corpus does not import tsed code and contains no material from
-private conformance suites.
+This directory contains language-neutral, black-box tests for implementations
+of the POSIX ed utility.  The data is licensed under 0BSD and contains no
+material from private conformance products.
 
-Each case has these fields:
+The suite is designed to be reused.  It does not import tsed code, assume an
+editor implementation language, or require that the editor executable be
+named ed.  The supplied runners use Bun for process and PTY support, but any
+program capable of reading JSON and launching a process can consume the data.
+
+The suite is a torture and regression corpus.  Passing it is strong evidence
+about the behaviors it exercises, but is not a formal POSIX certification.
+
+
+COLLECTIONS
+------------------------------------------------------------------------
+
+cases.json is the frozen version 1 corpus.  It contains 125 small pipe-driven
+cases with exact input, output, and status expectations.  Its public fields
+are:
 
     name        stable descriptive identifier
-    arguments   command-line arguments passed to ed
+    arguments   command-line arguments passed to the editor
     stdin       exact bytes supplied to standard input
     stdout      exact expected standard output
     stderr      exact expected standard error
     status      expected process exit status
 
-All strings currently contain ASCII text encoded as UTF-8.  Cases use -s to
-suppress byte counts and write the final buffer to /dev/null before quitting.
-This keeps them deterministic while using only POSIX interfaces.
+cases-v2.json is the POSIX.1-2024 torture corpus.  It adds generated behavior
+matrices, file fixtures, signals, PTYs, locale prerequisites, multiple
+acceptable outcomes, and byte-level comparisons.  Its public format is
+specified by schema-v2.json.
 
-Run the corpus against tsed after building it:
+requirements.json maps paraphrased POSIX requirements to exact public case
+names.  It does not depend on tsed's private unit tests.  Its format is
+specified by requirements-schema-v1.json.
+
+Generated JSON is the public interface.  Generator TypeScript is an authoring
+tool and can change without changing the corpus format.
+
+
+RUNNING AN EDITOR
+------------------------------------------------------------------------
+
+Build tsed and run both collections:
 
     bun run test:portable
 
-Run it against another implementation:
+Run version 1 against another editor:
 
     bun test/portable_runner.ts /path/to/ed
 
-or:
-
-    TSED_TEST_ED=/path/to/ed bun run test:portable
-
-The JSON file is the public interface.  The supplied runner uses Bun only for
-convenience; another project may consume the same file with any JSON parser and
-process-launching API.
-
-Version 2
-------------------------------------------------------------------------
-
-cases-v2.json adds the process behavior needed by the POSIX.1-2024 audit while
-leaving version 1 stable.  Each case names the requirement it covers and has
-one or more acceptable outcomes.  The richer fields provide:
-
-    mode            pipe or PTY execution
-    environment     additional environment variables
-    stdin           UTF-8 or base64 input bytes
-    actions         PTY waits, writes, and signals
-    fixtures        files created below a private temporary directory
-    expect           acceptable status, output, transcript, and file results
-    timeout_ms      optional per-case timeout
-
-The token @TMP@ in UTF-8 strings expands to the temporary directory used for a
-case.  Fixture and expected-file paths are relative and cannot escape it.
-An expected status can be an exact integer, "nonzero", or "any".  Output can
-be compared exactly or checked for required byte strings and a minimum length,
-so requirements with implementation-defined diagnostics remain portable.
-
-requirements.json is a paraphrased coverage map for the POSIX ed page.  It
-contains requirement identifiers and public test locations, not copied
-standard or private-suite assertion text.
-
-Run both corpus versions against tsed:
-
-    bun run test:portable
-
-Run version 2 against another implementation, optionally selecting cases:
+Run the torture corpus against another editor:
 
     bun test/portable_v2_runner.ts --editor /path/to/ed
-    bun test/portable_v2_runner.ts --editor /path/to/ed --case address
 
-Use --json to obtain a machine-readable result report.
+Select a case-name substring or suppress per-case output:
 
-Do not edit generated JSON by hand.  Change the compact families in the
-generator sources and regenerate every public artifact with:
+    bun test/portable_v2_runner.ts --editor /path/to/ed --case substitute
+    bun test/portable_v2_runner.ts --editor /path/to/ed --quiet
+
+Exercise a missing-capability result path explicitly:
+
+    bun test/portable_v2_runner.ts \
+        --editor /path/to/ed \
+        --disable-capability utf8-locale \
+        --case torture/locale
+
+Use a copied or modified corpus:
+
+    bun test/portable_v2_runner.ts \
+        --editor /path/to/ed \
+        --corpus /path/to/cases-v2.json
+
+Produce a machine-readable report:
+
+    bun test/portable_v2_runner.ts --editor /path/to/ed --json
+
+The npm package includes both runners, the PTY harness, schemas, maps, and
+corpora.  A package consumer can run:
+
+    bun node_modules/@wordgitet/tsed/test/portable_v2_runner.ts \
+        --editor ./my-ed
+
+
+RESULTS
+------------------------------------------------------------------------
+
+The torture runner uses its own result vocabulary:
+
+    OK             an expected outcome matched
+    MISMATCH       editor behavior matched no expected outcome
+    SKIP           a case prerequisite, such as a UTF-8 locale, was absent
+    RUNNER_LIMIT   this runner could not provide a required facility
+    HARNESS_ERROR  execution did not produce a trustworthy comparison
+
+MISMATCH describes an observable difference, not its cause.  Confirm the
+case against the cited POSIX requirement before changing an editor.  Reference
+implementations are useful secondary evidence, but agreement among historical
+editors does not override normative text.
+
+The runner exits 1 when any MISMATCH is present.  It exits 2 when there is a
+HARNESS_ERROR and no mismatch.  SKIP and RUNNER_LIMIT remain visible in the
+report without being silently counted as successful executions.
+
+
+VERSION 2 DATA
+------------------------------------------------------------------------
+
+Each version 2 case contains:
+
+    name            stable case identifier
+    requirement     identifier from requirements.json
+    mode            pipe or pty
+    arguments       editor command-line arguments
+    expect          one or more acceptable observable outcomes
+
+Optional fields provide:
+
+    environment     additional environment variables
+    stdin           UTF-8 or base64 pipe input
+    actions         PTY waits, writes, and signals
+    fixtures        files created below a private temporary directory
+    requires        runner capabilities needed by the case
+    timeout_ms      case-specific execution limit
+
+Recognized capabilities are posix-shell, pty, signals, and utf8-locale.  The
+runner probes them once and records the probe results in JSON reports.
+
+An expected process status can be an exact integer, nonzero, or any.  Streams
+can be compared exactly or checked for required byte strings and minimum byte
+counts.  Cases can verify exact files and assert that named files were not
+created.
+
+The token @TMP@ in UTF-8 strings expands to the private directory allocated
+for one case.  The token @UTF8_LOCALE@ expands to the locale selected by the
+UTF-8 capability probe.  Fixture and expected-file paths are relative and
+cannot escape the case directory.
+
+
+ADDING TORTURE CASES
+------------------------------------------------------------------------
+
+Do not edit generated JSON by hand.  Add compact rows or behavior matrices to
+the generator sources, then regenerate all public artifacts:
 
     bun run generate:portable
+
+Every case should isolate one observable rule or one deliberate interaction.
+Expected results must come from public normative text.  Compare with GNU ed,
+FreeBSD ed, or another implementation to catch mistaken expectations, but
+record permitted alternatives instead of selecting a historical favorite.
+
+New families should use stable names, reference a mapped requirement, avoid
+implementation-specific diagnostic wording, and remain deterministic in a
+fresh temporary directory.  PTY behavior must use PTY mode; a pipe is not a
+substitute for terminal input.
+
+Before contributing, run:
+
+    bun run generate:portable
+    bun run typecheck
+    bun run check:style
+    bun run test:portable
+
+Format changes require a new corpus version.  Adding optional fields or new
+cases can remain within version 2 when old version 2 consumers can continue to
+read the data.

@@ -56,9 +56,18 @@ export class pty_session {
 		timeout_ms = 2_000,
 	): Promise<void>
 	{
+		await this.wait_for_count(text, 1, timeout_ms);
+	}
+
+	public async wait_for_count(
+		text: string,
+		occurrences: number,
+		timeout_ms = 2_000,
+	): Promise<void>
+	{
 		const deadline = performance.now() + timeout_ms;
 		for (;;) {
-			if (this.transcript.includes(text)) {
+			if (count_occurrences(this.transcript, text) >= occurrences) {
 				return;
 			}
 			if (performance.now() >= deadline) {
@@ -98,5 +107,23 @@ export class pty_session {
 			this.child.kill("SIGKILL");
 			this.terminal.close();
 		}
+	}
+}
+
+function
+count_occurrences(value: string, needle: string): number
+{
+	if (needle.length === 0) {
+		return 0;
+	}
+	let count = 0;
+	let start = 0;
+	for (;;) {
+		const index = value.indexOf(needle, start);
+		if (index === -1) {
+			return count;
+		}
+		count += 1;
+		start = index + needle.length;
 	}
 }
