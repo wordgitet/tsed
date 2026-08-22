@@ -13,7 +13,7 @@ the documentation may smile, while observable editor behavior stays precise.
 ## Development workflow
 
 The minimum Bun version is not known. The current development environment uses
-Bun 1.3.14.
+Bun 1.4.0.
 
 From the repository root:
 

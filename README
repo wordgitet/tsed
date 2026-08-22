@@ -61,7 +61,7 @@ Both accept the following arguments:
     ./dist/ed [-s] [-p prompt] [--] [pathname]
 
 The minimum usable Bun version is not known.  Development currently uses Bun
-1.3.14, so trying an older version is at your own risk.
+1.4.0, so trying an older version is at your own risk.
 
 ------------------------------------------------------------------------
 A TINY SESSION

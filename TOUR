@@ -25,7 +25,7 @@ Install Bun and build the editor from the repository root:
     bun run build
 
 The build creates dist/tsed and the dist/ed symlink.  The minimum usable Bun
-version is not known.  Development currently uses Bun 1.3.14.
+version is not known.  Development currently uses Bun 1.4.0.
 
 The examples in this tour are real.  Each TRANSCRIPT contains a SCRIPT followed
 by its exact OUTPUT.  After building, bun test and bun run test:tour execute
