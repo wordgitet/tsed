@@ -397,16 +397,47 @@ describe("editor", () => {
         expect(output.stdout).toBe("?\n1\n");
     });
 
-    test("keeps modified-buffer warnings recoverable", async () => {
+    test(
+        "keeps a modified-buffer warning across non-mutating commands",
+        async () => {
+            const output = new memory_output();
+            const instance = new editor(
+                new memory_input([
+                    "a", "abc", ".", "q", ".p", "q", "Q",
+                ]),
+                output,
+                { input_kind: "regular", prompt: undefined, silent: true },
+            );
+
+            expect(await instance.run(undefined)).toBe(0);
+            expect(output.stdout).toBe("?\nabc\n");
+        },
+    );
+
+    test("requires another warning after a new modification", async () => {
         const output = new memory_output();
         const instance = new editor(
-            new memory_input(["a", "abc", ".", "q", ".p", "q", "Q"]),
+            new memory_input([
+                "a", "abc", ".", "q", "s/a/a/", "q", "q",
+            ]),
             output,
-            { input_kind: "regular", prompt: undefined, silent: true },
+            { input_kind: "terminal", prompt: undefined, silent: true },
         );
 
         expect(await instance.run(undefined)).toBe(0);
-        expect(output.stdout).toBe("?\nabc\n?\n");
+        expect(output.stdout).toBe("?\n?\n");
+    });
+
+    test("treats undo as a new buffer modification", async () => {
+        const output = new memory_output();
+        const instance = new editor(
+            new memory_input(["a", "abc", ".", "u", "q", "q"]),
+            output,
+            { input_kind: "terminal", prompt: undefined, silent: true },
+        );
+
+        expect(await instance.run(undefined)).toBe(0);
+        expect(output.stdout).toBe("?\n");
     });
 
     test(

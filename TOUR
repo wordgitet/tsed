@@ -85,7 +85,7 @@ pathname, previous regular expression, previous replacement, previous shell
 command, prompt mode, help mode, undo state, and modified-buffer warnings.
 
 It resolves default ranges, validates addresses, dispatches commands, reports
-errors, and decides whether an error ends a regular-file command script.
+errors, and ends a non-terminal command script after an unrecoverable error.
 Buffer mutations use snapshots.  A failed mutation is rolled back, while a
 successful one becomes undoable.
 
@@ -484,8 +484,6 @@ a
 only
 .
 2p
-h
-Q
 ED
 )
 tour_status=$?
@@ -496,18 +494,17 @@ END SCRIPT
 BEGIN OUTPUT
 ?
 invalid address
-invalid address
 END OUTPUT
 END TRANSCRIPT
 
-q warns once instead of discarding a modified buffer.  Repeating q allows the
-quit if no intervening different command clears the warning.  Q always quits.
-End of input acts like q.
+q warns once instead of discarding a modified buffer.  Another e or q takes
+effect unless an intervening command modifies the buffer again.  Q always
+quits.  End of input acts like q.
 
 A recoverable modified-buffer warning does not by itself force failure status.
 Other command errors make the eventual process status nonzero.  A
-non-recoverable error ends input classified as a regular file.  Terminal and
-other streaming input can continue accepting commands.
+non-recoverable error ends non-terminal input.  A terminal reports the error,
+flushes pending input, and reads another command.
 
 
 ------------------------------------------------------------------------

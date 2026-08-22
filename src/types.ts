@@ -35,8 +35,13 @@ export interface buffer_snapshot {
     current: number;
     next_id: number;
     marks: Map<string, number>;
-    changed: boolean;
+    change_state: buffer_change_state;
 }
+
+export type buffer_change_state =
+    | "unchanged"
+    | "changed"
+    | "changed-and-warned";
 
 export interface editor_snapshot extends buffer_snapshot {
     pathname: string | undefined;

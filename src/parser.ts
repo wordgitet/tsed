@@ -22,12 +22,8 @@ parse_command(source: string): parsed_command
 {
     let index = skip_spaces(source, 0);
     const addresses: address_spec[] = [];
-    let separator: "," | ";" | null = null;
-    let trailing_separator = false;
-
     const leading_separator = source[index];
     if (
-        addresses.length === 0 &&
         (leading_separator === "," || leading_separator === ";")
     ) {
         addresses.push({
@@ -37,41 +33,56 @@ parse_command(source: string): parsed_command
             separator: null,
             offset: 0,
         });
-        separator = leading_separator;
         index = skip_spaces(source, index + 1);
+        const address = parse_address_with_offset(source, index);
+        if (address === undefined) {
+            addresses.push({
+                expression: { kind: "last" },
+                separator: leading_separator,
+                offset: 0,
+            });
+        } else {
+            addresses.push({
+                expression: address.expression,
+                separator: leading_separator,
+                offset: address.offset,
+            });
+            index = address.index;
+        }
+    } else {
+        const address = parse_address_with_offset(source, index);
+        if (address !== undefined) {
+            addresses.push({
+                expression: address.expression,
+                separator: null,
+                offset: address.offset,
+            });
+            index = address.index;
+        }
     }
 
     for (;;) {
-        const address = parse_address(source, index);
-        if (address === undefined) {
+        index = skip_spaces(source, index);
+        const separator = source[index];
+        if (separator !== "," && separator !== ";") {
             break;
         }
-        index = skip_spaces(source, address.index);
-        const offset_result = parse_offset(source, index);
-        index = skip_spaces(source, offset_result.index);
-        addresses.push({
-            expression: address.expression,
-            separator,
-            offset: offset_result.offset,
-        });
-
-        const next = source[index];
-        if (next !== "," && next !== ";") {
-            break;
-        }
-        separator = next;
-        trailing_separator = true;
         index = skip_spaces(source, index + 1);
-    }
-
-    if (addresses.length === 1 && separator !== null) {
-        addresses.push({
-            expression: trailing_separator
-                ? { kind: "previous" }
-                : { kind: "last" },
-            separator,
-            offset: 0,
-        });
+        const address = parse_address_with_offset(source, index);
+        if (address === undefined) {
+            addresses.push({
+                expression: { kind: "previous" },
+                separator,
+                offset: 0,
+            });
+        } else {
+            addresses.push({
+                expression: address.expression,
+                separator,
+                offset: address.offset,
+            });
+            index = address.index;
+        }
     }
 
     const command = source[index] ?? "";
@@ -89,6 +100,24 @@ parse_command(source: string): parsed_command
         command,
         argument: source.slice(index + 1),
         suffix: "",
+    };
+}
+
+function
+parse_address_with_offset(
+    source: string,
+    start: number,
+): { expression: address_expression; offset: number; index: number } | undefined
+{
+    const address = parse_address(source, start);
+    if (address === undefined) {
+        return undefined;
+    }
+    const offset = parse_offset(source, address.index);
+    return {
+        expression: address.expression,
+        offset: offset.offset,
+        index: offset.index,
     };
 }
 
@@ -111,7 +140,7 @@ parse_address(
     }
     if (character === "'") {
         const name = source[start + 1];
-        if (name === undefined) {
+        if (name === undefined || !is_lowercase_letter(name)) {
             throw new ed_error("invalid mark address");
         }
         return { expression: { kind: "mark", name }, index: start + 2 };
@@ -153,16 +182,17 @@ parse_offset(
 {
     let index = start;
     let offset = 0;
-    if (is_digit(source[index] ?? "")) {
-        const number_start = index;
-        while (index < source.length && is_digit(source[index] ?? "")) {
+    for (;;) {
+        index = skip_spaces(source, index);
+        const character = source[index];
+        if (character !== "+" && character !== "-" &&
+            !is_digit(character ?? "")) {
+            return { offset, index };
+        }
+        const sign = character === "-" ? -1 : 1;
+        if (character === "+" || character === "-") {
             index += 1;
         }
-        offset = Number(source.slice(number_start, index));
-    }
-    while (source[index] === "+" || source[index] === "-") {
-        const sign = source[index] === "+" ? 1 : -1;
-        index += 1;
         const number_start = index;
         while (index < source.length && is_digit(source[index] ?? "")) {
             index += 1;
@@ -175,7 +205,6 @@ parse_offset(
         }
         offset += sign * distance;
     }
-    return { offset, index };
 }
 
 export function
@@ -270,6 +299,12 @@ function
 is_digit(value: string): boolean
 {
 	return value >= "0" && value <= "9";
+}
+
+function
+is_lowercase_letter(value: string): boolean
+{
+    return value >= "a" && value <= "z";
 }
 
 function

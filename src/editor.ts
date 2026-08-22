@@ -53,7 +53,6 @@ export class editor {
     private prompt_enabled: boolean;
     private help_enabled = false;
     private undo_snapshot: editor_snapshot | undefined;
-    private warned_command: string | undefined;
     private quit_requested = false;
     private had_error = false;
     private interrupted = false;
@@ -163,12 +162,6 @@ export class editor {
             ? parse_command(".+1p")
             : parsed;
         const command = effective.command;
-        if (
-            this.warned_command !== undefined &&
-            this.warned_command !== command
-        ) {
-            this.warned_command = undefined;
-        }
         if (record_undo && this.is_buffer_mutating(command)) {
             await this.with_undo(
                 async () => this.execute_parsed(effective, false),
@@ -245,7 +238,7 @@ export class editor {
                 );
                 return;
             case "e":
-                await this.check_modified("e");
+                await this.check_modified();
                 await this.edit_file(this.pathname_argument(argument), true);
                 return;
             case "E":
@@ -350,7 +343,7 @@ export class editor {
                 this.prompt_enabled = !this.prompt_enabled;
                 return;
             case "q":
-                await this.check_modified("q");
+                await this.check_modified();
                 this.quit_requested = true;
                 return;
             case "Q":
@@ -418,9 +411,12 @@ export class editor {
     private async with_undo(operation: () => Promise<void>): Promise<void>
     {
         const before = this.snapshot();
+        const mutations = this.buffer.mutations;
         try {
             await operation();
-            this.undo_snapshot = before;
+            if (this.buffer.mutations !== mutations) {
+                this.undo_snapshot = before;
+            }
         } catch (error) {
             this.restore(before);
             throw error;
@@ -458,6 +454,7 @@ export class editor {
         }
         const current = this.snapshot();
         this.restore(this.undo_snapshot);
+        this.buffer.changed = true;
         this.undo_snapshot = current;
     }
 
@@ -850,7 +847,6 @@ export class editor {
         if (this.pathname === undefined) {
             this.pathname = pathname;
         }
-        this.warned_command = undefined;
         if (!this.options.silent) {
             this.write_stdout(`${bytes.length}\n`);
         }
@@ -1113,7 +1109,7 @@ export class editor {
     private set_mark(argument: string, address: number): void
     {
         const name = argument.trim();
-        if (name.length !== 1) {
+        if (!/^[a-z]$/.test(name)) {
             throw new ed_error("invalid mark name");
         }
         this.buffer.mark(name, address);
@@ -1127,19 +1123,20 @@ export class editor {
         }
         if (this.pathname !== undefined) {
             this.write_stdout(`${this.pathname}\n`);
+            return;
         }
+        throw new ed_error("no pathname");
     }
 
-    private async check_modified(command: string): Promise<void>
+    private async check_modified(): Promise<void>
     {
-        if (!this.buffer.changed) {
+        if (this.buffer.change_state === "unchanged") {
             return;
         }
-        if (this.warned_command === command) {
-            this.warned_command = undefined;
+        if (this.buffer.change_state === "changed-and-warned") {
             return;
         }
-        this.warned_command = command;
+        this.buffer.change_state = "changed-and-warned";
         throw new ed_error("buffer modified", true);
     }
 
@@ -1150,7 +1147,7 @@ export class editor {
             return;
         }
         this.had_error = true;
-        if (this.options.input_kind === "regular") {
+        if (this.options.input_kind !== "terminal") {
             this.quit_requested = true;
         }
     }

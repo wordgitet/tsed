@@ -5,6 +5,7 @@
  */
 
 import {
+    type buffer_change_state,
     copy_bytes,
     ed_error,
     type buffer_snapshot,
@@ -13,11 +14,32 @@ import {
 
 export class line_buffer {
     public current = 0;
-    public changed = false;
+    public change_state: buffer_change_state = "unchanged";
 
     private next_id = 1;
+    private mutation_count = 0;
     private lines: line_record[] = [];
     private marks = new Map<string, number>();
+
+    public get changed(): boolean
+    {
+        return this.change_state !== "unchanged";
+    }
+
+    public set changed(value: boolean)
+    {
+        if (value) {
+            this.change_state = "changed";
+            this.mutation_count += 1;
+        } else {
+            this.change_state = "unchanged";
+        }
+    }
+
+    public get mutations(): number
+    {
+        return this.mutation_count;
+    }
 
     public get line_count(): number
     {
@@ -34,7 +56,7 @@ export class line_buffer {
         this.lines = values.map((bytes) => this.new_line(bytes));
         this.current = this.lines.length;
         this.marks.clear();
-        this.changed = false;
+        this.change_state = "unchanged";
     }
 
     public snapshot(): buffer_snapshot
@@ -47,7 +69,7 @@ export class line_buffer {
             current: this.current,
             next_id: this.next_id,
             marks: new Map(this.marks),
-            changed: this.changed,
+            change_state: this.change_state,
         };
     }
 
@@ -60,7 +82,7 @@ export class line_buffer {
         this.current = snapshot.current;
         this.next_id = snapshot.next_id;
         this.marks = new Map(snapshot.marks);
-        this.changed = snapshot.changed;
+        this.change_state = snapshot.change_state;
     }
 
     public line(address: number): line_record
@@ -102,7 +124,9 @@ export class line_buffer {
         this.current = records.length === 0
             ? address
             : address + records.length;
-        this.changed = this.changed || records.length !== 0;
+        if (records.length !== 0) {
+            this.changed = true;
+        }
     }
 
     public delete(start: number, end: number): void

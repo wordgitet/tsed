@@ -178,14 +178,19 @@ const command_cases: readonly command_case[] = [
         input_kind: "terminal" },
     { name: "rejects a long mark name", commands: ["1kab"],
         stdout: "?\n", status: 1, input_kind: "terminal" },
+    { name: "rejects an uppercase mark name", commands: ["1kA"],
+        stdout: "?\n", status: 1, input_kind: "terminal" },
+    { name: "rejects filename output without a remembered pathname",
+        initial: [], commands: ["f"], stdout: "?\n", status: 1,
+        input_kind: "terminal" },
     { name: "rejects an invalid move destination", commands: ["1mword"],
         stdout: "?\n", status: 1, input_kind: "terminal" },
     { name: "rejects print on an empty buffer", initial: [], commands: ["p"],
         stdout: "?\n", status: 1, input_kind: "terminal" },
     { name: "appends to an empty buffer", initial: [],
         commands: ["a", "first", ".", "p"], stdout: "first\n" },
-    { name: "allows a repeated modified-buffer quit warning",
-        commands: ["q", "p", "q", "q"], stdout: "?\nthree\n?\n" },
+    { name: "allows a warned quit after a non-mutating command",
+        commands: ["q", "p", "q", "q"], stdout: "?\nthree\n" },
 ];
 
 describe("editor command regressions", () => {
