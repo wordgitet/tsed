@@ -91,9 +91,12 @@ build_posix_corpus(): portable_corpus_v2
 	add_address_cases(cases);
 	add_change_state_cases(cases);
 	add_delimiter_cases(cases);
+	add_input_and_regex_cases(cases);
+	add_command_semantics_cases(cases);
 	add_file_cases(cases);
 	add_output_cases(cases);
 	add_process_cases(cases);
+	add_shell_cases(cases);
 	add_terminal_cases(cases);
 
 	return {
@@ -254,6 +257,160 @@ add_delimiter_cases(cases: portable_case_v2[]): void
 }
 
 function
+add_input_and_regex_cases(cases: portable_case_v2[]): void
+{
+	add_pipe_case(cases, {
+		name: "input/command-looking-lines-are-text",
+		requirement: "input.text",
+		stdin: "a\np\nq\nw\n!\n\\.\n.\n,p\nQ\n",
+		stdout: "p\nq\nw\n!\n\\.\n",
+	});
+	add_pipe_case(cases, {
+		name: "regex/delimiter-in-bracket-expression",
+		requirement: "regex.bre",
+		stdin: "a\na%b\nplain\n.\ng%[%]%p\nQ\n",
+		stdout: "a%b\n",
+	});
+	add_pipe_case(cases, {
+		name: "regex/escaped-address-delimiter",
+		requirement: "regex.bre",
+		stdin: "a\na/b\nplain\n.\n/a\\/b/p\nQ\n",
+		stdout: "a/b\n",
+	});
+	add_pipe_case(cases, {
+		name: "regex/null-expression-in-substitute",
+		requirement: "regex.bre",
+		stdin: "a\none two\n.\ns/o/O/\ns//X/\np\nQ\n",
+		stdout: "One twX\n",
+	});
+}
+
+function
+add_command_semantics_cases(cases: portable_case_v2[]): void
+{
+	add_pipe_case(cases, {
+		name: "address/intermediate-out-of-range",
+		requirement: "address.basic",
+		stdin: `${four_line_setup()}3 ---- 2p\nQ\n`,
+		stdout: "one\n",
+	});
+	add_pipe_case(cases, {
+		name: "address/mark-follows-moved-line",
+		requirement: "address.mark",
+		stdin: `${four_line_setup()}2ka\n2m$\n'ap\nQ\n`,
+		stdout: "two\n",
+	});
+	add_pipe_case(cases, {
+		name: "command/mark-preserves-current-line",
+		requirement: "command.mark",
+		stdin: `${four_line_setup()}2ka\n.=\nQ\n`,
+		stdout: "4\n",
+	});
+	add_pipe_case(cases, {
+		name: "command/delete-selects-following-line",
+		requirement: "command.delete",
+		stdin: `${four_line_setup()}2,3d\n.=\n,p\nQ\n`,
+		stdout: "2\none\nfour\n",
+	});
+	add_pipe_case(cases, {
+		name: "command/change-empty-final-range",
+		requirement: "command.change",
+		stdin: `${four_line_setup()}4c\n.\n.=\n,p\nQ\n`,
+		stdout: "3\none\ntwo\nthree\n",
+	});
+	add_pipe_case(cases, {
+		name: "command/one-address-join-is-noop",
+		requirement: "command.join",
+		stdin: `${four_line_setup()}2j\n.=\n,p\nQ\n`,
+		stdout: "4\none\ntwo\nthree\nfour\n",
+	});
+	add_pipe_case(cases, {
+		name: "command/join-selects-joined-line",
+		requirement: "command.join",
+		stdin: `${four_line_setup()}2,3j\n.=\n2p\nQ\n`,
+		stdout: "2\ntwothree\n",
+	});
+	add_pipe_case(cases, {
+		name: "command/move-range-to-start",
+		requirement: "command.move",
+		stdin: `${four_line_setup()}3,4m0\n.=\n,p\nQ\n`,
+		stdout: "2\nthree\nfour\none\ntwo\n",
+	});
+	add_pipe_case(cases, {
+		name: "command/copy-range-to-start",
+		requirement: "command.copy",
+		stdin: `${four_line_setup()}3,4t0\n.=\n,p\nQ\n`,
+		stdout: "2\nthree\nfour\none\ntwo\nthree\nfour\n",
+	});
+	add_pipe_case(cases, {
+		name: "command/delete-print-suffix",
+		requirement: "command.suffix",
+		stdin: `${four_line_setup()}2dp\nQ\n`,
+		stdout: "three\n",
+	});
+	add_pipe_case(cases, {
+		name: "command/move-number-suffix",
+		requirement: "command.suffix",
+		stdin: `${four_line_setup()}2m4n\nQ\n`,
+		stdout: "4\ttwo\n",
+	});
+	add_pipe_case(cases, {
+		name: "command/print-updates-current-line",
+		requirement: "command.print",
+		stdin: `${four_line_setup()}1,3p\n.=\nQ\n`,
+		stdout: "one\ntwo\nthree\n3\n",
+	});
+	add_pipe_case(cases, {
+		name: "command/equals-preserves-current-line",
+		requirement: "command.equals",
+		stdin: `${four_line_setup()}2=\n.=\nQ\n`,
+		stdout: "2\n4\n",
+	});
+	add_pipe_case(cases, {
+		name: "command/address-and-null-command",
+		requirement: "command.null",
+		stdin: `${four_line_setup()}2\n\nQ\n`,
+		stdout: "two\nthree\n",
+	});
+	add_pipe_case(cases, {
+		name: "command/quit-without-checking-discards-change",
+		requirement: "command.quit",
+		stdin: "a\none\n.\nQ\n",
+		stdout: "",
+	});
+}
+
+function
+add_shell_cases(cases: portable_case_v2[]): void
+{
+	add_pipe_case(cases, {
+		name: "shell/pathname-substitution",
+		requirement: "command.shell",
+		stdin: "f token\n!echo %\nQ\n",
+		stdout: "token\necho token\ntoken\n",
+	});
+	add_pipe_case(cases, {
+		name: "shell/repeat-previous-command",
+		requirement: "command.shell",
+		stdin: "!echo first\n!!\nQ\n",
+		stdout: "first\necho first\nfirst\n",
+	});
+	add_pipe_case(cases, {
+		name: "shell/write-does-not-clear-change-state",
+		requirement: "command.write",
+		stdin: "a\none\n.\nw !cat >/dev/null\nq\nq\n",
+		stdout: "?\n",
+		status: "any",
+	});
+	add_pipe_case(cases, {
+		name: "shell/read-does-not-remember-pathname",
+		requirement: "command.read",
+		stdin: "f @TMP@/remembered\nr !printf 'one\\n'\nf\n,p\nQ\n",
+		stdout: "@TMP@/remembered\n@TMP@/remembered\none\n",
+	});
+}
+
+function
 add_file_cases(cases: portable_case_v2[]): void
 {
 	add_pipe_case(cases, {
@@ -279,6 +436,14 @@ add_file_cases(cases: portable_case_v2[]): void
 		stdin: "a\none\n.\nw @TMP@/output\nq\n",
 		stdout: "4\n",
 		files: [{ path: "output", data: utf8("one\n") }],
+	});
+	add_pipe_case(cases, {
+		name: "file/partial-write-preserves-change-state",
+		requirement: "command.write",
+		stdin: `${four_line_setup()}1,2w @TMP@/partial\nq\nq\n`,
+		stdout: "?\n",
+		status: "any",
+		files: [{ path: "partial", data: utf8("one\ntwo\n") }],
 	});
 	add_pipe_case(cases, {
 		name: "file/filename-set-and-print",
@@ -383,6 +548,19 @@ add_process_cases(cases: portable_case_v2[]): void
 function
 add_terminal_cases(cases: portable_case_v2[]): void
 {
+	cases.push({
+		name: "terminal/error-recovers-to-command-mode",
+		requirement: "errors.terminal",
+		mode: "pty",
+		arguments: ["-s", "-p", ": "],
+		actions: [
+			{ kind: "wait", text: ": " },
+			{ kind: "write", data: utf8("0p\n") },
+			{ kind: "wait", text: "?\r\n: " },
+			{ kind: "write", data: utf8("Q\n") },
+		],
+		expect: [{ status: "nonzero", transcript_contains: ["?\r\n: "] }],
+	});
 	cases.push({
 		name: "terminal/prompt-and-quit",
 		requirement: "option.prompt",
@@ -570,7 +748,9 @@ const requirement_rows: readonly requirement_row[] = [
 		]],
 	["environment.locale", "ENVIRONMENT VARIABLES",
 		"Apply locale rules to text and BRE processing.",
-		"platform-dependent", ["test/locale.test.ts", "VSC 30 and 55"]],
+		"platform-dependent", [
+			"test/locale.test.ts", "private locale conformance campaign",
+		]],
 	["signal.int", "ASYNCHRONOUS EVENTS",
 		"Interrupt input and return to command mode.", "covered",
 		["terminal/sigint-interrupts-input"]],
@@ -580,23 +760,27 @@ const requirement_rows: readonly requirement_row[] = [
 		"covered", ["terminal/sighup-saves-buffer"]],
 	["input.text", "STDIN", "Read command and input text as lines.",
 		"covered", [
-			"test/io.test.ts", "output/list-preserves-carriage-return",
+			"input/command-looking-lines-are-text", "test/io.test.ts",
+			"output/list-preserves-carriage-return",
 		]],
 	["buffer.change-state", "EXTENDED DESCRIPTION",
 		"Maintain unchanged, changed, and warned buffer states.", "covered",
 		["issue8/change-state/", "terminal/modified-warning"]],
 	["regex.bre", "Regular Expressions in ed", "Use POSIX BRE matching.",
 		"covered", [
-			"test/bre.test.ts", "test/regression/bre_substitute.test.ts",
+			"regex/", "test/bre.test.ts",
+			"test/regression/bre_substitute.test.ts",
 		]],
 	["regex.locale", "Regular Expressions in ed",
 		"Use locale classes, collation, and multibyte characters.",
 		"platform-dependent", ["test/locale.test.ts", "native/posix_regex.c"]],
 	["address.basic", "Addresses in ed",
 		"Resolve current, last, numeric, and offset addresses.", "covered",
-		["address/", "test/regression/address.test.ts"]],
+		["address/intermediate-out-of-range", "address/",
+			"test/regression/address.test.ts"]],
 	["address.mark", "Addresses in ed", "Resolve lowercase marked lines.",
-		"covered", ["test/regression/address.test.ts"]],
+		"covered", ["address/mark-follows-moved-line",
+			"test/regression/address.test.ts"]],
 	["address.search", "Addresses in ed",
 		"Search forward and backward with wraparound and null BRE reuse.",
 		"covered", ["issue8/delimiter/omitted-forward-search",
@@ -605,13 +789,14 @@ const requirement_rows: readonly requirement_row[] = [
 		"Expand omitted addresses and evaluate excess addresses in order.",
 		"covered", ["issue8/address/"]],
 	["command.suffix", "Commands in ed", "Apply l, n, and p suffixes.",
-		"covered", ["test/regression/command.test.ts"]],
+		"covered", ["command/delete-print-suffix",
+			"command/move-number-suffix", "test/regression/command.test.ts"]],
 	["command.append", "Append Command", "Append input after an address.",
 		"covered", ["edit/append/", "empty-append-is-unchanged"]],
 	["command.change", "Change Command", "Replace an addressed range.",
-		"covered", ["edit/change/"]],
+		"covered", ["command/change-empty-final-range", "edit/change/"]],
 	["command.delete", "Delete Command", "Delete an addressed range.",
-		"covered", ["edit/delete/"]],
+		"covered", ["command/delete-selects-following-line", "edit/delete/"]],
 	["command.edit", "Edit Commands", "Replace the buffer from a file.",
 		"covered", ["warned-edit-takes-effect", "test/editor.test.ts"]],
 	["command.filename", "Filename Command", "Set and print the pathname.",
@@ -626,43 +811,55 @@ const requirement_rows: readonly requirement_row[] = [
 			"test/regression/command.test.ts",
 		]],
 	["command.join", "Join Command", "Join addressed lines.", "covered",
-		["edit/join/", "test/regression/command.test.ts"]],
+		["command/one-address-join-is-noop",
+			"command/join-selects-joined-line", "edit/join/",
+			"test/regression/command.test.ts"]],
 	["command.mark", "Mark Command", "Set lowercase line marks.", "covered",
-		["test/regression/command.test.ts"]],
+		["command/mark-preserves-current-line",
+			"test/regression/command.test.ts"]],
 	["command.list", "List Command", "Write visually unambiguous lines.",
 		"covered", ["output/list-", "test/regression/command.test.ts"]],
 	["command.move", "Move Command", "Move lines after a destination.",
-		"covered", ["test/regression/command.test.ts"]],
+		"covered", ["command/move-range-to-start",
+			"test/regression/command.test.ts"]],
 	["command.number", "Number Command", "Write numbered lines.", "covered",
 		["output/numbered-lines"]],
 	["command.print", "Print Command", "Write addressed lines.", "covered",
-		["address/", "test/regression/command.test.ts"]],
+		["command/print-updates-current-line", "address/",
+			"test/regression/command.test.ts"]],
 	["command.quit", "Quit Commands", "Quit with or without change checks.",
-		"covered", ["issue8/change-state/", "terminal/modified-warning"]],
+		"covered", ["command/quit-without-checking-discards-change",
+			"issue8/change-state/", "terminal/modified-warning"]],
 	["command.read", "Read Command", "Append file or shell output.", "covered",
 		["file/read-"]],
 	["command.substitute", "Substitute Command",
 		"Replace BRE matches and apply substitute flags.", "covered",
 		["test/regression/bre_substitute.test.ts", "issue8/delimiter/"]],
 	["command.copy", "Copy Command", "Copy lines after a destination.",
-		"covered", ["test/regression/command.test.ts"]],
+		"covered", ["command/copy-range-to-start",
+			"test/regression/command.test.ts"]],
 	["command.undo", "Undo Command", "Toggle the most recent real change.",
 		"covered", ["undo-is-a-change", "global-no-change-undo-noop",
 			"test/regression/command.test.ts"]],
 	["command.write", "Write Command", "Write complete addressed lines.",
-		"covered", ["file/write-", "full-write-clears-change"]],
+		"covered", ["file/write-", "file/partial-write-preserves-change-state",
+			"shell/write-does-not-clear-change-state",
+			"full-write-clears-change"]],
 	["command.equals", "Line Number Command", "Write an addressed number.",
-		"covered", ["test/regression/address.test.ts"]],
+		"covered", ["command/equals-preserves-current-line",
+			"test/regression/address.test.ts"]],
 	["command.shell", "Shell Escape Command", "Execute POSIX shell commands.",
-		"covered", ["test/editor.test.ts", "TOUR"]],
+		"covered", ["shell/", "test/editor.test.ts", "TOUR"]],
 	["command.null", "Null Command", "Print the addressed or next line.",
-		"covered", ["test/editor.test.ts", "test/regression/address.test.ts"]],
+		"covered", ["command/address-and-null-command", "test/editor.test.ts",
+			"test/regression/address.test.ts"]],
 	["errors.non-terminal", "CONSEQUENCES OF ERRORS",
 		"Stop non-terminal input after an ordinary error.", "covered",
 		["process/non-terminal-error-stops-input"]],
 	["errors.terminal", "CONSEQUENCES OF ERRORS",
 		"Report terminal errors and read another command.", "covered",
-		["test/integration/process.test.ts"]],
+		["terminal/error-recovers-to-command-mode",
+			"test/integration/process.test.ts"]],
 ];
 
 async function

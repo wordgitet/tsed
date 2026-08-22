@@ -601,6 +601,405 @@
       ]
     },
     {
+      "name": "input/command-looking-lines-are-text",
+      "requirement": "input.text",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\np\nq\nw\n!\n\\.\n.\n,p\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "p\nq\nw\n!\n\\.\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "regex/delimiter-in-bracket-expression",
+      "requirement": "regex.bre",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\na%b\nplain\n.\ng%[%]%p\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "a%b\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "regex/escaped-address-delimiter",
+      "requirement": "regex.bre",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\na/b\nplain\n.\n/a\\/b/p\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "a/b\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "regex/null-expression-in-substitute",
+      "requirement": "regex.bre",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\none two\n.\ns/o/O/\ns//X/\np\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "One twX\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "address/intermediate-out-of-range",
+      "requirement": "address.basic",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\none\ntwo\nthree\nfour\n.\n3 ---- 2p\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "one\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "address/mark-follows-moved-line",
+      "requirement": "address.mark",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\none\ntwo\nthree\nfour\n.\n2ka\n2m$\n'ap\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "two\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "command/mark-preserves-current-line",
+      "requirement": "command.mark",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\none\ntwo\nthree\nfour\n.\n2ka\n.=\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "4\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "command/delete-selects-following-line",
+      "requirement": "command.delete",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\none\ntwo\nthree\nfour\n.\n2,3d\n.=\n,p\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "2\none\nfour\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "command/change-empty-final-range",
+      "requirement": "command.change",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\none\ntwo\nthree\nfour\n.\n4c\n.\n.=\n,p\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "3\none\ntwo\nthree\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "command/one-address-join-is-noop",
+      "requirement": "command.join",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\none\ntwo\nthree\nfour\n.\n2j\n.=\n,p\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "4\none\ntwo\nthree\nfour\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "command/join-selects-joined-line",
+      "requirement": "command.join",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\none\ntwo\nthree\nfour\n.\n2,3j\n.=\n2p\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "2\ntwothree\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "command/move-range-to-start",
+      "requirement": "command.move",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\none\ntwo\nthree\nfour\n.\n3,4m0\n.=\n,p\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "2\nthree\nfour\none\ntwo\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "command/copy-range-to-start",
+      "requirement": "command.copy",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\none\ntwo\nthree\nfour\n.\n3,4t0\n.=\n,p\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "2\nthree\nfour\none\ntwo\nthree\nfour\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "command/delete-print-suffix",
+      "requirement": "command.suffix",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\none\ntwo\nthree\nfour\n.\n2dp\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "three\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "command/move-number-suffix",
+      "requirement": "command.suffix",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\none\ntwo\nthree\nfour\n.\n2m4n\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "4\ttwo\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "command/print-updates-current-line",
+      "requirement": "command.print",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\none\ntwo\nthree\nfour\n.\n1,3p\n.=\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "one\ntwo\nthree\n3\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "command/equals-preserves-current-line",
+      "requirement": "command.equals",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\none\ntwo\nthree\nfour\n.\n2=\n.=\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "2\n4\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "command/address-and-null-command",
+      "requirement": "command.null",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\none\ntwo\nthree\nfour\n.\n2\n\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "two\nthree\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "command/quit-without-checking-discards-change",
+      "requirement": "command.quit",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\none\n.\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": ""
+          }
+        }
+      ]
+    },
+    {
       "name": "file/initial-byte-count",
       "requirement": "operand.file",
       "mode": "pipe",
@@ -680,6 +1079,36 @@
               "data": {
                 "encoding": "utf8",
                 "data": "one\n"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "file/partial-write-preserves-change-state",
+      "requirement": "command.write",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\none\ntwo\nthree\nfour\n.\n1,2w @TMP@/partial\nq\nq\n"
+      },
+      "expect": [
+        {
+          "status": "any",
+          "stdout": {
+            "encoding": "utf8",
+            "data": "?\n"
+          },
+          "files": [
+            {
+              "path": "partial",
+              "data": {
+                "encoding": "utf8",
+                "data": "one\ntwo\n"
               }
             }
           ]
@@ -980,6 +1409,132 @@
       "expect": [
         {
           "status": "nonzero"
+        }
+      ]
+    },
+    {
+      "name": "shell/pathname-substitution",
+      "requirement": "command.shell",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "f token\n!echo %\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "token\necho token\ntoken\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "shell/repeat-previous-command",
+      "requirement": "command.shell",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "!echo first\n!!\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "first\necho first\nfirst\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "shell/write-does-not-clear-change-state",
+      "requirement": "command.write",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\none\n.\nw !cat >/dev/null\nq\nq\n"
+      },
+      "expect": [
+        {
+          "status": "any",
+          "stdout": {
+            "encoding": "utf8",
+            "data": "?\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "shell/read-does-not-remember-pathname",
+      "requirement": "command.read",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "f @TMP@/remembered\nr !printf 'one\\n'\nf\n,p\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "@TMP@/remembered\n@TMP@/remembered\none\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "terminal/error-recovers-to-command-mode",
+      "requirement": "errors.terminal",
+      "mode": "pty",
+      "arguments": [
+        "-s",
+        "-p",
+        ": "
+      ],
+      "actions": [
+        {
+          "kind": "wait",
+          "text": ": "
+        },
+        {
+          "kind": "write",
+          "data": {
+            "encoding": "utf8",
+            "data": "0p\n"
+          }
+        },
+        {
+          "kind": "wait",
+          "text": "?\r\n: "
+        },
+        {
+          "kind": "write",
+          "data": {
+            "encoding": "utf8",
+            "data": "Q\n"
+          }
+        }
+      ],
+      "expect": [
+        {
+          "status": "nonzero",
+          "transcript_contains": [
+            "?\r\n: "
+          ]
         }
       ]
     },

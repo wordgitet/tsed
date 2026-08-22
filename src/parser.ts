@@ -17,6 +17,11 @@ interface address_result {
 	index: number;
 }
 
+export interface delimiter_options {
+	allow_end?: boolean;
+	regular_expression?: boolean;
+}
+
 export function
 parse_command(source: string): parsed_command
 {
@@ -144,7 +149,12 @@ parse_address(
 		return { expression: { kind: "mark", name }, index: start + 2 };
 	}
 	if (character === "/" || character === "?") {
-		const pattern_result = read_delimited(source, start, character, true);
+		const pattern_result = read_delimited(
+		    source,
+		    start,
+		    character,
+		    { allow_end: true, regular_expression: true },
+		);
 		return {
 			expression: {
 				kind: "search",
@@ -210,7 +220,7 @@ read_delimited(
     source: string,
     start: number,
     delimiter: string,
-    allow_end = false,
+    options: delimiter_options = {},
 ): { value: string; index: number; terminated: boolean }
 {
 	const delimiter_end = character_end(source, start);
@@ -223,14 +233,72 @@ read_delimited(
 	}
 	let index = delimiter_end;
 	let value = "";
+	let in_bracket = false;
+	let bracket_can_close = false;
+	let bracket_caret_allowed = false;
+	let bracket_operator: string | undefined;
 	while (index < source.length) {
 		const end = character_end(source, index);
 		if (end === undefined) {
 			throw new ed_error("unterminated delimiter");
 		}
 		const character = source.slice(index, end);
-		if (character === actual_delimiter) {
+		if (!in_bracket && character === actual_delimiter) {
 			return { value, index: end, terminated: true };
+		}
+		if (in_bracket) {
+			value += character;
+			index = end;
+			if (bracket_operator !== undefined) {
+				if (character === bracket_operator) {
+					const close_end = character_end(source, index);
+					if (close_end !== undefined &&
+					    source.slice(index, close_end) === "]") {
+						value += "]";
+						index = close_end;
+						bracket_operator = undefined;
+						bracket_can_close = true;
+						bracket_caret_allowed = false;
+					}
+				}
+				continue;
+			}
+			if (character === "[") {
+				const operator_end = character_end(source, index);
+				if (operator_end !== undefined) {
+					const operator = source.slice(index, operator_end);
+					if (".=:".includes(operator)) {
+						value += operator;
+						index = operator_end;
+						bracket_operator = operator;
+						bracket_can_close = true;
+						bracket_caret_allowed = false;
+						continue;
+					}
+				}
+			}
+			if (character === "]") {
+				if (bracket_can_close) {
+					in_bracket = false;
+				} else {
+					bracket_can_close = true;
+					bracket_caret_allowed = false;
+				}
+			} else {
+				if (character !== "^" || !bracket_caret_allowed) {
+					bracket_can_close = true;
+				}
+				bracket_caret_allowed = false;
+			}
+			continue;
+		}
+		if (options.regular_expression === true && character === "[") {
+			value += character;
+			index = end;
+			in_bracket = true;
+			bracket_can_close = false;
+			bracket_caret_allowed = true;
+			continue;
 		}
 		if (character === "\\" && end < source.length) {
 			const escaped_end = character_end(source, end);
@@ -244,7 +312,7 @@ read_delimited(
 			index = end;
 		}
 	}
-	if (allow_end) {
+	if (options.allow_end === true) {
 		return { value, index, terminated: false };
 	}
 	throw new ed_error("unterminated delimiter");
@@ -267,12 +335,17 @@ split_substitute(argument: string): {
 	if (delimiter === undefined || delimiter === " " || delimiter === "\t") {
 		throw new ed_error("invalid substitute command");
 	}
-	const pattern_result = read_delimited(argument, 0, delimiter);
+	const pattern_result = read_delimited(
+	    argument,
+	    0,
+	    delimiter,
+	    { regular_expression: true },
+	);
 	const replacement_result = read_delimited(
 	    argument,
 	    pattern_result.index - delimiter.length,
 	    delimiter,
-	    true,
+	    { allow_end: true },
 	);
 	const flags = replacement_result.terminated
 	    ? argument.slice(replacement_result.index)

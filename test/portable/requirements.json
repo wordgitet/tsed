@@ -51,7 +51,7 @@
       "disposition": "platform-dependent",
       "coverage": [
         "test/locale.test.ts",
-        "VSC 30 and 55"
+        "private locale conformance campaign"
       ]
     },
     {
@@ -87,6 +87,7 @@
       "summary": "Read command and input text as lines.",
       "disposition": "covered",
       "coverage": [
+        "input/command-looking-lines-are-text",
         "test/io.test.ts",
         "output/list-preserves-carriage-return"
       ]
@@ -107,6 +108,7 @@
       "summary": "Use POSIX BRE matching.",
       "disposition": "covered",
       "coverage": [
+        "regex/",
         "test/bre.test.ts",
         "test/regression/bre_substitute.test.ts"
       ]
@@ -127,6 +129,7 @@
       "summary": "Resolve current, last, numeric, and offset addresses.",
       "disposition": "covered",
       "coverage": [
+        "address/intermediate-out-of-range",
         "address/",
         "test/regression/address.test.ts"
       ]
@@ -137,6 +140,7 @@
       "summary": "Resolve lowercase marked lines.",
       "disposition": "covered",
       "coverage": [
+        "address/mark-follows-moved-line",
         "test/regression/address.test.ts"
       ]
     },
@@ -165,6 +169,8 @@
       "summary": "Apply l, n, and p suffixes.",
       "disposition": "covered",
       "coverage": [
+        "command/delete-print-suffix",
+        "command/move-number-suffix",
         "test/regression/command.test.ts"
       ]
     },
@@ -184,6 +190,7 @@
       "summary": "Replace an addressed range.",
       "disposition": "covered",
       "coverage": [
+        "command/change-empty-final-range",
         "edit/change/"
       ]
     },
@@ -193,6 +200,7 @@
       "summary": "Delete an addressed range.",
       "disposition": "covered",
       "coverage": [
+        "command/delete-selects-following-line",
         "edit/delete/"
       ]
     },
@@ -252,6 +260,8 @@
       "summary": "Join addressed lines.",
       "disposition": "covered",
       "coverage": [
+        "command/one-address-join-is-noop",
+        "command/join-selects-joined-line",
         "edit/join/",
         "test/regression/command.test.ts"
       ]
@@ -262,6 +272,7 @@
       "summary": "Set lowercase line marks.",
       "disposition": "covered",
       "coverage": [
+        "command/mark-preserves-current-line",
         "test/regression/command.test.ts"
       ]
     },
@@ -281,6 +292,7 @@
       "summary": "Move lines after a destination.",
       "disposition": "covered",
       "coverage": [
+        "command/move-range-to-start",
         "test/regression/command.test.ts"
       ]
     },
@@ -299,6 +311,7 @@
       "summary": "Write addressed lines.",
       "disposition": "covered",
       "coverage": [
+        "command/print-updates-current-line",
         "address/",
         "test/regression/command.test.ts"
       ]
@@ -309,6 +322,7 @@
       "summary": "Quit with or without change checks.",
       "disposition": "covered",
       "coverage": [
+        "command/quit-without-checking-discards-change",
         "issue8/change-state/",
         "terminal/modified-warning"
       ]
@@ -338,6 +352,7 @@
       "summary": "Copy lines after a destination.",
       "disposition": "covered",
       "coverage": [
+        "command/copy-range-to-start",
         "test/regression/command.test.ts"
       ]
     },
@@ -359,6 +374,8 @@
       "disposition": "covered",
       "coverage": [
         "file/write-",
+        "file/partial-write-preserves-change-state",
+        "shell/write-does-not-clear-change-state",
         "full-write-clears-change"
       ]
     },
@@ -368,6 +385,7 @@
       "summary": "Write an addressed number.",
       "disposition": "covered",
       "coverage": [
+        "command/equals-preserves-current-line",
         "test/regression/address.test.ts"
       ]
     },
@@ -377,6 +395,7 @@
       "summary": "Execute POSIX shell commands.",
       "disposition": "covered",
       "coverage": [
+        "shell/",
         "test/editor.test.ts",
         "TOUR"
       ]
@@ -387,6 +406,7 @@
       "summary": "Print the addressed or next line.",
       "disposition": "covered",
       "coverage": [
+        "command/address-and-null-command",
         "test/editor.test.ts",
         "test/regression/address.test.ts"
       ]
@@ -406,6 +426,7 @@
       "summary": "Report terminal errors and read another command.",
       "disposition": "covered",
       "coverage": [
+        "terminal/error-recovers-to-command-mode",
         "test/integration/process.test.ts"
       ]
     }

@@ -936,7 +936,7 @@ export class editor {
 		    parsed.argument,
 		    0,
 		    delimiter,
-		    true,
+		    { allow_end: true, regular_expression: true },
 		);
 		let initial_list = "";
 		if (pattern_result.index < parsed.argument.length) {

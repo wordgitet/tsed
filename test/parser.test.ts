@@ -55,6 +55,29 @@ describe("command parser", () => {
 		});
 	});
 
+	test("keeps delimiters inside bracket expressions", () => {
+		expect(split_substitute("%[%]%X%")).toEqual({
+			pattern: "[%]",
+			replacement: "X",
+			flags: "",
+		});
+		expect(split_substitute("%[[:alpha:]%]%X%")).toEqual({
+			pattern: "[[:alpha:]%]",
+			replacement: "X",
+			flags: "",
+		});
+		expect(split_substitute("%[^^%]%X%")).toEqual({
+			pattern: "[^^%]",
+			replacement: "X",
+			flags: "",
+		});
+		expect(parse_command("/[/]/p").addresses[0]?.expression).toEqual({
+			kind: "search",
+			pattern: "[/]",
+			direction: "forward",
+		});
+	});
+
 	test.skipIf(!active_utf8_locale())(
 		"accepts a multibyte substitute delimiter",
 		() => {
