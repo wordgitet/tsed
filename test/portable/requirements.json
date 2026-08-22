@@ -348,6 +348,7 @@
       "disposition": "covered",
       "coverage": [
         "undo-is-a-change",
+        "global-no-change-undo-noop",
         "test/regression/command.test.ts"
       ]
     },

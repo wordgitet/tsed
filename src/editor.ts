@@ -41,6 +41,10 @@ export interface editor_options {
     silent: boolean;
 }
 
+type undo_state =
+    | { kind: "snapshot"; snapshot: editor_snapshot }
+    | { kind: "no-op" };
+
 export class editor {
     private readonly buffer = new line_buffer();
     private readonly input: input_source;
@@ -52,7 +56,7 @@ export class editor {
     private last_shell_command: string | undefined;
     private prompt_enabled: boolean;
     private help_enabled = false;
-    private undo_snapshot: editor_snapshot | undefined;
+    private undo_state: undo_state | undefined;
     private quit_requested = false;
     private had_error = false;
     private interrupted = false;
@@ -165,6 +169,7 @@ export class editor {
         if (record_undo && this.is_buffer_mutating(command)) {
             await this.with_undo(
                 async () => this.execute_parsed(effective, false),
+                "gGvV".includes(command),
             );
         } else {
             await this.execute_parsed(effective, record_undo);
@@ -408,14 +413,19 @@ export class editor {
 
     private error_message: string | undefined;
 
-    private async with_undo(operation: () => Promise<void>): Promise<void>
+    private async with_undo(
+        operation: () => Promise<void>,
+        no_change_is_noop: boolean,
+    ): Promise<void>
     {
         const before = this.snapshot();
         const mutations = this.buffer.mutations;
         try {
             await operation();
             if (this.buffer.mutations !== mutations) {
-                this.undo_snapshot = before;
+                this.undo_state = { kind: "snapshot", snapshot: before };
+            } else if (no_change_is_noop) {
+                this.undo_state = { kind: "no-op" };
             }
         } catch (error) {
             this.restore(before);
@@ -449,13 +459,16 @@ export class editor {
 
     private undo(): void
     {
-        if (this.undo_snapshot === undefined) {
+        if (this.undo_state === undefined) {
             throw new ed_error("nothing to undo");
         }
+        if (this.undo_state.kind === "no-op") {
+            return;
+        }
         const current = this.snapshot();
-        this.restore(this.undo_snapshot);
+        this.restore(this.undo_state.snapshot);
         this.buffer.changed = true;
-        this.undo_snapshot = current;
+        this.undo_state = { kind: "snapshot", snapshot: current };
     }
 
     private is_buffer_mutating(command: string): boolean
@@ -768,7 +781,7 @@ export class editor {
         }
         this.buffer.load(bytes_to_lines(bytes));
         this.last_regex = undefined;
-        this.undo_snapshot = undefined;
+        this.undo_state = undefined;
         if (!this.options.silent) {
             this.write_stdout(`${bytes.length}\n`);
         }

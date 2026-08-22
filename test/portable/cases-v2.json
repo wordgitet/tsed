@@ -279,6 +279,27 @@
       ]
     },
     {
+      "name": "issue8/change-state/global-no-change-undo-noop",
+      "requirement": "command.undo",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\none\ntwo\n.\ng/missing/d\nu\n1,$p\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "one\ntwo\n"
+          }
+        }
+      ]
+    },
+    {
       "name": "issue8/change-state/empty-append-is-unchanged",
       "requirement": "command.append",
       "mode": "pipe",

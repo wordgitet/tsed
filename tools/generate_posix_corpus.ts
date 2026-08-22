@@ -172,6 +172,12 @@ add_change_state_cases(cases: portable_case_v2[]): void
         stdout: "?\n",
     });
     add_pipe_case(cases, {
+        name: "issue8/change-state/global-no-change-undo-noop",
+        requirement: "command.undo",
+        stdin: "a\none\ntwo\n.\ng/missing/d\nu\n1,$p\nQ\n",
+        stdout: "one\ntwo\n",
+    });
+    add_pipe_case(cases, {
         name: "issue8/change-state/empty-append-is-unchanged",
         requirement: "command.append",
         stdin: "a\n.\nq\n",
@@ -641,7 +647,8 @@ const requirement_rows: readonly requirement_row[] = [
     ["command.copy", "Copy Command", "Copy lines after a destination.",
         "covered", ["test/regression/command.test.ts"]],
     ["command.undo", "Undo Command", "Toggle the most recent real change.",
-        "covered", ["undo-is-a-change", "test/regression/command.test.ts"]],
+        "covered", ["undo-is-a-change", "global-no-change-undo-noop",
+            "test/regression/command.test.ts"]],
     ["command.write", "Write Command", "Write complete addressed lines.",
         "covered", ["file/write-", "full-write-clears-change"]],
     ["command.equals", "Line Number Command", "Write an addressed number.",
