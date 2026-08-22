@@ -5,296 +5,296 @@
  */
 
 import {
-    type buffer_change_state,
-    copy_bytes,
-    ed_error,
-    type buffer_snapshot,
-    type line_record,
+	type buffer_change_state,
+	copy_bytes,
+	ed_error,
+	type buffer_snapshot,
+	type line_record,
 } from "./types";
 
 export class line_buffer {
-    public current = 0;
-    public change_state: buffer_change_state = "unchanged";
+	public current = 0;
+	public change_state: buffer_change_state = "unchanged";
 
-    private next_id = 1;
-    private mutation_count = 0;
-    private lines: line_record[] = [];
-    private marks = new Map<string, number>();
+	private next_id = 1;
+	private mutation_count = 0;
+	private lines: line_record[] = [];
+	private marks = new Map<string, number>();
 
-    public get changed(): boolean
-    {
-        return this.change_state !== "unchanged";
-    }
+	public get changed(): boolean
+	{
+		return this.change_state !== "unchanged";
+	}
 
-    public set changed(value: boolean)
-    {
-        if (value) {
-            this.change_state = "changed";
-            this.mutation_count += 1;
-        } else {
-            this.change_state = "unchanged";
-        }
-    }
+	public set changed(value: boolean)
+	{
+		if (value) {
+			this.change_state = "changed";
+			this.mutation_count += 1;
+		} else {
+			this.change_state = "unchanged";
+		}
+	}
 
-    public get mutations(): number
-    {
-        return this.mutation_count;
-    }
+	public get mutations(): number
+	{
+		return this.mutation_count;
+	}
 
-    public get line_count(): number
-    {
-        return this.lines.length;
-    }
+	public get line_count(): number
+	{
+		return this.lines.length;
+	}
 
-    public get all_lines(): readonly line_record[]
-    {
-        return this.lines;
-    }
+	public get all_lines(): readonly line_record[]
+	{
+		return this.lines;
+	}
 
-    public load(values: readonly Uint8Array[]): void
-    {
-        this.lines = values.map((bytes) => this.new_line(bytes));
-        this.current = this.lines.length;
-        this.marks.clear();
-        this.change_state = "unchanged";
-    }
+	public load(values: readonly Uint8Array[]): void
+	{
+		this.lines = values.map((bytes) => this.new_line(bytes));
+		this.current = this.lines.length;
+		this.marks.clear();
+		this.change_state = "unchanged";
+	}
 
-    public snapshot(): buffer_snapshot
-    {
-        return {
-            lines: this.lines.map((line) => ({
-                id: line.id,
-                bytes: copy_bytes(line.bytes),
-            })),
-            current: this.current,
-            next_id: this.next_id,
-            marks: new Map(this.marks),
-            change_state: this.change_state,
-        };
-    }
+	public snapshot(): buffer_snapshot
+	{
+		return {
+			lines: this.lines.map((line) => ({
+				id: line.id,
+				bytes: copy_bytes(line.bytes),
+			})),
+			current: this.current,
+			next_id: this.next_id,
+			marks: new Map(this.marks),
+			change_state: this.change_state,
+		};
+	}
 
-    public restore(snapshot: buffer_snapshot): void
-    {
-        this.lines = snapshot.lines.map((line) => ({
-            id: line.id,
-            bytes: copy_bytes(line.bytes),
-        }));
-        this.current = snapshot.current;
-        this.next_id = snapshot.next_id;
-        this.marks = new Map(snapshot.marks);
-        this.change_state = snapshot.change_state;
-    }
+	public restore(snapshot: buffer_snapshot): void
+	{
+		this.lines = snapshot.lines.map((line) => ({
+			id: line.id,
+			bytes: copy_bytes(line.bytes),
+		}));
+		this.current = snapshot.current;
+		this.next_id = snapshot.next_id;
+		this.marks = new Map(snapshot.marks);
+		this.change_state = snapshot.change_state;
+	}
 
-    public line(address: number): line_record
-    {
-        if (address < 1 || address > this.line_count) {
-            throw new ed_error("invalid address");
-        }
+	public line(address: number): line_record
+	{
+		if (address < 1 || address > this.line_count) {
+			throw new ed_error("invalid address");
+		}
 
-        const line = this.lines[address - 1];
-        if (line === undefined) {
-            throw new ed_error("invalid address");
-        }
+		const line = this.lines[address - 1];
+		if (line === undefined) {
+			throw new ed_error("invalid address");
+		}
 
-        return line;
-    }
+		return line;
+	}
 
-    public bytes(address: number): Uint8Array
-    {
-        return copy_bytes(this.line(address).bytes);
-    }
+	public bytes(address: number): Uint8Array
+	{
+		return copy_bytes(this.line(address).bytes);
+	}
 
-    public range(start: number, end: number): line_record[]
-    {
-        if (start < 1 || end < start || end > this.line_count) {
-            throw new ed_error("invalid address range");
-        }
+	public range(start: number, end: number): line_record[]
+	{
+		if (start < 1 || end < start || end > this.line_count) {
+			throw new ed_error("invalid address range");
+		}
 
-        return this.lines.slice(start - 1, end);
-    }
+		return this.lines.slice(start - 1, end);
+	}
 
-    public insert_after(address: number, values: readonly Uint8Array[]): void
-    {
-        if (address < 0 || address > this.line_count) {
-            throw new ed_error("invalid address");
-        }
+	public insert_after(address: number, values: readonly Uint8Array[]): void
+	{
+		if (address < 0 || address > this.line_count) {
+			throw new ed_error("invalid address");
+		}
 
-        const records = values.map((bytes) => this.new_line(bytes));
-        this.lines.splice(address, 0, ...records);
-        this.current = records.length === 0
-            ? address
-            : address + records.length;
-        if (records.length !== 0) {
-            this.changed = true;
-        }
-    }
+		const records = values.map((bytes) => this.new_line(bytes));
+		this.lines.splice(address, 0, ...records);
+		this.current = records.length === 0
+			? address
+			: address + records.length;
+		if (records.length !== 0) {
+			this.changed = true;
+		}
+	}
 
-    public delete(start: number, end: number): void
-    {
-        this.range(start, end);
-        const removed = this.lines.splice(start - 1, end - start + 1);
-        const removed_ids = new Set(removed.map((line) => line.id));
+	public delete(start: number, end: number): void
+	{
+		this.range(start, end);
+		const removed = this.lines.splice(start - 1, end - start + 1);
+		const removed_ids = new Set(removed.map((line) => line.id));
 
-        for (const [name, id] of this.marks) {
-            if (removed_ids.has(id)) {
-                this.marks.delete(name);
-            }
-        }
+		for (const [name, id] of this.marks) {
+			if (removed_ids.has(id)) {
+				this.marks.delete(name);
+			}
+		}
 
-        this.current = Math.min(start, this.line_count);
-        this.changed = true;
-    }
+		this.current = Math.min(start, this.line_count);
+		this.changed = true;
+	}
 
-    public replace(
-        start: number,
-        end: number,
-        values: readonly Uint8Array[],
-    ): void
-    {
-        const removed = this.range(start, end);
-        const first_id = removed[0]?.id;
-        const records = values.map((bytes, index) => ({
-            id: index === 0 && first_id !== undefined
-                ? first_id
-                : this.next_id++,
-            bytes: copy_bytes(bytes),
-        }));
-        const retained_ids = new Set(records.map((line) => line.id));
-        const removed_ids = new Set(removed.map((line) => line.id));
+	public replace(
+		start: number,
+		end: number,
+		values: readonly Uint8Array[],
+	): void
+	{
+		const removed = this.range(start, end);
+		const first_id = removed[0]?.id;
+		const records = values.map((bytes, index) => ({
+			id: index === 0 && first_id !== undefined
+				? first_id
+				: this.next_id++,
+			bytes: copy_bytes(bytes),
+		}));
+		const retained_ids = new Set(records.map((line) => line.id));
+		const removed_ids = new Set(removed.map((line) => line.id));
 
-        this.lines.splice(start - 1, end - start + 1, ...records);
-        for (const [name, id] of this.marks) {
-            if (removed_ids.has(id) && !retained_ids.has(id)) {
-                this.marks.delete(name);
-            }
-        }
-        this.current = records.length === 0
-            ? Math.min(start, this.line_count)
-            : start + records.length - 1;
-        this.changed = true;
-    }
+		this.lines.splice(start - 1, end - start + 1, ...records);
+		for (const [name, id] of this.marks) {
+			if (removed_ids.has(id) && !retained_ids.has(id)) {
+				this.marks.delete(name);
+			}
+		}
+		this.current = records.length === 0
+			? Math.min(start, this.line_count)
+			: start + records.length - 1;
+		this.changed = true;
+	}
 
-    public move(start: number, end: number, target: number): void
-    {
-        this.range(start, end);
-        if (target < 0 || target > this.line_count) {
-            throw new ed_error("invalid address");
-        }
-        if (target >= start && target <= end) {
-            throw new ed_error("invalid move destination");
-        }
+	public move(start: number, end: number, target: number): void
+	{
+		this.range(start, end);
+		if (target < 0 || target > this.line_count) {
+			throw new ed_error("invalid address");
+		}
+		if (target >= start && target <= end) {
+			throw new ed_error("invalid move destination");
+		}
 
-        const count = end - start + 1;
-        const records = this.lines.splice(start - 1, count);
-        const insertion_index = target > end ? target - count : target;
-        this.lines.splice(insertion_index, 0, ...records);
-        this.current = insertion_index + count;
-        this.changed = true;
-    }
+		const count = end - start + 1;
+		const records = this.lines.splice(start - 1, count);
+		const insertion_index = target > end ? target - count : target;
+		this.lines.splice(insertion_index, 0, ...records);
+		this.current = insertion_index + count;
+		this.changed = true;
+	}
 
-    public copy(start: number, end: number, target: number): void
-    {
-        this.range(start, end);
-        if (target < 0 || target > this.line_count) {
-            throw new ed_error("invalid address");
-        }
+	public copy(start: number, end: number, target: number): void
+	{
+		this.range(start, end);
+		if (target < 0 || target > this.line_count) {
+			throw new ed_error("invalid address");
+		}
 
-        const records = this.range(start, end).map(
-            (line) => this.new_line(line.bytes),
-        );
-        this.lines.splice(target, 0, ...records);
-        this.current = target + records.length;
-        this.changed = true;
-    }
+		const records = this.range(start, end).map(
+			(line) => this.new_line(line.bytes),
+		);
+		this.lines.splice(target, 0, ...records);
+		this.current = target + records.length;
+		this.changed = true;
+	}
 
-    public join(start: number, end: number): void
-    {
-        this.range(start, end);
-        if (start === end) {
-            return;
-        }
+	public join(start: number, end: number): void
+	{
+		this.range(start, end);
+		if (start === end) {
+			return;
+		}
 
-        const total = this.range(start, end).reduce(
-            (length, line) => length + line.bytes.length,
-            0,
-        );
-        const joined = new Uint8Array(total);
-        let offset = 0;
+		const total = this.range(start, end).reduce(
+			(length, line) => length + line.bytes.length,
+			0,
+		);
+		const joined = new Uint8Array(total);
+		let offset = 0;
 
-        for (const line of this.range(start, end)) {
-            joined.set(line.bytes, offset);
-            offset += line.bytes.length;
-        }
+		for (const line of this.range(start, end)) {
+			joined.set(line.bytes, offset);
+			offset += line.bytes.length;
+		}
 
-        const removed_ids = new Set(this.range_ids(start + 1, end));
-        const first = this.line(start);
-        this.lines.splice(start - 1, end - start + 1, {
-            id: first.id,
-            bytes: joined,
-        });
-        for (const [name, id] of this.marks) {
-            if (removed_ids.has(id)) {
-                this.marks.delete(name);
-            }
-        }
-        this.current = start;
-        this.changed = true;
-    }
+		const removed_ids = new Set(this.range_ids(start + 1, end));
+		const first = this.line(start);
+		this.lines.splice(start - 1, end - start + 1, {
+			id: first.id,
+			bytes: joined,
+		});
+		for (const [name, id] of this.marks) {
+			if (removed_ids.has(id)) {
+				this.marks.delete(name);
+			}
+		}
+		this.current = start;
+		this.changed = true;
+	}
 
-    public set_bytes(address: number, bytes: Uint8Array): void
-    {
-        const line = this.line(address);
-        line.bytes = copy_bytes(bytes);
-        this.current = address;
-        this.changed = true;
-    }
+	public set_bytes(address: number, bytes: Uint8Array): void
+	{
+		const line = this.line(address);
+		line.bytes = copy_bytes(bytes);
+		this.current = address;
+		this.changed = true;
+	}
 
-    public mark(name: string, address: number): void
-    {
-        this.line(address);
-        this.marks.set(name, this.line(address).id);
-    }
+	public mark(name: string, address: number): void
+	{
+		this.line(address);
+		this.marks.set(name, this.line(address).id);
+	}
 
-    public marked(name: string): number
-    {
-        const id = this.marks.get(name);
-        if (id === undefined) {
-            throw new ed_error("undefined mark");
-        }
+	public marked(name: string): number
+	{
+		const id = this.marks.get(name);
+		if (id === undefined) {
+			throw new ed_error("undefined mark");
+		}
 
-        const index = this.lines.findIndex((line) => line.id === id);
-        if (index < 0) {
-            throw new ed_error("undefined mark");
-        }
+		const index = this.lines.findIndex((line) => line.id === id);
+		if (index < 0) {
+			throw new ed_error("undefined mark");
+		}
 
-        return index + 1;
-    }
+		return index + 1;
+	}
 
-    public ids(start: number, end: number): number[]
-    {
-        return this.range(start, end).map((line) => line.id);
-    }
+	public ids(start: number, end: number): number[]
+	{
+		return this.range(start, end).map((line) => line.id);
+	}
 
-    public address_of(id: number): number | undefined
-    {
-        const index = this.lines.findIndex((line) => line.id === id);
-        return index < 0 ? undefined : index + 1;
-    }
+	public address_of(id: number): number | undefined
+	{
+		const index = this.lines.findIndex((line) => line.id === id);
+		return index < 0 ? undefined : index + 1;
+	}
 
-    private range_ids(start: number, end: number): number[]
-    {
-        if (start > end) {
-            return [];
-        }
+	private range_ids(start: number, end: number): number[]
+	{
+		if (start > end) {
+			return [];
+		}
 
-        return this.lines.slice(start - 1, end).map((line) => line.id);
-    }
+		return this.lines.slice(start - 1, end).map((line) => line.id);
+	}
 
-    private new_line(bytes: Uint8Array): line_record
-    {
-        return {
-            id: this.next_id++,
-            bytes: copy_bytes(bytes),
-        };
-    }
+	private new_line(bytes: Uint8Array): line_record
+	{
+		return {
+			id: this.next_id++,
+			bytes: copy_bytes(bytes),
+		};
+	}
 }

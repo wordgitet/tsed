@@ -9,32 +9,32 @@ import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 export interface native_span {
-    start: number;
-    end: number;
+	start: number;
+	end: number;
 }
 
 export interface native_match {
-    start: number;
-    end: number;
-    captures: readonly (native_span | null)[];
+	start: number;
+	end: number;
+	captures: readonly (native_span | null)[];
 }
 
 export interface native_character {
-    start: number;
-    end: number;
-    printable: boolean;
+	start: number;
+	end: number;
+	printable: boolean;
 }
 
 interface native_module {
-    initialize_locale(): void;
-    compile(pattern: Uint8Array): unknown;
-    execute(
-        program: unknown,
-        line: Uint8Array,
-        from: number,
-    ): native_match | null;
-    scan_text(bytes: Uint8Array): native_character[];
-    next_character(bytes: Uint8Array, offset: number): number;
+	initialize_locale(): void;
+	compile(pattern: Uint8Array): unknown;
+	execute(
+		program: unknown,
+		line: Uint8Array,
+		from: number,
+	): native_match | null;
+	scan_text(bytes: Uint8Array): native_character[];
+	next_character(bytes: Uint8Array, offset: number): number;
 }
 
 type native_loader = (path: string) => native_module;

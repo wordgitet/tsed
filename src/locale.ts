@@ -8,9 +8,9 @@ import { next_text_character, scan_text } from "./native";
 import { ed_error } from "./types";
 
 export interface text_character {
-    start: number;
-    end: number;
-    printable: boolean;
+	start: number;
+	end: number;
+	printable: boolean;
 }
 
 export function

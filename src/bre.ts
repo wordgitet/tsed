@@ -8,45 +8,45 @@ import { bytes_from_string, ed_error, string_from_bytes } from "./types";
 import { posix_regex, type native_span } from "./native";
 
 interface capture_span {
-    start: number;
-    end: number;
+	start: number;
+	end: number;
 }
 
 export interface bre_match {
-    start: number;
-    end: number;
-    captures: Map<number, capture_span>;
+	start: number;
+	end: number;
+	captures: Map<number, capture_span>;
 }
 
 export class bre_program {
-    public readonly source: string;
-    private handle: unknown;
-    private closed = false;
+	public readonly source: string;
+	private handle: unknown;
+	private closed = false;
 
-    public constructor(source: string, handle: unknown)
-    {
-        this.source = source;
-        this.handle = handle;
-    }
+	public constructor(source: string, handle: unknown)
+	{
+		this.source = source;
+		this.handle = handle;
+	}
 
-    public close(): void
-    {
-        this.closed = true;
-        this.handle = undefined;
-    }
+	public close(): void
+	{
+		this.closed = true;
+		this.handle = undefined;
+	}
 
-    public native_handle(): unknown
-    {
-        if (this.closed) {
-            throw new ed_error("regular expression is closed");
-        }
-        return this.handle;
-    }
+	public native_handle(): unknown
+	{
+		if (this.closed) {
+			throw new ed_error("regular expression is closed");
+		}
+		return this.handle;
+	}
 }
 
 export interface substitution_result {
-    changed: boolean;
-    lines: Uint8Array[];
+	changed: boolean;
+	lines: Uint8Array[];
 }
 
 export function
