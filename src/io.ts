@@ -6,6 +6,7 @@
 
 import { read } from "node:fs";
 import { open } from "node:fs/promises";
+
 import { validate_text } from "./locale";
 import {
 	bytes_from_string,
@@ -62,7 +63,7 @@ export class stdin_line_reader implements input_source {
 	}
 
 	private async wait_for_next(
-		next: Promise<Uint8Array | null>,
+	    next: Promise<Uint8Array | null>,
 	): Promise<Uint8Array | null | typeof input_interrupted>
 	{
 		if (this.interrupt_pending) {
@@ -161,8 +162,8 @@ read_file_bytes(pathname: string): Promise<Uint8Array>
 
 export async function
 write_file_bytes(
-	pathname: string,
-	bytes: Uint8Array,
+    pathname: string,
+    bytes: Uint8Array,
 ): Promise<void>
 {
 	const file = await open(pathname, "w");
@@ -175,9 +176,9 @@ write_file_bytes(
 
 export interface byte_writer {
 	write(
-		buffer: Uint8Array,
-		offset: number,
-		length: number,
+	    buffer: Uint8Array,
+	    offset: number,
+	    length: number,
 	): Promise<{ bytesWritten: number }>;
 }
 
@@ -196,9 +197,9 @@ write_all_bytes(writer: byte_writer, bytes: Uint8Array): Promise<void>
 
 export async function
 run_shell(
-	command: string,
-	input: Uint8Array | undefined,
-	capture_output: boolean,
+    command: string,
+    input: Uint8Array | undefined,
+    capture_output: boolean,
 ): Promise<{ status: number; stdout: Uint8Array }>
 {
 	const process_options: Parameters<typeof Bun.spawn>[1] = {
@@ -209,9 +210,9 @@ run_shell(
 	const child = Bun.spawn(["sh", "-c", command], process_options);
 	let stdout = new Uint8Array(0);
 	if (
-		capture_output &&
-		child.stdout !== null &&
-		typeof child.stdout !== "number"
+	    capture_output &&
+	    child.stdout !== null &&
+	    typeof child.stdout !== "number"
 	) {
 		stdout = new Uint8Array(await new Response(child.stdout).arrayBuffer());
 	}
@@ -220,8 +221,8 @@ run_shell(
 
 export function
 concat_bytes(
-	first: Uint8Array,
-	second: Uint8Array,
+    first: Uint8Array,
+    second: Uint8Array,
 ): Uint8Array
 {
 	const result = new Uint8Array(first.length + second.length);

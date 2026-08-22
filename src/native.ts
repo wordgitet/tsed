@@ -29,9 +29,9 @@ interface native_module {
 	initialize_locale(): void;
 	compile(pattern: Uint8Array): unknown;
 	execute(
-		program: unknown,
-		line: Uint8Array,
-		from: number,
+	    program: unknown,
+	    line: Uint8Array,
+	    from: number,
 	): native_match | null;
 	scan_text(bytes: Uint8Array): native_character[];
 	next_character(bytes: Uint8Array, offset: number): number;
@@ -83,17 +83,32 @@ load_native_module(): native_module
 				const loader = runtime_require("node-gyp-build") as native_loader;
 				return loader(package_root);
 			} catch (loader_error) {
+				const cause = select_load_error(
+				    embedded_error,
+				    local_error,
+				    loader_error,
+				);
 				throw new Error(
-					"cannot load the POSIX regular-expression backend",
-					{
-						cause: loader_error instanceof Error
-							? loader_error
-							: embedded_error instanceof Error
-								? embedded_error
-								: local_error,
-					},
+				    "cannot load the POSIX regular-expression backend",
+				    { cause },
 				);
 			}
 		}
 	}
+}
+
+function
+select_load_error(
+    embedded_error: unknown,
+    local_error: unknown,
+    loader_error: unknown,
+): unknown
+{
+	if (loader_error instanceof Error) {
+		return loader_error;
+	}
+	if (embedded_error instanceof Error) {
+		return embedded_error;
+	}
+	return local_error;
 }

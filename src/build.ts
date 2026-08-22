@@ -15,10 +15,10 @@ main(): Promise<void>
 {
 	const project_root = dirname(dirname(fileURLToPath(import.meta.url)));
 	const native_path = join(
-		project_root,
-		"build",
-		"Release",
-		"tsed_posix_regex.node",
+	    project_root,
+	    "build",
+	    "Release",
+	    "tsed_posix_regex.node",
 	);
 	await mkdir("dist", { recursive: true });
 	const result = await Bun.build({
@@ -57,20 +57,18 @@ native_addon_plugin(native_path: string): BunPlugin
 				path: "tsed-native-addon",
 				namespace: "tsed-native-addon",
 			}));
-			build.onLoad(
-				{
-					filter: /^tsed-native-addon$/,
-					namespace: "tsed-native-addon",
-				},
-				() => ({
-					contents: [
-						"module.exports = require(",
-						JSON.stringify(native_path),
-						");",
-					].join(""),
-					loader: "js",
-				}),
-			);
+			const load_options = {
+				filter: /^tsed-native-addon$/,
+				namespace: "tsed-native-addon",
+			};
+			build.onLoad(load_options, () => ({
+				contents: [
+					"module.exports = require(",
+					JSON.stringify(native_path),
+					");",
+				].join(""),
+				loader: "js",
+			}));
 		},
 	};
 }

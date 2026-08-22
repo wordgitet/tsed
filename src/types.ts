@@ -105,7 +105,7 @@ string_from_bytes(value: Uint8Array): string
 	const chunk_size = 8192;
 	for (let offset = 0; offset < value.length; offset += chunk_size) {
 		result += String.fromCharCode(
-			...value.slice(offset, offset + chunk_size),
+		    ...value.slice(offset, offset + chunk_size),
 		);
 	}
 	return result;

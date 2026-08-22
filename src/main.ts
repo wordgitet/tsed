@@ -23,14 +23,15 @@ main(): Promise<void>
 	try {
 		const options = parse_options(process.argv.slice(2));
 		posix_regex();
+		const instance_options = {
+			input_kind: standard_input_kind(),
+			prompt: options.prompt,
+			silent: options.silent,
+		};
 		const instance = new editor(
-			new stdin_line_reader(),
-			new process_output(),
-			{
-				input_kind: standard_input_kind(),
-				prompt: options.prompt,
-				silent: options.silent,
-			},
+		    new stdin_line_reader(),
+		    new process_output(),
+		    instance_options,
 		);
 		process.on("SIGINT", () => instance.interrupt());
 		process.on("SIGQUIT", () => undefined);
@@ -76,15 +77,15 @@ parse_options(arguments_list: readonly string[]): command_line_options
 			continue;
 		}
 		if (
-			options_enabled &&
-			argument.startsWith("-") &&
-			argument.length > 1
+		    options_enabled &&
+		    argument.startsWith("-") &&
+		    argument.length > 1
 		) {
 			const option_group = argument.slice(1);
 			for (
-				let option_index = 0;
-				option_index < option_group.length;
-				option_index += 1
+			    let option_index = 0;
+			    option_index < option_group.length;
+			    option_index += 1
 			) {
 				const option = option_group[option_index];
 				if (option === "s") {
@@ -99,7 +100,7 @@ parse_options(arguments_list: readonly string[]): command_line_options
 						const next = arguments_list[index + 1];
 						if (next === undefined) {
 							throw new ed_error(
-								"option -p requires an argument",
+							    "option -p requires an argument",
 							);
 						}
 						prompt = next;

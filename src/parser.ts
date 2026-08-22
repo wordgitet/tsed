@@ -23,9 +23,7 @@ parse_command(source: string): parsed_command
 	let index = skip_spaces(source, 0);
 	const addresses: address_spec[] = [];
 	const leading_separator = source[index];
-	if (
-		(leading_separator === "," || leading_separator === ";")
-	) {
+	if (leading_separator === "," || leading_separator === ";") {
 		addresses.push({
 			expression: leading_separator === ","
 				? { kind: "number", value: 1 }
@@ -105,8 +103,8 @@ parse_command(source: string): parsed_command
 
 function
 parse_address_with_offset(
-	source: string,
-	start: number,
+    source: string,
+    start: number,
 ): { expression: address_expression; offset: number; index: number } | undefined
 {
 	const address = parse_address(source, start);
@@ -123,8 +121,8 @@ parse_address_with_offset(
 
 function
 parse_address(
-	source: string,
-	start: number,
+    source: string,
+    start: number,
 ): address_result | undefined
 {
 	const character = source[start];
@@ -176,8 +174,8 @@ parse_address(
 
 function
 parse_offset(
-	source: string,
-	start: number,
+    source: string,
+    start: number,
 ): { offset: number; index: number }
 {
 	let index = start;
@@ -186,7 +184,7 @@ parse_offset(
 		index = skip_spaces(source, index);
 		const character = source[index];
 		if (character !== "+" && character !== "-" &&
-			!is_digit(character ?? "")) {
+		    !is_digit(character ?? "")) {
 			return { offset, index };
 		}
 		const sign = character === "-" ? -1 : 1;
@@ -209,10 +207,10 @@ parse_offset(
 
 export function
 read_delimited(
-	source: string,
-	start: number,
-	delimiter: string,
-	allow_end = false,
+    source: string,
+    start: number,
+    delimiter: string,
+    allow_end = false,
 ): { value: string; index: number; terminated: boolean }
 {
 	const delimiter_end = character_end(source, start);
@@ -271,17 +269,18 @@ split_substitute(argument: string): {
 	}
 	const pattern_result = read_delimited(argument, 0, delimiter);
 	const replacement_result = read_delimited(
-		argument,
-		pattern_result.index - delimiter.length,
-		delimiter,
-		true,
+	    argument,
+	    pattern_result.index - delimiter.length,
+	    delimiter,
+	    true,
 	);
+	const flags = replacement_result.terminated
+	    ? argument.slice(replacement_result.index)
+	    : "p";
 	return {
 		pattern: pattern_result.value,
 		replacement: replacement_result.value,
-		flags: replacement_result.terminated
-			? argument.slice(replacement_result.index)
-			: "p",
+		flags,
 	};
 }
 

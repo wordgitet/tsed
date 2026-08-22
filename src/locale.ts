@@ -46,9 +46,8 @@ next_character(bytes: Uint8Array, offset: number): number
 function
 invalid_text_error(error: unknown): ed_error
 {
-	return new ed_error(
-		error instanceof Error && error.message === "text contains NUL"
-			? "text contains NUL"
-			: "text contains an invalid multibyte sequence",
-	);
+	if (error instanceof Error && error.message === "text contains NUL") {
+		return new ed_error("text contains NUL");
+	}
+	return new ed_error("text contains an invalid multibyte sequence");
 }

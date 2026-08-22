@@ -121,9 +121,10 @@ export class line_buffer {
 
 		const records = values.map((bytes) => this.new_line(bytes));
 		this.lines.splice(address, 0, ...records);
-		this.current = records.length === 0
-			? address
-			: address + records.length;
+		this.current = address;
+		if (records.length !== 0) {
+			this.current += records.length;
+		}
 		if (records.length !== 0) {
 			this.changed = true;
 		}
@@ -146,19 +147,22 @@ export class line_buffer {
 	}
 
 	public replace(
-		start: number,
-		end: number,
-		values: readonly Uint8Array[],
+	    start: number,
+	    end: number,
+	    values: readonly Uint8Array[],
 	): void
 	{
 		const removed = this.range(start, end);
 		const first_id = removed[0]?.id;
-		const records = values.map((bytes, index) => ({
-			id: index === 0 && first_id !== undefined
-				? first_id
-				: this.next_id++,
-			bytes: copy_bytes(bytes),
-		}));
+		const records = values.map((bytes, index) => {
+			let id: number;
+			if (index === 0 && first_id !== undefined) {
+				id = first_id;
+			} else {
+				id = this.next_id++;
+			}
+			return { id, bytes: copy_bytes(bytes) };
+		});
 		const retained_ids = new Set(records.map((line) => line.id));
 		const removed_ids = new Set(removed.map((line) => line.id));
 
@@ -168,9 +172,10 @@ export class line_buffer {
 				this.marks.delete(name);
 			}
 		}
-		this.current = records.length === 0
-			? Math.min(start, this.line_count)
-			: start + records.length - 1;
+		this.current = Math.min(start, this.line_count);
+		if (records.length !== 0) {
+			this.current = start + records.length - 1;
+		}
 		this.changed = true;
 	}
 
@@ -200,7 +205,7 @@ export class line_buffer {
 		}
 
 		const records = this.range(start, end).map(
-			(line) => this.new_line(line.bytes),
+		    (line) => this.new_line(line.bytes),
 		);
 		this.lines.splice(target, 0, ...records);
 		this.current = target + records.length;
@@ -215,8 +220,8 @@ export class line_buffer {
 		}
 
 		const total = this.range(start, end).reduce(
-			(length, line) => length + line.bytes.length,
-			0,
+		    (length, line) => length + line.bytes.length,
+		    0,
 		);
 		const joined = new Uint8Array(total);
 		let offset = 0;

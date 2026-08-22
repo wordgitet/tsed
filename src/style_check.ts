@@ -31,13 +31,13 @@ main(): Promise<void>
 			}
 			if (line.length > maximum_line_length) {
 				console.error(
-					`${pathname}:${index + 1}: line exceeds 80 columns`,
+				    `${pathname}:${index + 1}: line exceeds 80 columns`,
 				);
 				failed = true;
 			}
 			if (/\bwhile\s*\(\s*true\s*\)/.test(line)) {
 				console.error(
-					`${pathname}:${index + 1}: use for (;;) for forever loops`,
+				    `${pathname}:${index + 1}: use for (;;) for forever loops`,
 				);
 				failed = true;
 			}
@@ -74,23 +74,23 @@ check_declaration_style(pathname: string, lines: readonly string[]): boolean
 		const trimmed = line.trim();
 		if (declaration === undefined) {
 			if (/^(?:export\s+)?(?:async\s+)?function\s+[A-Za-z_]/
-				.test(trimmed)) {
+			    .test(trimmed)) {
 				report_declaration_error(
-					pathname,
-					index,
-					"put the function keyword on its own line",
+				    pathname,
+				    index,
+				    "put the function keyword on its own line",
 				);
 				failed = true;
 			} else if (/^(?:export\s+)?(?:async\s+)?function$/.test(trimmed)) {
 				declaration = "function";
 			} else if (
-				/^(?:public|private|protected)\s+.*\(/.test(trimmed)
+			    /^(?:public|private|protected)\s+.*\(/.test(trimmed)
 			) {
 				if (trimmed.endsWith("{")) {
 					report_declaration_error(
-						pathname,
-						index,
-						"put the method brace on its own line",
+					    pathname,
+					    index,
+					    "put the method brace on its own line",
 					);
 					failed = true;
 				} else {
@@ -108,12 +108,13 @@ check_declaration_style(pathname: string, lines: readonly string[]): boolean
 			continue;
 		}
 		if (trimmed.endsWith("{") && !trimmed.endsWith(": {")) {
+			const message = declaration === "function"
+			    ? "put the function brace on its own line"
+			    : "put the method brace on its own line";
 			report_declaration_error(
-				pathname,
-				index,
-				declaration === "function"
-					? "put the function brace on its own line"
-					: "put the method brace on its own line",
+			    pathname,
+			    index,
+			    message,
 			);
 			failed = true;
 			declaration = undefined;
@@ -124,9 +125,9 @@ check_declaration_style(pathname: string, lines: readonly string[]): boolean
 
 function
 report_declaration_error(
-	pathname: string,
-	index: number,
-	message: string,
+    pathname: string,
+    index: number,
+    message: string,
 ): void
 {
 	console.error(`${pathname}:${index + 1}: ${message}`);

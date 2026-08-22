@@ -62,9 +62,9 @@ compile_bre(source: string): bre_program
 
 export function
 find_bre(
-	line_bytes: Uint8Array,
-	program: bre_program,
-	from = 0,
+    line_bytes: Uint8Array,
+    program: bre_program,
+    from = 0,
 ): bre_match | undefined
 {
 	if (from < 0 || from > line_bytes.length) {
@@ -72,9 +72,9 @@ find_bre(
 	}
 	try {
 		const result = posix_regex().execute(
-			program.native_handle(),
-			line_bytes,
-			from,
+		    program.native_handle(),
+		    line_bytes,
+		    from,
 		);
 		if (result === null) {
 			return undefined;
@@ -91,11 +91,11 @@ find_bre(
 
 export function
 substitute_bre(
-	line_bytes: Uint8Array,
-	program: bre_program,
-	replacement: string,
-	global: boolean,
-	occurrence: number | undefined,
+    line_bytes: Uint8Array,
+    program: bre_program,
+    replacement: string,
+    global: boolean,
+    occurrence: number | undefined,
 ): substitution_result
 {
 	const line = string_from_bytes(line_bytes);
@@ -145,7 +145,7 @@ substitute_bre(
 
 function
 make_captures(
-	captures: readonly (native_span | null)[],
+    captures: readonly (native_span | null)[],
 ): Map<number, capture_span>
 {
 	const result = new Map<number, capture_span>();
