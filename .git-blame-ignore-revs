@@ -1,2 +1,5 @@
 # Wrap long source lines.
 d3491238d88596d3d2ee78f3feef983a2640c332
+
+# Normalize TypeScript indentation.
+f81556e6801ce4ae3575933b6e9fa1b9ca1fb426
