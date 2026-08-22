@@ -2,7 +2,7 @@
                     PORTABLE ED TEST CORPUS
 ========================================================================
 
-cases.json is a language-neutral collection of black-box ed tests.  It can be
+cases.json is the stable version 1 collection of black-box ed tests.  It can be
 used by implementations written in C, Rust, TypeScript, Go, or any other
 language.  The corpus does not import tsed code and contains no material from
 private conformance suites.
@@ -36,7 +36,43 @@ The JSON file is the public interface.  The supplied runner uses Bun only for
 convenience; another project may consume the same file with any JSON parser and
 process-launching API.
 
-Do not edit cases.json by hand.  Change the compact families in
-tools/generate_portable_corpus.ts and regenerate it with:
+Version 2
+------------------------------------------------------------------------
+
+cases-v2.json adds the process behavior needed by the POSIX.1-2024 audit while
+leaving version 1 stable.  Each case names the requirement it covers and has
+one or more acceptable outcomes.  The richer fields provide:
+
+    mode            pipe or PTY execution
+    environment     additional environment variables
+    stdin           UTF-8 or base64 input bytes
+    actions         PTY waits, writes, and signals
+    fixtures        files created below a private temporary directory
+    expect           acceptable status, output, transcript, and file results
+    timeout_ms      optional per-case timeout
+
+The token @TMP@ in UTF-8 strings expands to the temporary directory used for a
+case.  Fixture and expected-file paths are relative and cannot escape it.
+An expected status can be an exact integer, "nonzero", or "any".  Output can
+be compared exactly or checked for required byte strings and a minimum length,
+so requirements with implementation-defined diagnostics remain portable.
+
+requirements.json is a paraphrased coverage map for the POSIX ed page.  It
+contains requirement identifiers and public test locations, not copied
+standard or private-suite assertion text.
+
+Run both corpus versions against tsed:
+
+    bun run test:portable
+
+Run version 2 against another implementation, optionally selecting cases:
+
+    bun test/portable_v2_runner.ts --editor /path/to/ed
+    bun test/portable_v2_runner.ts --editor /path/to/ed --case address
+
+Use --json to obtain a machine-readable result report.
+
+Do not edit generated JSON by hand.  Change the compact families in the
+generator sources and regenerate every public artifact with:
 
     bun run generate:portable

@@ -80,6 +80,25 @@ describe("POSIX locale regular expressions", () => {
             "invalid multibyte sequence",
         );
     });
+
+    test.skipIf(!active_single_byte_locale())(
+        "uses single-byte locale classes and character boundaries",
+        () => {
+            const line = new Uint8Array([0xe9]);
+            const program = compile_bre("[[:alpha:]]");
+            const match = find_bre(line, program);
+
+            program.close();
+            expect(match).toEqual({
+                start: 0,
+                end: 1,
+                captures: new Map(),
+            });
+            expect(text_characters(line)).toEqual([
+                { start: 0, end: 1, printable: true },
+            ]);
+        },
+    );
 });
 
 function
@@ -90,4 +109,14 @@ active_utf8_locale(): boolean
         process.env.LANG ??
         "C";
 	return /utf-?8/i.test(locale);
+}
+
+function
+active_single_byte_locale(): boolean
+{
+    const locale = process.env.LC_ALL ??
+        process.env.LC_CTYPE ??
+        process.env.LANG ??
+        "C";
+	return /iso[-_.]?8859[-_.]?1/i.test(locale);
 }

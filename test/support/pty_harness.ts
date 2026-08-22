@@ -10,7 +10,11 @@ export class pty_session {
     private readonly child: Bun.Subprocess;
     private transcript = "";
 
-    public constructor(command: readonly string[], cwd?: string)
+    public constructor(
+        command: readonly string[],
+        cwd?: string,
+        environment?: Readonly<Record<string, string | undefined>>,
+    )
     {
         this.terminal = new Bun.Terminal({
             cols: 80,
@@ -26,6 +30,7 @@ export class pty_session {
                 ...process.env,
                 LC_ALL: "C",
                 TERM: "xterm",
+                ...environment,
             },
             terminal: this.terminal,
         });

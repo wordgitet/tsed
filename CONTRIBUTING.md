@@ -36,6 +36,8 @@ $ bun run test:all
 $ bun run test:tour
 $ bun run test:portable
 $ bun run test:integration
+$ bun run test:locale
+$ bun run compare:ed
 $ bun run test:fuzz
 $ bun run test:fuzz:ed
 ```
@@ -43,7 +45,13 @@ $ bun run test:fuzz:ed
 `bun run check` type-checks, builds, runs the fast deterministic tests, and
 checks source style.  `bun run test:all` additionally runs the portable
 process corpus, PTY integration tests, model fuzzer, and GNU ed differential
-fuzzer.  Executable and integration tests require a prior build.
+fuzzer.  `bun run test:locale` checks the POSIX and an installed UTF-8 locale;
+set `TSED_SINGLE_BYTE_LOCALE` and `LOCPATH` to add a single-byte locale.
+Executable and integration tests require a prior build.
+
+`bun run compare:ed` runs the POSIX.1-2024 corpus against tsed and any
+available pinned reference editors.  Reference differences are advisory; a
+reference implementation does not replace the normative corpus expectations.
 
 The portable black-box corpus is documented in `test/portable/README`.  Point
 its runner at another editor with:

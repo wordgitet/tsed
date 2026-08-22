@@ -1,0 +1,1233 @@
+{
+  "format": "portable-ed-corpus",
+  "version": 2,
+  "license": "0BSD",
+  "standard": "POSIX.1-2024",
+  "placeholder": "@TMP@",
+  "cases": [
+    {
+      "name": "issue8/address/repeated-leading-comma",
+      "requirement": "address.separators",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\none\ntwo\nthree\nfour\n.\n,,p\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "four\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue8/address/repeated-leading-semicolon",
+      "requirement": "address.separators",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\none\ntwo\nthree\nfour\n.\n;;p\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "four\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue8/address/mixed-leading-comma-semicolon",
+      "requirement": "address.separators",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\none\ntwo\nthree\nfour\n.\n,;p\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "four\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue8/address/mixed-leading-semicolon-comma",
+      "requirement": "address.separators",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\none\ntwo\nthree\nfour\n.\n;,p\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "four\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue8/address/omitted-middle-comma",
+      "requirement": "address.separators",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\none\ntwo\nthree\nfour\n.\n1,,3p\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "one\ntwo\nthree\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue8/address/omitted-middle-semicolon",
+      "requirement": "address.separators",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\none\ntwo\nthree\nfour\n.\n1;;3p\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "one\ntwo\nthree\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue8/address/discard-leading-address",
+      "requirement": "address.separators",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\none\ntwo\nthree\nfour\n.\n1,2,4p\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "two\nthree\nfour\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue8/address/evaluate-before-discard",
+      "requirement": "address.separators",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\none\ntwo\nthree\nfour\n.\n1;/three/;+1p\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "three\nfour\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue8/address/blank-separated-positive-offsets",
+      "requirement": "address.separators",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\none\ntwo\nthree\nfour\n.\n1 +1 +1p\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "three\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue8/address/blank-separated-negative-offsets",
+      "requirement": "address.separators",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\none\ntwo\nthree\nfour\n.\n4 -1 -1p\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "two\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue8/change-state/warning-survives-print",
+      "requirement": "buffer.change-state",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\nabc\n.\nq\np\nq\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "?\nabc\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue8/change-state/new-change-rearms-warning",
+      "requirement": "buffer.change-state",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\nabc\n.\nq\ns/a/a/\nq\nq\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "?\n?\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue8/change-state/undo-is-a-change",
+      "requirement": "command.undo",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\nabc\n.\nu\nq\nq\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "?\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue8/change-state/empty-append-is-unchanged",
+      "requirement": "command.append",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\n.\nq\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue8/change-state/empty-insert-is-unchanged",
+      "requirement": "command.insert",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "0i\n.\nq\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue8/change-state/full-write-clears-change",
+      "requirement": "command.write",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\nabc\n.\nw @TMP@/saved\nq\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": ""
+          },
+          "files": [
+            {
+              "path": "saved",
+              "data": {
+                "encoding": "utf8",
+                "data": "abc\n"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "issue8/change-state/warned-edit-takes-effect",
+      "requirement": "command.edit",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\nold\n.\nq\ne @TMP@/replacement\np\nq\n"
+      },
+      "fixtures": [
+        {
+          "path": "replacement",
+          "data": {
+            "encoding": "utf8",
+            "data": "new\n"
+          }
+        }
+      ],
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "?\nnew\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue8/change-state/no-op-substitution-is-a-change",
+      "requirement": "command.substitute",
+      "mode": "pipe",
+      "arguments": [
+        "-s",
+        "@TMP@/input"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "s/a/a/\nq\nq\n"
+      },
+      "fixtures": [
+        {
+          "path": "input",
+          "data": {
+            "encoding": "utf8",
+            "data": "a\n"
+          }
+        }
+      ],
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "?\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue8/delimiter/omitted-substitute",
+      "requirement": "command.substitute",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\nalpha\nbeta\nabc\n.\ns/abc/ABC\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "ABC\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue8/delimiter/omitted-global",
+      "requirement": "command.global",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\nalpha\nbeta\nabc\n.\ng/a\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "alpha\nbeta\nabc\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue8/delimiter/omitted-inverse-global",
+      "requirement": "command.global",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\nalpha\nbeta\nabc\n.\nv/z\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "alpha\nbeta\nabc\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue8/delimiter/omitted-forward-search",
+      "requirement": "address.search",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\nalpha\nbeta\nabc\n.\n/beta\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "beta\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue8/delimiter/omitted-backward-search",
+      "requirement": "address.search",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\nalpha\nbeta\nabc\n.\n?alpha\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "alpha\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue8/delimiter/omitted-interactive-global",
+      "requirement": "command.global",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\nalpha\n.\nG/alpha\np\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "alpha\nalpha\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue8/delimiter/omitted-interactive-inverse-global",
+      "requirement": "command.global",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\nalpha\n.\nV/z\np\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "alpha\nalpha\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "issue8/delimiter/reject-omitted-substitute-pattern",
+      "requirement": "command.substitute",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\nabc\n.\ns/abc\n"
+      },
+      "expect": [
+        {
+          "status": "nonzero",
+          "stdout": {
+            "encoding": "utf8",
+            "data": "?\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "file/initial-byte-count",
+      "requirement": "operand.file",
+      "mode": "pipe",
+      "arguments": [
+        "@TMP@/input"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "q\n"
+      },
+      "fixtures": [
+        {
+          "path": "input",
+          "data": {
+            "encoding": "utf8",
+            "data": "one\n"
+          }
+        }
+      ],
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "4\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "file/read-byte-count",
+      "requirement": "command.read",
+      "mode": "pipe",
+      "arguments": [],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "r @TMP@/input\nQ\n"
+      },
+      "fixtures": [
+        {
+          "path": "input",
+          "data": {
+            "encoding": "utf8",
+            "data": "one\n"
+          }
+        }
+      ],
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "4\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "file/write-byte-count-and-content",
+      "requirement": "command.write",
+      "mode": "pipe",
+      "arguments": [],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\none\n.\nw @TMP@/output\nq\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "4\n"
+          },
+          "files": [
+            {
+              "path": "output",
+              "data": {
+                "encoding": "utf8",
+                "data": "one\n"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "file/filename-set-and-print",
+      "requirement": "command.filename",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "f @TMP@/name\nf\nq\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "@TMP@/name\n@TMP@/name\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "file/filename-without-memory-errors",
+      "requirement": "command.filename",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "f\n"
+      },
+      "expect": [
+        {
+          "status": "nonzero",
+          "stdout": {
+            "encoding": "utf8",
+            "data": "?\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "file/read-remembers-first-pathname",
+      "requirement": "command.read",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "r @TMP@/input\nf\nQ\n"
+      },
+      "fixtures": [
+        {
+          "path": "input",
+          "data": {
+            "encoding": "utf8",
+            "data": "one\n"
+          }
+        }
+      ],
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "@TMP@/input\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "file/read-at-address-zero",
+      "requirement": "command.read",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\ntwo\n.\n0r @TMP@/input\n,p\nQ\n"
+      },
+      "fixtures": [
+        {
+          "path": "input",
+          "data": {
+            "encoding": "utf8",
+            "data": "one\n"
+          }
+        }
+      ],
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "one\ntwo\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "output/list-preserves-carriage-return",
+      "requirement": "command.list",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\ntext\r\n.\nl\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "text\\r$\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "output/list-escapes-controls",
+      "requirement": "command.list",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\n\u0007\b\t\u000b\f\r\\$\n.\nl\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "\\a\\b\\t\\v\\f\\r\\\\\\$$\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "output/numbered-lines",
+      "requirement": "command.number",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\none\ntwo\nthree\nfour\n.\n2,3n\nQ\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "2\ttwo\n3\tthree\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "output/prompt-string",
+      "requirement": "option.prompt",
+      "mode": "pipe",
+      "arguments": [
+        "-p",
+        "prompt> "
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "q\n"
+      },
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": "prompt> "
+          }
+        }
+      ]
+    },
+    {
+      "name": "output/silent-suppresses-counts",
+      "requirement": "option.silent",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "r @TMP@/input\nQ\n"
+      },
+      "fixtures": [
+        {
+          "path": "input",
+          "data": {
+            "encoding": "utf8",
+            "data": "one\n"
+          }
+        }
+      ],
+      "expect": [
+        {
+          "status": 0,
+          "stdout": {
+            "encoding": "utf8",
+            "data": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "process/non-terminal-error-stops-input",
+      "requirement": "errors.non-terminal",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "a\none\n.\n0p\np\n"
+      },
+      "expect": [
+        {
+          "status": "nonzero",
+          "stdout": {
+            "encoding": "utf8",
+            "data": "?\n"
+          }
+        }
+      ]
+    },
+    {
+      "name": "process/help-mode-explains-terminal-error",
+      "requirement": "command.help",
+      "mode": "pipe",
+      "arguments": [
+        "-s"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": "H\n0p\n"
+      },
+      "expect": [
+        {
+          "status": "nonzero",
+          "stdout_contains": [
+            {
+              "encoding": "utf8",
+              "data": "?\n"
+            }
+          ],
+          "stdout_minimum_bytes": 3
+        }
+      ]
+    },
+    {
+      "name": "process/rejects-unknown-option",
+      "requirement": "option.syntax",
+      "mode": "pipe",
+      "arguments": [
+        "-z"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": ""
+      },
+      "expect": [
+        {
+          "status": "nonzero"
+        }
+      ]
+    },
+    {
+      "name": "process/rejects-too-many-operands",
+      "requirement": "operand.file",
+      "mode": "pipe",
+      "arguments": [
+        "one",
+        "two"
+      ],
+      "stdin": {
+        "encoding": "utf8",
+        "data": ""
+      },
+      "expect": [
+        {
+          "status": "nonzero"
+        }
+      ]
+    },
+    {
+      "name": "terminal/prompt-and-quit",
+      "requirement": "option.prompt",
+      "mode": "pty",
+      "arguments": [
+        "-p",
+        ": "
+      ],
+      "actions": [
+        {
+          "kind": "wait",
+          "text": ": "
+        },
+        {
+          "kind": "write",
+          "data": {
+            "encoding": "utf8",
+            "data": "q\n"
+          }
+        }
+      ],
+      "expect": [
+        {
+          "status": 0,
+          "transcript_contains": [
+            ": ",
+            "q\r\n"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "terminal/modified-warning",
+      "requirement": "buffer.change-state",
+      "mode": "pty",
+      "arguments": [
+        "-s",
+        "-p",
+        ": "
+      ],
+      "actions": [
+        {
+          "kind": "wait",
+          "text": ": "
+        },
+        {
+          "kind": "write",
+          "data": {
+            "encoding": "utf8",
+            "data": "a\none\n.\nq\n"
+          }
+        },
+        {
+          "kind": "wait",
+          "text": "?\r\n: "
+        },
+        {
+          "kind": "write",
+          "data": {
+            "encoding": "utf8",
+            "data": "q\n"
+          }
+        }
+      ],
+      "expect": [
+        {
+          "status": 0,
+          "transcript_contains": [
+            "?\r\n: "
+          ]
+        }
+      ]
+    },
+    {
+      "name": "terminal/sigint-interrupts-input",
+      "requirement": "signal.int",
+      "mode": "pty",
+      "arguments": [
+        "-s",
+        "-p",
+        ": "
+      ],
+      "actions": [
+        {
+          "kind": "wait",
+          "text": ": "
+        },
+        {
+          "kind": "write",
+          "data": {
+            "encoding": "utf8",
+            "data": "a\npartial\n"
+          }
+        },
+        {
+          "kind": "wait",
+          "text": "partial\r\n"
+        },
+        {
+          "kind": "signal",
+          "signal": "SIGINT"
+        },
+        {
+          "kind": "wait",
+          "text": "?\r\n: "
+        },
+        {
+          "kind": "write",
+          "data": {
+            "encoding": "utf8",
+            "data": "Q\n"
+          }
+        }
+      ],
+      "expect": [
+        {
+          "status": 0,
+          "transcript_contains": [
+            "?\r\n: "
+          ]
+        }
+      ]
+    },
+    {
+      "name": "terminal/sigquit-is-ignored",
+      "requirement": "signal.quit",
+      "mode": "pty",
+      "arguments": [
+        "-s",
+        "-p",
+        ": "
+      ],
+      "actions": [
+        {
+          "kind": "wait",
+          "text": ": "
+        },
+        {
+          "kind": "signal",
+          "signal": "SIGQUIT"
+        },
+        {
+          "kind": "write",
+          "data": {
+            "encoding": "utf8",
+            "data": "q\n"
+          }
+        }
+      ],
+      "expect": [
+        {
+          "status": 0,
+          "transcript_contains": [
+            ": "
+          ]
+        }
+      ]
+    },
+    {
+      "name": "terminal/sighup-saves-buffer",
+      "requirement": "signal.hup",
+      "mode": "pty",
+      "arguments": [
+        "-s",
+        "-p",
+        ": "
+      ],
+      "actions": [
+        {
+          "kind": "wait",
+          "text": ": "
+        },
+        {
+          "kind": "write",
+          "data": {
+            "encoding": "utf8",
+            "data": "a\none\n.\n"
+          }
+        },
+        {
+          "kind": "wait",
+          "text": ".\r\n: "
+        },
+        {
+          "kind": "signal",
+          "signal": "SIGHUP"
+        }
+      ],
+      "expect": [
+        {
+          "status": "any",
+          "files": [
+            {
+              "path": "ed.hup",
+              "data": {
+                "encoding": "utf8",
+                "data": "one\n"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "terminal/sighup-falls-back-to-home",
+      "requirement": "signal.hup",
+      "mode": "pty",
+      "arguments": [
+        "-s",
+        "-p",
+        ": "
+      ],
+      "environment": {
+        "HOME": "@TMP@/home"
+      },
+      "fixtures": [
+        {
+          "path": "ed.hup/sentinel",
+          "data": {
+            "encoding": "utf8",
+            "data": ""
+          }
+        },
+        {
+          "path": "home/.keep",
+          "data": {
+            "encoding": "utf8",
+            "data": ""
+          }
+        }
+      ],
+      "actions": [
+        {
+          "kind": "wait",
+          "text": ": "
+        },
+        {
+          "kind": "write",
+          "data": {
+            "encoding": "utf8",
+            "data": "a\none\n.\n"
+          }
+        },
+        {
+          "kind": "wait",
+          "text": ".\r\n: "
+        },
+        {
+          "kind": "signal",
+          "signal": "SIGHUP"
+        }
+      ],
+      "expect": [
+        {
+          "status": "any",
+          "files": [
+            {
+              "path": "home/ed.hup",
+              "data": {
+                "encoding": "utf8",
+                "data": "one\n"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,412 @@
+{
+  "format": "tsed-posix-requirements",
+  "version": 1,
+  "standard": "POSIX.1-2024",
+  "source": "https://pubs.opengroup.org/onlinepubs/9799919799.2024edition/utilities/ed.html",
+  "requirements": [
+    {
+      "id": "option.syntax",
+      "section": "OPTIONS",
+      "summary": "Parse the specified option forms.",
+      "disposition": "covered",
+      "coverage": [
+        "process/rejects-unknown-option",
+        "test/main.test.ts"
+      ]
+    },
+    {
+      "id": "option.prompt",
+      "section": "OPTIONS",
+      "summary": "Use and toggle the requested prompt.",
+      "disposition": "covered",
+      "coverage": [
+        "output/prompt-string",
+        "terminal/prompt-and-quit"
+      ]
+    },
+    {
+      "id": "option.silent",
+      "section": "OPTIONS",
+      "summary": "Suppress counts and shell completion.",
+      "disposition": "covered",
+      "coverage": [
+        "output/silent-suppresses-counts",
+        "test/editor.test.ts"
+      ]
+    },
+    {
+      "id": "operand.file",
+      "section": "OPERANDS",
+      "summary": "Load at most one initial file operand.",
+      "disposition": "covered",
+      "coverage": [
+        "file/initial-byte-count",
+        "process/rejects-too-many-operands"
+      ]
+    },
+    {
+      "id": "environment.locale",
+      "section": "ENVIRONMENT VARIABLES",
+      "summary": "Apply locale rules to text and BRE processing.",
+      "disposition": "platform-dependent",
+      "coverage": [
+        "test/locale.test.ts",
+        "VSC 30 and 55"
+      ]
+    },
+    {
+      "id": "signal.int",
+      "section": "ASYNCHRONOUS EVENTS",
+      "summary": "Interrupt input and return to command mode.",
+      "disposition": "covered",
+      "coverage": [
+        "terminal/sigint-interrupts-input"
+      ]
+    },
+    {
+      "id": "signal.quit",
+      "section": "ASYNCHRONOUS EVENTS",
+      "summary": "Ignore SIGQUIT.",
+      "disposition": "covered",
+      "coverage": [
+        "terminal/sigquit-is-ignored"
+      ]
+    },
+    {
+      "id": "signal.hup",
+      "section": "ASYNCHRONOUS EVENTS",
+      "summary": "Save changed text on SIGHUP.",
+      "disposition": "covered",
+      "coverage": [
+        "terminal/sighup-saves-buffer"
+      ]
+    },
+    {
+      "id": "input.text",
+      "section": "STDIN",
+      "summary": "Read command and input text as lines.",
+      "disposition": "covered",
+      "coverage": [
+        "test/io.test.ts",
+        "output/list-preserves-carriage-return"
+      ]
+    },
+    {
+      "id": "buffer.change-state",
+      "section": "EXTENDED DESCRIPTION",
+      "summary": "Maintain unchanged, changed, and warned buffer states.",
+      "disposition": "covered",
+      "coverage": [
+        "issue8/change-state/",
+        "terminal/modified-warning"
+      ]
+    },
+    {
+      "id": "regex.bre",
+      "section": "Regular Expressions in ed",
+      "summary": "Use POSIX BRE matching.",
+      "disposition": "covered",
+      "coverage": [
+        "test/bre.test.ts",
+        "test/regression/bre_substitute.test.ts"
+      ]
+    },
+    {
+      "id": "regex.locale",
+      "section": "Regular Expressions in ed",
+      "summary": "Use locale classes, collation, and multibyte characters.",
+      "disposition": "platform-dependent",
+      "coverage": [
+        "test/locale.test.ts",
+        "native/posix_regex.c"
+      ]
+    },
+    {
+      "id": "address.basic",
+      "section": "Addresses in ed",
+      "summary": "Resolve current, last, numeric, and offset addresses.",
+      "disposition": "covered",
+      "coverage": [
+        "address/",
+        "test/regression/address.test.ts"
+      ]
+    },
+    {
+      "id": "address.mark",
+      "section": "Addresses in ed",
+      "summary": "Resolve lowercase marked lines.",
+      "disposition": "covered",
+      "coverage": [
+        "test/regression/address.test.ts"
+      ]
+    },
+    {
+      "id": "address.search",
+      "section": "Addresses in ed",
+      "summary": "Search forward and backward with wraparound and null BRE reuse.",
+      "disposition": "covered",
+      "coverage": [
+        "issue8/delimiter/omitted-forward-search",
+        "test/regression/address.test.ts"
+      ]
+    },
+    {
+      "id": "address.separators",
+      "section": "Addresses in ed",
+      "summary": "Expand omitted addresses and evaluate excess addresses in order.",
+      "disposition": "covered",
+      "coverage": [
+        "issue8/address/"
+      ]
+    },
+    {
+      "id": "command.suffix",
+      "section": "Commands in ed",
+      "summary": "Apply l, n, and p suffixes.",
+      "disposition": "covered",
+      "coverage": [
+        "test/regression/command.test.ts"
+      ]
+    },
+    {
+      "id": "command.append",
+      "section": "Append Command",
+      "summary": "Append input after an address.",
+      "disposition": "covered",
+      "coverage": [
+        "edit/append/",
+        "empty-append-is-unchanged"
+      ]
+    },
+    {
+      "id": "command.change",
+      "section": "Change Command",
+      "summary": "Replace an addressed range.",
+      "disposition": "covered",
+      "coverage": [
+        "edit/change/"
+      ]
+    },
+    {
+      "id": "command.delete",
+      "section": "Delete Command",
+      "summary": "Delete an addressed range.",
+      "disposition": "covered",
+      "coverage": [
+        "edit/delete/"
+      ]
+    },
+    {
+      "id": "command.edit",
+      "section": "Edit Commands",
+      "summary": "Replace the buffer from a file.",
+      "disposition": "covered",
+      "coverage": [
+        "warned-edit-takes-effect",
+        "test/editor.test.ts"
+      ]
+    },
+    {
+      "id": "command.filename",
+      "section": "Filename Command",
+      "summary": "Set and print the pathname.",
+      "disposition": "covered",
+      "coverage": [
+        "file/filename-"
+      ]
+    },
+    {
+      "id": "command.global",
+      "section": "Global Commands",
+      "summary": "Execute commands on selected lines.",
+      "disposition": "covered",
+      "coverage": [
+        "test/regression/global.test.ts",
+        "omitted-global"
+      ]
+    },
+    {
+      "id": "command.help",
+      "section": "Help Commands",
+      "summary": "Report and toggle error explanations.",
+      "disposition": "covered",
+      "coverage": [
+        "process/help-mode",
+        "test/regression/command.test.ts"
+      ]
+    },
+    {
+      "id": "command.insert",
+      "section": "Insert Command",
+      "summary": "Insert input before an address.",
+      "disposition": "permitted-choice",
+      "coverage": [
+        "edit/insert/",
+        "empty-insert-is-unchanged",
+        "test/regression/command.test.ts"
+      ]
+    },
+    {
+      "id": "command.join",
+      "section": "Join Command",
+      "summary": "Join addressed lines.",
+      "disposition": "covered",
+      "coverage": [
+        "edit/join/",
+        "test/regression/command.test.ts"
+      ]
+    },
+    {
+      "id": "command.mark",
+      "section": "Mark Command",
+      "summary": "Set lowercase line marks.",
+      "disposition": "covered",
+      "coverage": [
+        "test/regression/command.test.ts"
+      ]
+    },
+    {
+      "id": "command.list",
+      "section": "List Command",
+      "summary": "Write visually unambiguous lines.",
+      "disposition": "covered",
+      "coverage": [
+        "output/list-",
+        "test/regression/command.test.ts"
+      ]
+    },
+    {
+      "id": "command.move",
+      "section": "Move Command",
+      "summary": "Move lines after a destination.",
+      "disposition": "covered",
+      "coverage": [
+        "test/regression/command.test.ts"
+      ]
+    },
+    {
+      "id": "command.number",
+      "section": "Number Command",
+      "summary": "Write numbered lines.",
+      "disposition": "covered",
+      "coverage": [
+        "output/numbered-lines"
+      ]
+    },
+    {
+      "id": "command.print",
+      "section": "Print Command",
+      "summary": "Write addressed lines.",
+      "disposition": "covered",
+      "coverage": [
+        "address/",
+        "test/regression/command.test.ts"
+      ]
+    },
+    {
+      "id": "command.quit",
+      "section": "Quit Commands",
+      "summary": "Quit with or without change checks.",
+      "disposition": "covered",
+      "coverage": [
+        "issue8/change-state/",
+        "terminal/modified-warning"
+      ]
+    },
+    {
+      "id": "command.read",
+      "section": "Read Command",
+      "summary": "Append file or shell output.",
+      "disposition": "covered",
+      "coverage": [
+        "file/read-"
+      ]
+    },
+    {
+      "id": "command.substitute",
+      "section": "Substitute Command",
+      "summary": "Replace BRE matches and apply substitute flags.",
+      "disposition": "covered",
+      "coverage": [
+        "test/regression/bre_substitute.test.ts",
+        "issue8/delimiter/"
+      ]
+    },
+    {
+      "id": "command.copy",
+      "section": "Copy Command",
+      "summary": "Copy lines after a destination.",
+      "disposition": "covered",
+      "coverage": [
+        "test/regression/command.test.ts"
+      ]
+    },
+    {
+      "id": "command.undo",
+      "section": "Undo Command",
+      "summary": "Toggle the most recent real change.",
+      "disposition": "covered",
+      "coverage": [
+        "undo-is-a-change",
+        "test/regression/command.test.ts"
+      ]
+    },
+    {
+      "id": "command.write",
+      "section": "Write Command",
+      "summary": "Write complete addressed lines.",
+      "disposition": "covered",
+      "coverage": [
+        "file/write-",
+        "full-write-clears-change"
+      ]
+    },
+    {
+      "id": "command.equals",
+      "section": "Line Number Command",
+      "summary": "Write an addressed number.",
+      "disposition": "covered",
+      "coverage": [
+        "test/regression/address.test.ts"
+      ]
+    },
+    {
+      "id": "command.shell",
+      "section": "Shell Escape Command",
+      "summary": "Execute POSIX shell commands.",
+      "disposition": "covered",
+      "coverage": [
+        "test/editor.test.ts",
+        "TOUR"
+      ]
+    },
+    {
+      "id": "command.null",
+      "section": "Null Command",
+      "summary": "Print the addressed or next line.",
+      "disposition": "covered",
+      "coverage": [
+        "test/editor.test.ts",
+        "test/regression/address.test.ts"
+      ]
+    },
+    {
+      "id": "errors.non-terminal",
+      "section": "CONSEQUENCES OF ERRORS",
+      "summary": "Stop non-terminal input after an ordinary error.",
+      "disposition": "covered",
+      "coverage": [
+        "process/non-terminal-error-stops-input"
+      ]
+    },
+    {
+      "id": "errors.terminal",
+      "section": "CONSEQUENCES OF ERRORS",
+      "summary": "Report terminal errors and read another command.",
+      "disposition": "covered",
+      "coverage": [
+        "test/integration/process.test.ts"
+      ]
+    }
+  ]
+}
